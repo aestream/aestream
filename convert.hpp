@@ -1,4 +1,4 @@
-
+#pragma once
 #include "aedat.hpp"
 
 #include <iostream>
