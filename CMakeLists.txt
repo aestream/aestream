@@ -14,5 +14,9 @@ include_directories(viewer ${SDL2_INCLUDE_DIRS} )
 target_link_libraries(viewer ${SDL2_LIBRARIES})
 
 
+add_library(convert SHARED convert.cpp)
+target_link_libraries(convert PRIVATE "${TORCH_LIBRARIES}")
+
+
 add_executable(converter converter.cpp)
-target_link_libraries(converter ${TORCH_LIBRARIES})
+target_link_libraries(converter convert ${TORCH_LIBRARIES})
