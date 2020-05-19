@@ -18,3 +18,7 @@ The viewer can then be used to view the example data
 ```
 ./viewer ../example_data/user01_natural.aedat
 ```
+or to view data from the gesture dataset
+```
+./viewer ../example_data/user01_natural.aedat ../example_data/user01_natural_labels.cs
+```

@@ -19,9 +19,7 @@ struct DataSet {
     std::vector<AEDAT::PolarityEvent> events;
   };
 
-  void load(std::string filename) {
-    std::string labels_filename = filename + "_labels.csv";
-    std::string aedat_filename = filename + ".aedat";
+  void load(std::string aedat_filename, std::string labels_filename) {
 
     std::fstream fs;
     char line[256];
@@ -46,19 +44,19 @@ struct DataSet {
     data.load(aedat_filename);
 
     size_t event_idx = 0;
-    for (auto row : rows) {
+    for (size_t row_idx = 0; row_idx < rows.size(); row_idx++) {
+      datapoints.push_back(DataPoint{rows[row_idx].label});
 
-      while (data.polarity_events[event_idx].timestamp < row.startTime) {
+      while (data.polarity_events[event_idx].timestamp <
+             rows[row_idx].startTime) {
         event_idx++;
       }
 
-      DataPoint p{row.label};
-      while (data.polarity_events[event_idx].timestamp < row.endTime) {
-        p.events.push_back(data.polarity_events[event_idx]);
+      while (data.polarity_events[event_idx].timestamp <
+             rows[row_idx].endTime) {
+        datapoints[row_idx].events.push_back(data.polarity_events[event_idx]);
         event_idx++;
       }
-
-      datapoints.push_back(p);
     }
   }
 

@@ -6,5 +6,3 @@
 
 torch::Tensor
 convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events);
-
-

@@ -1,7 +1,6 @@
 #include "convert.hpp"
 #include <torch/script.h>
 
-
 torch::Tensor
 convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events) {
   size_t size = polarity_events.size();
@@ -18,8 +17,7 @@ convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events) {
 
   auto index_options = torch::TensorOptions().dtype(torch::kInt64);
   torch::Tensor ind = torch::from_blob(
-      &indices[0], {3, static_cast<uint32_t>(size)},
-      index_options);
+      &indices[0], {3, static_cast<uint32_t>(size)}, index_options);
 
   auto value_options = torch::TensorOptions().dtype(torch::kInt8);
   torch::Tensor val = torch::from_blob(
