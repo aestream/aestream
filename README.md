@@ -22,3 +22,5 @@ or to view data from the gesture dataset
 ```
 ./viewer ../example_data/user01_natural.aedat ../example_data/user01_natural_labels.cs
 ```
+this should result in 
+![viewer](example_data/viewer.gif)
