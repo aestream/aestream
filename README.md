@@ -16,9 +16,9 @@ cmake -GNinja ..
 
 The viewer can then be used to view the example data
 ```
-./viewer ../example_data/user01_natural.aedat
+./viewer ../example_data/ibm/user01_natural.aedat
 ```
 or to view data from the gesture dataset
 ```
-./viewer ../example_data/user01_natural.aedat ../example_data/user01_natural_labels.cs
+./viewer ../example_data/ibm/user01_natural.aedat ../example_data/ibm/user01_natural_labels.csv
 ```
