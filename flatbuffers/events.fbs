@@ -1,0 +1,12 @@
+struct Event {
+	t: int64;
+	x: int16;
+	y: int16;
+	on: bool;
+}
+
+table EventPacket {
+	elements: [Event];
+}
+
+root_type EventPacket;
