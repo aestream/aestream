@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
+#include <map>
 
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -16,10 +17,48 @@
 #include "frame_generated.h"
 #include "imus_generated.h"
 #include "ioheader_generated.h"
+#include "rapidxml.hpp"
 #include "trigger_generated.h"
 
 struct AEDAT4 {
 
+  struct OutInfo {
+    enum Type {
+	  EVTS,
+	  FRME,
+	  IMUS,
+	  TRIG
+    };   
+    int name;
+    Type type;
+    std::string compression;
+
+    static Type to_type(std::string str) {
+      if (str == "EVTS") {
+	return Type::EVTS;	
+      } else if (str == "FRME") {
+	return Type::FRME;
+      } else if (str == "IMUS") {
+	return Type::IMUS;
+      } else if (str == "TRIG") {
+	return Type::TRIG;
+      } else {
+	throw std::runtime_error("unexpected event type");
+      }
+    }
+  };
+
+  std::map<std::string, std::string> collect_attributes(rapidxml::xml_node<>* node) {
+      std::map<std::string, std::string> attributes;
+      for (const rapidxml::xml_attribute<> *a = node->first_attribute(); a;
+	      a = a->next_attribute()) {
+	auto name = std::string(a->name(), a->name_size());
+	auto value = std::string(a->value(), a->value_size());	
+	attributes[name] = value;	
+      }
+      return attributes;
+  }
+  
   void load(std::string filename) {
     struct stat stat_info;
 
@@ -47,16 +86,56 @@ struct AEDAT4 {
         *reinterpret_cast<flatbuffers::uoffset_t *>(data);
     const IOHeader *ioheader = GetSizePrefixedIOHeader(data);
 
-    std::cout << ioheader->infoNode()->str() << std::endl;
+    std::vector<OutInfo> outinfos;
+    
+    // std::cout << ioheader->infoNode()->str() << std::endl;
+    rapidxml::xml_document<> doc;
 
+    doc.parse<0>((char *)(ioheader->infoNode()->str().c_str()));
+
+    // extract necessary data from XML
+    auto node = doc.first_node();   
+    for (rapidxml::xml_node<> *outinfo = node->first_node(); outinfo;
+         outinfo = outinfo->next_sibling()) {
+
+      auto attributes = collect_attributes(outinfo);
+      if (attributes["name"] != "outInfo") {
+	continue;
+      }
+
+      for (rapidxml::xml_node<> *child = outinfo->first_node(); child;
+           child = child->next_sibling()) {
+	OutInfo info;
+	auto attributes = collect_attributes(child);	
+	info.name = std::stoi(attributes["name"]);
+
+        for (rapidxml::xml_node<> *attr = child->first_node(); attr;
+             attr = attr->next_sibling()) {
+	  auto attributes = collect_attributes(attr);	  
+	  if (attributes["key"] == "compression") {
+	    info.compression = attr->value();
+	  } else if (attributes["key"] == "typeIdentifier") {
+	    info.type = OutInfo::to_type(attr->value());
+	  }
+        }
+	outinfos.push_back(info);
+      }
+    }
+
+    for (auto info : outinfos) {
+      std::cout << "{" << info.name << ", " << info.compression << ", " << info.type << "}" << std::endl;
+    }
+    
     size_t data_table_position = ioheader->dataTablePosition();
 
     data += ioheader_offset + 4;
     char *header_end = data;
 
     // we have to treat each packet according the compression method used,
-    // which can be found in ioheader->compression()
+    // which can be found in 
     // assume LZ4 compression for now
+
+    // std::cout << ioheader->compression() << std::endl;
 
     const size_t dst_size_fixed = 1000000;
     std::vector<uint8_t> dst_buffer(dst_size_fixed);
@@ -102,7 +181,8 @@ struct AEDAT4 {
         continue;
       }
 
-      if (stream_id == 0) {
+      switch (outinfos[stream_id].type) {
+      case OutInfo::Type::EVTS: {
         auto event_packet = GetSizePrefixedEventPacket(&dst_buffer[0]);
         for (auto event : *event_packet->elements()) {
           polarity_events.push_back(
@@ -111,20 +191,22 @@ struct AEDAT4 {
                                    static_cast<uint32_t>(event->y()),
                                    static_cast<uint32_t>(event->t())});
         }
+	break;
       }
-      if (stream_id == 1) {
+      case OutInfo::Type::FRME: {
         auto frame_packet = GetSizePrefixedFrame(&dst_buffer[0]);
-        // std::cout << frame_packet->t() << " "
-        // 	  << frame_packet->width() << " "
-        //	  << frame_packet->height() << " "
-        //	  << std::endl;
+	break;
       }
-      if (stream_id == 2) {
+      case OutInfo::Type::IMUS: {
         auto imu_packet = GetSizePrefixedImuPacket(&dst_buffer[0]);
+	break;
       }
-      if (stream_id == 3) {
+      case OutInfo::Type::TRIG: {
         auto trigger_packet = GetSizePrefixedTriggerPacket(&dst_buffer[0]);
+	break;
       }
+      }
+
     }
   }
 
