@@ -89,7 +89,6 @@ struct AEDAT4 {
     std::vector<OutInfo> outinfos;
     rapidxml::xml_document<> doc;
 
-
     std::cout << ioheader->infoNode()->str() << std::endl;
 
     doc.parse<0>((char *)(ioheader->infoNode()->str().c_str()));
