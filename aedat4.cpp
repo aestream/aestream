@@ -61,13 +61,11 @@ struct AEDAT4 {
     auto fd = open(filename.c_str(), O_RDONLY, 0);
 
     if (fd < 0) {
-      std::cout << "Failed to open file" << std::endl;
-      return;
+      throw std::runtime_error("Failed to open file");
     }
 
     if (fstat(fd, &stat_info)) {
-      std::cout << "Failed to stat" << std::endl;
-      return;
+      throw std::runtime_error("Failed to stat file");
     }
 
     char *data = static_cast<char *>(
@@ -75,7 +73,11 @@ struct AEDAT4 {
     char *buffer_start = data;
 
     auto header = std::string(data, 14);
-    data += 14; // size of the header
+    if (header != "#!AER-DAT4.0\r\n") {
+      throw std::runtime_error("Invalid AEDAT version");
+    }
+
+    data += 14; // size of the version string
 
     // find size of IOHeader (it is variable)
     flatbuffers::uoffset_t ioheader_offset =
@@ -83,8 +85,6 @@ struct AEDAT4 {
     const IOHeader *ioheader = GetSizePrefixedIOHeader(data);
 
     std::vector<OutInfo> outinfos;
-
-    // std::cout << ioheader->infoNode()->str() << std::endl;
     rapidxml::xml_document<> doc;
 
     doc.parse<0>((char *)(ioheader->infoNode()->str().c_str()));
@@ -129,10 +129,8 @@ struct AEDAT4 {
     char *header_end = data;
 
     // we have to treat each packet according the compression method used,
-    // which can be found in
+    // which can be found in ioheader->compression()
     // assume LZ4 compression for now
-
-    // std::cout << ioheader->compression() << std::endl;
 
     const size_t dst_size_fixed = 10000000;
     std::vector<uint8_t> dst_buffer(dst_size_fixed);
