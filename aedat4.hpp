@@ -23,10 +23,18 @@
 #include "trigger_generated.h"
 
 struct AEDAT4 {
+  struct Frame {
+    int64_t time;
+    int16_t width;
+    int16_t height;
+    std::vector<uint8_t> pixels;
+  };
 
   struct OutInfo {
     enum Type { EVTS, FRME, IMUS, TRIG };
     int name;
+    int size_x;
+    int size_y;
     Type type;
     std::string compression;
 
@@ -86,7 +94,6 @@ struct AEDAT4 {
         *reinterpret_cast<flatbuffers::uoffset_t *>(data);
     const IOHeader *ioheader = GetSizePrefixedIOHeader(data);
 
-    std::vector<OutInfo> outinfos;
     rapidxml::xml_document<> doc;
 
     std::cout << ioheader->infoNode()->str() << std::endl;
@@ -116,6 +123,17 @@ struct AEDAT4 {
             info.compression = attr->value();
           } else if (attributes["key"] == "typeIdentifier") {
             info.type = OutInfo::to_type(attr->value());
+          } else if (attributes["name"] == "info") {
+            for (rapidxml::xml_node<> *info_node = attr->first_node();
+                 info_node; info_node = info_node->next_sibling()) {
+              auto infos = collect_attributes(info_node);
+
+              if (infos["key"] == "sizeX") {
+                info.size_x = std::stoi(info_node->value());
+              } else if (infos["key"] == "sizeY") {
+                info.size_y = std::stoi(info_node->value());
+              }
+            }
           }
         }
         outinfos.push_back(info);
@@ -124,7 +142,8 @@ struct AEDAT4 {
 
     for (auto info : outinfos) {
       std::cout << "{" << info.name << ", " << info.compression << ", "
-                << info.type << "}" << std::endl;
+                << info.type << ", " << info.size_x << ", " << info.size_y
+                << "}" << std::endl;
     }
 
     size_t data_table_position = ioheader->dataTablePosition();
@@ -193,7 +212,27 @@ struct AEDAT4 {
         break;
       }
       case OutInfo::Type::FRME: {
+        Frame res;
         auto frame_packet = GetSizePrefixedFrame(&dst_buffer[0]);
+        res.time = frame_packet->t();
+        res.width = frame_packet->width();
+        res.height = frame_packet->height();
+
+        // std::cout << frame_packet->offset_y() << std::endl;
+
+        auto pixels = frame_packet->pixels()->data();
+
+        // res.pixels.reserve(res.width * res.height * 3);
+
+        for (int j = 0; j < res.height; j++) {
+          for (int i = 0; i < res.width; i++) {
+            res.pixels.push_back(pixels[i + j * res.width]);
+            res.pixels.push_back(pixels[i + j * res.width]);
+            res.pixels.push_back(pixels[i + j * res.width]);
+          }
+        }
+
+        frames.push_back(res);
         break;
       }
       case OutInfo::Type::IMUS: {
@@ -208,5 +247,7 @@ struct AEDAT4 {
     }
   }
 
+  std::vector<OutInfo> outinfos;
+  std::vector<Frame> frames;
   std::vector<AEDAT::PolarityEvent> polarity_events;
 };

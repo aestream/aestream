@@ -8,6 +8,24 @@
 #include <stdlib.h>
 #include <vector>
 
+uint32_t render_frame(SDL_Renderer *renderer, SDL_Texture *frame_texture,
+                      AEDAT4 &data, uint32_t frame_index, uint64_t timestep) {
+  if (frame_index >= data.frames.size()) {
+    return 0;
+  }
+
+  while ((data.frames[frame_index].time < timestep) &&
+         (frame_index < data.frames.size() - 1)) {
+    frame_index++;
+  }
+
+  SDL_UpdateTexture(frame_texture, nullptr, &data.frames[frame_index].pixels[0],
+                    3 * data.frames[frame_index].width);
+  SDL_RenderCopy(renderer, frame_texture, nullptr, nullptr);
+
+  return frame_index;
+}
+
 uint32_t
 render_polarity_events(SDL_Renderer *renderer,
                        std::vector<AEDAT::PolarityEvent> &polarity_events,
@@ -19,15 +37,16 @@ render_polarity_events(SDL_Renderer *renderer,
     return 0;
   }
 
-  while (polarity_events[event_index].timestamp < timestep) {
+  while ((polarity_events[event_index].timestamp < timestep) &&
+         (event_index < polarity_events.size())) {
     if (polarity_events[event_index].polarity == 1) {
       positive_polarity_points.push_back(
-          {top.y + polarity_events[event_index].y,
-           top.x + polarity_events[event_index].x});
+          {top.x + polarity_events[event_index].x,
+           top.y + polarity_events[event_index].y});
     } else {
       negative_polarity_points.push_back(
-          {top.y + polarity_events[event_index].y,
-           top.x + polarity_events[event_index].x});
+          {top.x + polarity_events[event_index].x,
+           top.y + polarity_events[event_index].y});
     }
     event_index++;
   }
@@ -56,11 +75,12 @@ int main(int argc, char *argv[]) {
   std::vector<std::vector<AEDAT::PolarityEvent>> events;
   std::vector<uint32_t> event_index;
   std::vector<uint32_t> timestep;
+  int64_t video_timestep;
 
   if (argc == 2) {
     data4.load(argv[1]);
-    window_width = 240;
-    window_height = 346;
+    window_width = data4.outinfos[0].size_x;
+    window_height = data4.outinfos[0].size_y;
     events.push_back(data4.polarity_events);
     event_index.push_back(0);
     num_row = 1;
@@ -90,11 +110,27 @@ int main(int argc, char *argv[]) {
   SDL_Window *window;
 
   SDL_Init(SDL_INIT_VIDEO);
+
   SDL_CreateWindowAndRenderer(window_width, window_height, 0, &window,
                               &renderer);
 
-  std::cout << "begin render loop" << std::endl;
+  auto frame_texture =
+      SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888,
+                        SDL_TEXTUREACCESS_STATIC, window_width, window_height);
+  if (!frame_texture) {
+    std::cout << SDL_GetError() << std::endl;
+  }
+
+  bool has_video = data4.frames.size() > 0;
+
+  if (has_video) {
+    SDL_UpdateTexture(frame_texture, nullptr, &data4.frames[0].pixels[0],
+                      3 * window_width);
+    video_timestep = data4.frames[0].time;
+  }
+
   uint32_t frame_idx = 0;
+  uint32_t video_frame_index = 0;
   uint32_t ticks = SDL_GetTicks();
   while (1) {
     uint32_t next_ticks = SDL_GetTicks();
@@ -105,6 +141,17 @@ int main(int argc, char *argv[]) {
 
     if (SDL_PollEvent(&event) && event.type == SDL_QUIT)
       break;
+
+    if (has_video) {
+      if (video_frame_index >= data4.frames.size() - 1) {
+        video_frame_index = 0;
+        video_timestep = data4.frames[0].time;
+      }
+
+      video_frame_index = render_frame(renderer, frame_texture, data4,
+                                       video_frame_index, video_timestep);
+      video_timestep += 16000;
+    }
 
     for (int i = 0; i < num_row; i++) {
       for (int j = 0; j < num_column; j++) {
