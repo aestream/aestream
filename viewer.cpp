@@ -1,4 +1,5 @@
 #include "aedat.hpp"
+#include "aedat4.hpp"
 #include "dvs_gesture.hpp"
 
 #include <SDL.h>
@@ -49,6 +50,7 @@ int main(int argc, char *argv[]) {
   int num_classes;
 
   AEDAT data;
+  AEDAT4 data4;
   dvs_gesture::DataSet dataset;
   bool gesture_dataset = false;
   std::vector<std::vector<AEDAT::PolarityEvent>> events;
@@ -56,15 +58,15 @@ int main(int argc, char *argv[]) {
   std::vector<uint32_t> timestep;
 
   if (argc == 2) {
-    data.load(argv[1]);
-    window_width = 128;
-    window_height = 128;
-    events.push_back(data.polarity_events);
+    data4.load(argv[1]);
+    window_width = 240;
+    window_height = 346;
+    events.push_back(data4.polarity_events);
     event_index.push_back(0);
     num_row = 1;
     num_column = 1;
     num_classes = 1;
-    timestep.push_back(data.polarity_events[0].timestamp + 16000);
+    timestep.push_back(data4.polarity_events[0].timestamp + 16000);
   } else if (argc == 3) {
     dataset.load(argv[1], argv[2]);
     num_row = 3;
@@ -91,6 +93,7 @@ int main(int argc, char *argv[]) {
   SDL_CreateWindowAndRenderer(window_width, window_height, 0, &window,
                               &renderer);
 
+  std::cout << "begin render loop" << std::endl;
   uint32_t frame_idx = 0;
   uint32_t ticks = SDL_GetTicks();
   while (1) {

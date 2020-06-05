@@ -1,3 +1,5 @@
+#pragma once
+
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -86,6 +88,9 @@ struct AEDAT4 {
 
     std::vector<OutInfo> outinfos;
     rapidxml::xml_document<> doc;
+
+
+    std::cout << ioheader->infoNode()->str() << std::endl;
 
     doc.parse<0>((char *)(ioheader->infoNode()->str().c_str()));
 
@@ -206,13 +211,3 @@ struct AEDAT4 {
 
   std::vector<AEDAT::PolarityEvent> polarity_events;
 };
-
-int main(int argc, char *argv[]) {
-  AEDAT4 data;
-
-  if (argc > 0) {
-    data.load(argv[1]);
-  } else {
-    return 0;
-  }
-}
