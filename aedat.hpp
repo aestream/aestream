@@ -119,7 +119,7 @@ struct AEDAT {
     uint32_t eventValid;
   } __attribute__((packed));
 
-  void load(std::string filename) {
+  void load(const std::string &filename) {
     std::fstream fs;
     char line[128];
     Header header;
@@ -177,6 +177,9 @@ struct AEDAT {
     }
     return;
   }
+
+  AEDAT() {}
+  AEDAT(const std::string &filename) { load(filename); }
 
   std::vector<DynapSEEvent> dynapse_events;
   std::vector<IMU6Event> imu6_events;

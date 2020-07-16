@@ -22,3 +22,18 @@ or to view data from the gesture dataset
 ```
 ./viewer ../example_data/ibm/user01_natural.aedat ../example_data/ibm/user01_natural_labels.csv
 ```
+
+In order to build and install the python bindings run
+```
+python setup.py install
+```
+this assumes that you habe pytorch 1.5.1 installed.
+
+A minimal example of using the AEDAT3.1 import functionality is then
+```python
+import torch # Needs to be first otherwise you will encounter an error
+import aedat
+
+data = aedat.AEDAT("example_data/ibm/user01_natural.aedat")
+events = aedat.convert_polarity_events(data.polarity_events)
+```
