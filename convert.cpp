@@ -1,4 +1,5 @@
 #include "convert.hpp"
+#include "dvs_gesture.hpp"
 
 #include <torch/extension.h>
 #include <torch/script.h>
@@ -31,6 +32,13 @@ convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events) {
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   py::class_<AEDAT::PolarityEvent>(m, "PolarityEvent");
+  py::class_<dvs_gesture::DataSet::DataPoint>(m, "DVSGestureDataPoint")
+      .def_readonly("label", &dvs_gesture::DataSet::DataPoint::label)
+      .def_readonly("events", &dvs_gesture::DataSet::DataPoint::events);
+  py::class_<dvs_gesture::DataSet>(m, "DVSGestureData")
+      .def(py::init<const std::string &, const std::string &>())
+      .def_readonly("datapoints", &dvs_gesture::DataSet::datapoints);
+
   py::class_<AEDAT>(m, "AEDAT")
       .def(py::init<>())
       .def(py::init<const std::string &>())

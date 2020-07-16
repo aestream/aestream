@@ -19,7 +19,8 @@ struct DataSet {
     std::vector<AEDAT::PolarityEvent> events;
   };
 
-  void load(std::string aedat_filename, std::string labels_filename) {
+  void load(const std::string &aedat_filename,
+            const std::string &labels_filename) {
 
     std::fstream fs;
     char line[256];
@@ -58,6 +59,11 @@ struct DataSet {
         event_idx++;
       }
     }
+  }
+
+  DataSet(const std::string &aedat_filename,
+          const std::string &labels_filename) {
+    load(aedat_filename, labels_filename);
   }
 
   std::vector<DataPoint> datapoints;

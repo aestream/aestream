@@ -37,3 +37,15 @@ import aedat
 data = aedat.AEDAT("example_data/ibm/user01_natural.aedat")
 events = aedat.convert_polarity_events(data.polarity_events)
 ```
+
+An example working with the gesture dataset is
+```python
+import torch
+import aedat
+
+datapoints = aedat.DVSGestureData("example_data/ibm/user01_natural.aedat", "example_data/ibm/user01_natural_labels.csv")
+
+for element in data.datapoints
+    label = element.label
+    events = aedat.convert_polarity_events(element.events)
+```
