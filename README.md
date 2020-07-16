@@ -43,7 +43,10 @@ An example working with the gesture dataset is
 import torch
 import aedat
 
-datapoints = aedat.DVSGestureData("example_data/ibm/user01_natural.aedat", "example_data/ibm/user01_natural_labels.csv")
+datapoints = aedat.DVSGestureData(
+    "example_data/ibm/user01_natural.aedat",
+    "example_data/ibm/user01_natural_labels.csv"
+)
 
 for element in data.datapoints
     label = element.label
