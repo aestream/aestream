@@ -27,7 +27,7 @@ In order to build and install the python bindings run
 ```
 python setup.py install
 ```
-this assumes that you habe pytorch 1.5.1 installed.
+this assumes that you have pytorch 1.5.1 installed.
 
 A minimal example of using the AEDAT3.1 import functionality is then
 ```python
