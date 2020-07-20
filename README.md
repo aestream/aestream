@@ -1,8 +1,10 @@
-# aedat - address event encoding 
+# aedat - address event encoding library
 
 This repository contains a decoder and simple viewer for the AEDAT 3.1 format as defined
 [here](https://inivation.com/support/software/fileformat/#formats). In addition it provides
 support for converting polarity events into a libtorch sparse tensor.
+
+## Dataset viewer
 
 The viewer requires SDL2 and [libtorch](https://pytorch.org/cppdocs/installing.html) is needed to build the converter.
 
@@ -22,6 +24,8 @@ or to view data from the gesture dataset
 ```
 ./viewer ../example_data/ibm/user01_natural.aedat ../example_data/ibm/user01_natural_labels.csv
 ```
+
+## Python bindings
 
 In order to build and install the python bindings run
 ```
