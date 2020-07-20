@@ -65,7 +65,7 @@ struct AEDAT4 {
     return attributes;
   }
 
-  void load(std::string filename) {
+  void load(const std::string &filename) {
     struct stat stat_info;
 
     auto fd = open(filename.c_str(), O_RDONLY, 0);
@@ -246,6 +246,10 @@ struct AEDAT4 {
       }
     }
   }
+
+  AEDAT4() {}
+
+  AEDAT4(const std::string &filename) { load(filename); }
 
   std::vector<OutInfo> outinfos;
   std::vector<Frame> frames;

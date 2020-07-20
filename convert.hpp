@@ -1,5 +1,6 @@
 #pragma once
 #include "aedat.hpp"
+#include "aedat4.hpp"
 
 #include <iostream>
 #include <torch/script.h>
