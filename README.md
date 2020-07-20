@@ -55,7 +55,7 @@ for element in dvs.datapoints
 
 To use the AEDAT4 formatted data you can try the following:
 
-```
+```python
 import torch
 import aedat
 import numpy as np
