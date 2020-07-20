@@ -66,6 +66,8 @@ struct DataSet {
     load(aedat_filename, labels_filename);
   }
 
+  DataSet() {}
+
   std::vector<DataPoint> datapoints;
 };
 } // namespace dvs_gesture

@@ -1,8 +1,10 @@
 #include "convert.hpp"
 #include "dvs_gesture.hpp"
 
+#include <torch/csrc/autograd/python_variable.h>
 #include <torch/extension.h>
 #include <torch/script.h>
+#include <torch/torch.h>
 
 torch::Tensor
 convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events) {
