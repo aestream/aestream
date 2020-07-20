@@ -1,8 +1,10 @@
 # aedat - address event encoding library
 
-This repository contains a decoder and simple viewer for the AEDAT 3.1 format as defined
-[here](https://inivation.com/support/software/fileformat/#formats). In addition it provides
-support for converting polarity events into a libtorch sparse tensor.
+aedat contains unofficial decoders for the AEDAT 3.1 and 4.0 formats used by 
+the dynamic vision sensors of iniVation. In addition it provides support 
+for converting polarity events into pytorch sparse tensors, thereby providing
+a building block for using dynamic vision sensors in conjunction with pytorch
+based machine learning algorithms.
 
 ## Dataset viewer
 
