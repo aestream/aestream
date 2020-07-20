@@ -52,3 +52,24 @@ for element in dvs.datapoints
     label = element.label
     events = aedat.convert_polarity_events(element.events)
 ```
+
+To use the AEDAT4 formatted data you can try the following:
+
+```
+import torch
+import aedat
+import numpy as np
+import mathplotlib.pyplot as plt
+
+data = aedat.AEDAT4("example_data/kth/example.aedat4")
+
+# display the first frame
+pixels = data.frames[0].pixels
+width, height = data.frames[0].width, data.frames[0].height
+im =  np.array(pixels).reshape(height, width, 3)
+plt.imshow(im)
+plt.show()
+
+# convert the polarity events to a sparse pytorch tensor
+events = aedat.convert_polarity_events(data.polarity_events)
+```
