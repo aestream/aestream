@@ -39,6 +39,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       .def_readonly("events", &dvs_gesture::DataSet::DataPoint::events);
 
   py::class_<dvs_gesture::DataSet>(m, "DVSGestureData")
+      .def(py::init<>())
       .def(py::init<const std::string &, const std::string &>())
       .def("load", &dvs_gesture::DataSet::load)
       .def_readonly("datapoints", &dvs_gesture::DataSet::datapoints);
