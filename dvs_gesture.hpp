@@ -46,7 +46,7 @@ struct DataSet {
 
     size_t event_idx = 0;
     for (size_t row_idx = 0; row_idx < rows.size(); row_idx++) {
-      datapoints.push_back(DataPoint{rows[row_idx].label});
+      auto datapoint = DataPoint{rows[row_idx].label};
 
       while (data.polarity_events[event_idx].timestamp <
              rows[row_idx].startTime) {
@@ -55,9 +55,13 @@ struct DataSet {
 
       while (data.polarity_events[event_idx].timestamp <
              rows[row_idx].endTime) {
-        datapoints[row_idx].events.push_back(data.polarity_events[event_idx]);
+        auto event = data.polarity_events[event_idx];
+        event.timestamp -= rows[row_idx].startTime;
+        datapoint.events.push_back(event);
         event_idx++;
       }
+
+      datapoints.push_back(datapoint);
     }
   }
 
