@@ -8,7 +8,7 @@ based machine learning algorithms.
 
 ## Dataset viewer
 
-The viewer requires SDL2 and [libtorch](https://pytorch.org/cppdocs/installing.html) is needed to build the converter.
+The viewer requires SDL2, [LZ4](https://lz4.github.io/lz4/), and [flatbuffers v. >= 1.12](https://google.github.io/flatbuffers/). [libtorch](https://pytorch.org/cppdocs/installing.html) is needed to build the converter.
 
 To build the viewer and converter binaries
 ```
@@ -16,6 +16,7 @@ export CMAKE_PREFIX_PATH=`absolute path to libtorch/`
 mkdir build/
 cd build/
 cmake -GNinja ..
+ninja
 ```
 
 The viewer can then be used to view the example data
