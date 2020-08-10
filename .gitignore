@@ -1,4 +1,8 @@
 libtorch/
 DvsGesture/
 build/
+dist/
 .vscode/
+*.so
+aedat.egg-info/
+
