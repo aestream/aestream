@@ -6,18 +6,19 @@
 #include <torch/script.h>
 #include <torch/torch.h>
 
-torch::Tensor
-convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events) {
-  size_t size = polarity_events.size();
+torch::Tensor convert_polarity_events_cropped(
+    std::vector<AEDAT::PolarityEvent> &polarity_events,
+    const size_t max_events) {
+  const size_t size = max_events <= 0 ? polarity_events.size() : max_events;
   std::vector<int64_t> indices(3 * size);
   std::vector<int8_t> values;
-  size_t idx = 0;
-  for (auto event : polarity_events) {
+
+  for (size_t idx = 0; idx < size; idx++) {
+    auto event = polarity_events[idx];
     indices[idx] = event.timestamp - polarity_events[0].timestamp;
     indices[size + idx] = event.x;
     indices[2 * size + idx] = event.y;
     values.push_back(event.polarity ? 1 : -1);
-    idx++;
   }
 
   auto index_options = torch::TensorOptions().dtype(torch::kInt64);
@@ -30,6 +31,12 @@ convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events) {
   auto events = torch::sparse_coo_tensor(ind, val);
 
   return events.clone();
+}
+
+torch::Tensor
+convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events) {
+  return convert_polarity_events_cropped(polarity_events,
+                                         polarity_events.size());
 }
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
@@ -59,7 +66,10 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       .def_readwrite("imu6_events", &AEDAT::imu6_events)
       .def_readwrite("imu9_events", &AEDAT::imu9_events);
   m.def("convert_polarity_events", &convert_polarity_events,
-        "convert_polarity_events");
+        "Converts the AEDAT data into a sparse Torch tensor");
+  m.def("convert_polarity_events_cropped", &convert_polarity_events_cropped,
+        "Converts the AEDAT data into a sparse Torch tensor, cropped to a "
+        "maximum number of events");
 
   py::class_<AEDAT4>(m, "AEDAT4")
       .def(py::init<>())
