@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <ostream>
 #include <vector>
 
 #include "aedat.hpp"
@@ -61,7 +62,10 @@ struct DataSet {
         event_idx++;
       }
 
-      datapoints.push_back(datapoint);
+      // Avoid pushing empty points
+      if (!datapoint.events.empty()) {
+        datapoints.push_back(datapoint);
+      }
     }
   }
 
