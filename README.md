@@ -4,7 +4,8 @@ aedat contains unofficial decoders for the AEDAT 3.1 and 4.0 formats used by
 the dynamic vision sensors of iniVation. In addition it provides support 
 for converting polarity events into pytorch sparse tensors, thereby providing
 a building block for using dynamic vision sensors in conjunction with pytorch
-based machine learning algorithms.
+based machine learning algorithms. Official documentation of the AEDAT 3.1 format
+can be found [here](https://inivation.github.io/inivation-docs/Software%20user%20guides/AEDAT_file_formats.html).
 
 ## Dataset viewer
 
