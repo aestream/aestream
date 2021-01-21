@@ -57,6 +57,34 @@ convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events,
   return events.clone();
 }
 
+torch::Tensor event_tensor(std::vector<AEDAT::PolarityEvent> &polarity_events, 
+                                    torch::IntArrayRef image_dimensions) {
+  const size_t length = polarity_events.size();
+  auto size_vector = image_dimensions.vec();
+  size_vector.insert(size_vector.begin(), length);
+  const torch::IntArrayRef size = torch::IntArrayRef(size_vector);
+  torch::Tensor tensor = torch::empty(size);
+  for (size_t idx = 0; idx < length; idx++) {
+    auto event = polarity_events[idx];
+    tensor[idx][event.x][event.y] = event.polarity ? 1 : -1;
+  }
+  return tensor;
+}
+
+std::vector<torch::Tensor> convert_polarity(std::vector<AEDAT::PolarityEvent> &polarity_events,
+                 const int64_t window_size,
+                 const int64_t window_step,
+                 const std::vector<int64_t> &image_dimension) {
+  auto tensor = event_tensor(polarity_events, image_dimension);
+  const size_t size = polarity_events.size();
+  std::vector<torch::Tensor> values;
+  for (size_t idx = 0; idx < (size - window_size); idx += window_step) {
+    torch::Tensor t = tensor.slice(0, idx, idx + window_size).clone();
+    values.push_back(t);
+  }
+  return values;
+}
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   py::class_<AEDAT::PolarityEvent>(m, "PolarityEvent");
 
@@ -84,6 +112,13 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       .def_readwrite("dynapse_events", &AEDAT::dynapse_events)
       .def_readwrite("imu6_events", &AEDAT::imu6_events)
       .def_readwrite("imu9_events", &AEDAT::imu9_events);
+
+  m.def("convert_polarity", &convert_polarity,
+        py::arg("polarity_events"),
+        py::arg("window_size"),
+        py::arg("window_step"),
+        py::arg("image_dimension"),
+        "Converts the AEDAT data into a dense Torch tensor.");
 
   m.def("convert_polarity_events", &convert_polarity_events,
         py::arg("polarity_events"),

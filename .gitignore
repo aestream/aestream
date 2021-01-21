@@ -5,4 +5,7 @@ dist/
 .vscode/
 *.so
 aedat.egg-info/
-
+.ninja_deps
+.ninja_log
+CMakeCache.txt
+CMakeFiles/
