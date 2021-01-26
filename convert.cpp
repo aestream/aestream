@@ -61,10 +61,13 @@ std::vector<torch::Tensor>
 convert_polarity(std::vector<AEDAT::PolarityEvent> &polarity_events,
                  const int64_t window_size,
                  const int64_t window_step,
+                 const std::vector<double> &scale,
                  const std::vector<int64_t> &image_dimensions) {
   std::vector<torch::Tensor> event_tensors;
   size_t start = 0;
   size_t idx = 0;
+  size_t next_idx = 0;
+  bool next_idx_found = false;
   auto last_event = polarity_events.back();
   while (start <  last_event.timestamp - window_size) {
     auto event = polarity_events[idx];
@@ -72,11 +75,16 @@ convert_polarity(std::vector<AEDAT::PolarityEvent> &polarity_events,
     std::vector<int64_t> indices;
     std::vector<int8_t> values;
 
+
     while (event.timestamp < start + window_size) {
-        indices.push_back(event.timestamp - start_time);
-        indices.push_back(event.x);
-        indices.push_back(event.y);
+        indices.push_back(static_cast<int64_t>((event.timestamp - start_time)/scale[0]));
+        indices.push_back(static_cast<int64_t>(event.x/scale[1]));
+        indices.push_back(static_cast<int64_t>(event.y/scale[2]));
         values.push_back(event.polarity ? 1 : -1);
+        if (!next_idx_found && (event.timestamp >= start + window_step)) {
+            next_idx = idx;
+            next_idx_found = true;
+        }
         idx += 1;
         event = polarity_events[idx];
     }
@@ -92,7 +100,10 @@ convert_polarity(std::vector<AEDAT::PolarityEvent> &polarity_events,
     auto events = torch::sparse_coo_tensor(ind, val, {window_size, image_dimensions[0], image_dimensions[1]});
 
     event_tensors.push_back(events.clone());
-    start += window_size;
+
+    idx = next_idx;
+    start += window_step;
+    next_idx_found = false;
   }
 
   return event_tensors;
@@ -130,6 +141,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         py::arg("polarity_events"),
         py::arg("window_size"),
         py::arg("window_step"),
+        py::arg("scale"),
         py::arg("image_dimension"),
         "Converts the AEDAT data into a dense Torch tensor.");
 

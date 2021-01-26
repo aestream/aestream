@@ -7,13 +7,10 @@
 #include "flatbuffers/flatbuffers.h"
 
 struct Imu;
-struct ImuBuilder;
 
 struct ImuPacket;
-struct ImuPacketBuilder;
 
 struct Imu FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef ImuBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_T = 4,
     VT_TEMPERATURE = 6,
@@ -78,7 +75,6 @@ struct Imu FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct ImuBuilder {
-  typedef Imu Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_t(int64_t t) {
@@ -155,7 +151,6 @@ inline flatbuffers::Offset<Imu> CreateImu(
 }
 
 struct ImuPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef ImuPacketBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ELEMENTS = 4
   };
@@ -172,7 +167,6 @@ struct ImuPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct ImuPacketBuilder {
-  typedef ImuPacket Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_elements(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Imu>>> elements) {
