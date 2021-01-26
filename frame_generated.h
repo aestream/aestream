@@ -7,7 +7,6 @@
 #include "flatbuffers/flatbuffers.h"
 
 struct Frame;
-struct FrameBuilder;
 
 enum FrameFormat {
   FrameFormat_Gray = 0,
@@ -36,7 +35,6 @@ inline const char *EnumNameFrameFormat(FrameFormat e) {
 }
 
 struct Frame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef FrameBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_T = 4,
     VT_BEGIN_T = 6,
@@ -102,7 +100,6 @@ struct Frame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct FrameBuilder {
-  typedef Frame Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_t(int64_t t) {

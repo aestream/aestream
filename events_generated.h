@@ -9,7 +9,6 @@
 struct Event;
 
 struct EventPacket;
-struct EventPacketBuilder;
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Event FLATBUFFERS_FINAL_CLASS {
  private:
@@ -48,7 +47,6 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Event FLATBUFFERS_FINAL_CLASS {
 FLATBUFFERS_STRUCT_END(Event, 16);
 
 struct EventPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef EventPacketBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ELEMENTS = 4
   };
@@ -64,7 +62,6 @@ struct EventPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct EventPacketBuilder {
-  typedef EventPacket Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_elements(flatbuffers::Offset<flatbuffers::Vector<const Event *>> elements) {
