@@ -7,10 +7,8 @@
 #include "flatbuffers/flatbuffers.h"
 
 struct Trigger;
-struct TriggerBuilder;
 
 struct TriggerPacket;
-struct TriggerPacketBuilder;
 
 enum TriggerSource {
   TriggerSource_TimestampReset = 0,
@@ -44,7 +42,7 @@ inline const TriggerSource (&EnumValuesTriggerSource())[10] {
 }
 
 inline const char * const *EnumNamesTriggerSource() {
-  static const char * const names[11] = {
+  static const char * const names[] = {
     "TimestampReset",
     "ExternalSignalRisingEdge",
     "ExternalSignalFallingEdge",
@@ -61,13 +59,12 @@ inline const char * const *EnumNamesTriggerSource() {
 }
 
 inline const char *EnumNameTriggerSource(TriggerSource e) {
-  if (flatbuffers::IsOutRange(e, TriggerSource_TimestampReset, TriggerSource_ExposureEnd)) return "";
+  if (e < TriggerSource_TimestampReset || e > TriggerSource_ExposureEnd) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesTriggerSource()[index];
 }
 
 struct Trigger FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef TriggerBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_T = 4,
     VT_SOURCE = 6
@@ -87,7 +84,6 @@ struct Trigger FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct TriggerBuilder {
-  typedef Trigger Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_t(int64_t t) {
@@ -119,7 +115,6 @@ inline flatbuffers::Offset<Trigger> CreateTrigger(
 }
 
 struct TriggerPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef TriggerPacketBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ELEMENTS = 4
   };
@@ -136,7 +131,6 @@ struct TriggerPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct TriggerPacketBuilder {
-  typedef TriggerPacket Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_elements(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Trigger>>> elements) {

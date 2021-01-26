@@ -9,10 +9,8 @@
 struct PacketHeader;
 
 struct FileDataDefinition;
-struct FileDataDefinitionBuilder;
 
 struct FileDataTable;
-struct FileDataTableBuilder;
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) PacketHeader FLATBUFFERS_FINAL_CLASS {
  private:
@@ -37,7 +35,6 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) PacketHeader FLATBUFFERS_FINAL_CLASS {
 FLATBUFFERS_STRUCT_END(PacketHeader, 8);
 
 struct FileDataDefinition FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef FileDataDefinitionBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_BYTEOFFSET = 4,
     VT_PACKETINFO = 6,
@@ -72,7 +69,6 @@ struct FileDataDefinition FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct FileDataDefinitionBuilder {
-  typedef FileDataDefinition Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_ByteOffset(int64_t ByteOffset) {
@@ -119,7 +115,6 @@ inline flatbuffers::Offset<FileDataDefinition> CreateFileDataDefinition(
 }
 
 struct FileDataTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef FileDataTableBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TABLE = 4
   };
@@ -136,7 +131,6 @@ struct FileDataTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct FileDataTableBuilder {
-  typedef FileDataTable Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_Table(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FileDataDefinition>>> Table) {
