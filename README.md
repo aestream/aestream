@@ -30,6 +30,14 @@ or to view data from the gesture dataset
 
 ## Python bindings
 
+The Python bindings require that you have installed a version of pytorch, lz4, and flatbuffers. One
+way of ensuring these requirements is by installing them as conda packages:
+```shell
+conda install pytorch
+conda install lz4
+conda install flatbuffers
+```
+
 In order to build and install the python bindings run
 ```
 python setup.py install
