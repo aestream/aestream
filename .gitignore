@@ -9,3 +9,4 @@ aedat.egg-info/
 .ninja_log
 CMakeCache.txt
 CMakeFiles/
+thirdparty/

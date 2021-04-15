@@ -1,10 +1,7 @@
 #include "convert.hpp"
 #include "dvs_gesture.hpp"
 
-#include <bits/stdint-intn.h>
-#include <bits/stdint-uintn.h>
 #include <cstddef>
-#include <sys/types.h>
 #include <torch/csrc/autograd/python_variable.h>
 #include <torch/extension.h>
 #include <torch/script.h>
