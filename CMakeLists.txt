@@ -1,35 +1,24 @@
-cmake_minimum_required(VERSION 3.7)
-project(aedat)
+cmake_minimum_required(VERSION 3.20)
+project(aestream)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(GCC_COVERAGE_COMPILE_FLAGS "-fcoroutines")
+add_compile_definitions(_GLIBCXX_USE_CXX11_ABI=0) # Required for PyTorch
 
-find_package(SDL2 REQUIRED)
-find_package(Torch REQUIRED)
+set(default_build_type Release)
+add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
 
-# for linking against python
-find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
-list(APPEND TORCH_LIBRARIES ${TORCH_PYTHON_LIBRARY})
+# Add includes
+include_directories("include/")
 
-find_path(LZ4_INCLUDE_DIR NAMES	lz4.h)
-find_library(LZ4_LIBRARY NAMES lz4)
-find_package (Python3 REQUIRED COMPONENTS Development)
+# Add sources
+add_subdirectory("src") 
+# install(TARGETS aestream 
+#         CONFIGURATIONS Release
+#         RUNTIME DESTINATION bin)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
-
-add_executable(viewer viewer.cpp aedat.hpp )
-
-include_directories(viewer ${SDL2_INCLUDE_DIRS} ${LZ4_INCLUDE_DIR} PRIVATE ${Python3_INCLUDE_DIRS})
-target_link_libraries(viewer ${SDL2_LIBRARIES} ${LZ4_LIBRARY} ${Python3_LIBRARIES})
-
-
-add_library(convert SHARED convert.cpp)
-target_compile_features(convert PRIVATE cxx_std_14)
-target_include_directories(convert PRIVATE ${TORCH_INCLUDE_DIRS} ${Python3_INCLUDE_DIRS})
-target_link_directories(convert PRIVATE ${TORCH_LINK_DIRECTORIES})
-target_link_libraries(convert PRIVATE ${TORCH_LIBRARIES} ${Python3_LIBRARIES} ${LZ4_LIBRARY})
-
-
-add_executable(converter converter.cpp)
-target_include_directories(converter PRIVATE ${TORCH_INCLUDE_DIRS})
-target_link_libraries(converter convert ${TORCH_LIBRARIES})
+# Add tests
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_subdirectory("test")
+endif()

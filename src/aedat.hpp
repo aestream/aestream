@@ -16,25 +16,25 @@ struct AEDAT {
   };
 
   struct PolarityEvent {
-    uint32_t valid : 1;
-    uint32_t polarity : 1;
-    uint32_t x : 15;
-    uint32_t y : 15;
-    uint32_t timestamp : 32;
+    uint64_t timestamp : 64;
+    uint16_t x : 15;
+    uint16_t y : 15;
+    bool valid : 1;
+    bool polarity : 1;
   } __attribute__((packed));
 
   struct SpecialEvent {
-    uint32_t valid : 1;
-    uint32_t type : 7;
     uint32_t data : 24;
+    uint8_t type : 7;
+    bool valid : 1;
   } __attribute__((packed));
 
   struct DynapSEEvent {
-    uint32_t valid : 1;
-    uint32_t core_id : 5;
-    uint32_t chip_id : 6;
+    uint64_t timestamp : 64;
     uint32_t neuron_id : 20;
-    uint32_t timestamp;
+    uint16_t chip_id : 6;
+    uint8_t core_id : 5;
+    bool valid : 1;
   } __attribute__((packed));
 
   enum class SpecialEventType : uint8_t {
@@ -59,9 +59,7 @@ struct AEDAT {
   };
 
   struct IMU6Event {
-    uint32_t valid : 1;
-    uint32_t padding : 31;
-    uint32_t timestamp : 32;
+    uint64_t timestamp : 64;
     float accel_x;
     float accel_y;
     float accel_z;
@@ -69,12 +67,12 @@ struct AEDAT {
     float gyro_y;
     float gyro_z;
     float temp;
+    uint32_t padding : 31;
+    uint32_t valid : 1;
   } __attribute__((packed));
 
   struct IMU9Event {
-    uint32_t valid : 1;
-    uint32_t padding : 31;
-    uint32_t timestamp : 32;
+    uint64_t timestamp : 64;
     float accel_x;
     float accel_y;
     float accel_z;
@@ -85,14 +83,11 @@ struct AEDAT {
     float comp_x;
     float comp_y;
     float comp_z;
+    uint32_t padding : 31;
+    uint32_t valid : 1;
   } __attribute__((packed));
 
   struct FrameEventHeader {
-    uint32_t valid : 1;
-    uint32_t channels : 3;
-    uint32_t filter : 4;
-    uint32_t roi : 7;
-    uint32_t reserved : 17;
     uint32_t frame_start;
     uint32_t frame_end;
     uint32_t exposure_start;
@@ -101,6 +96,11 @@ struct AEDAT {
     uint32_t y_length;
     uint32_t x_position;
     uint32_t y_position;
+    uint32_t reserved : 17;
+    uint32_t roi : 7;
+    uint32_t filter : 4;
+    uint32_t channels : 3;
+    uint32_t valid : 1;
   } __attribute__((packed));
 
   struct FrameEvent {
@@ -110,13 +110,13 @@ struct AEDAT {
 
   struct Header {
     EventType eventType;
-    uint16_t eventSource;
     uint32_t eventSize;
     uint32_t eventTSOffset;
     uint32_t eventTSOverflow;
     uint32_t eventCapacity;
     uint32_t eventNumber;
     uint32_t eventValid;
+    uint16_t eventSource;
   } __attribute__((packed));
 
   void load(const std::string &filename) {
