@@ -47,6 +47,6 @@ int main(int argc, char *argv[]) {
       printf("Test %dx%d", event.x, event.y);
     }
   } catch (const std::exception &e) {
-    printf("Failure while streaming events. Ending.\n");
+    std::cout << "Failure while streaming events: " << e.what() << "\n";
   }
 }

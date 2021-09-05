@@ -7,8 +7,14 @@
 USBConnection::USBConnection(std::string camera, uint16_t deviceId,
                              uint8_t deviceAddress) {
 
-  handle =
-      new libcaer::devices::dvXplorer(deviceId, deviceId, deviceAddress, "");
+  if (camera == "dvx") {
+    handle =
+        new libcaer::devices::dvXplorer(deviceId, deviceId, deviceAddress, "");
+  } else if (camera == "davis") {
+    handle = new libcaer::devices::davis(deviceId, deviceId, deviceAddress, "");
+  } else {
+    throw std::invalid_argument("Unknown camera '" + camera + "'");
+  }
 
   // Send the default configuration before using the device.
   // No configuration is sent automatically!
