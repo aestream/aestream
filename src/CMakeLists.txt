@@ -1,5 +1,6 @@
 # Stream DVS data via Ethernet using UDP
 add_library(usbdvs SHARED usb.hpp usb.cpp)
+target_link_libraries(usbdvs PRIVATE ${OpenCV_LIBS} MetavisionSDK::core MetavisionSDK::driver opencv_highgui)
 # target_compile_features(dvs2udp PRIVATE cxx_std_14)
 # target_include_directories(dvs2udp PRIVATE ${TORCH_INCLUDE_DIRS} ${Python3_INCLUDE_DIRS})
 # target_link_directories(dvs2udp PRIVATE ${LIBCAER_LINK_DIRECTORIES} ${TORCH_LINK_DIRECTORIES} ${CMAKE_BINARY_DIR}/res)
@@ -7,8 +8,7 @@ add_library(usbdvs SHARED usb.hpp usb.cpp)
 
 add_executable(stream stream.cpp)
 target_include_directories(stream PRIVATE ${TORCH_INCLUDE_DIRS})
-target_link_libraries(stream PRIVATE usbdvs ${TORCH_LIBRARIES} ${CAER_LIBRARY})
-
+target_link_libraries(stream PRIVATE usbdvs ${TORCH_LIBRARIES} ${CAER_LIBRARY} ${OpenCV_LIBS})
 
 # Stream DVS data and transform it into sparse tensors 
 # add_library(dvs2tensor SHARED dvs2tensor.hpp dvs2tensor.cpp)
