@@ -20,7 +20,10 @@ We currently support the following outputs:
 
 ## Setup
 
-DVSStream requires [libcaer](https://github.com/inivation/libcaer) and [libtorch](https://pytorch.org/cppdocs/installing.html).
+AEDATStream requires [libcaer](https://github.com/inivation/libcaer), [libtorch](https://pytorch.org/cppdocs/installing.html) and [OpenCV](https://github.com/opencv/opencv).
+
+As it uses coroutines, AEDATStream is based on [C++20](https://en.cppreference.com/w/cpp/20). Since C++20 is not yet fully supported by all compilers, we recommend using `GCC >= 10.2`. 
+
 
 To build the binaries of this repository, run the following code:
 ```
