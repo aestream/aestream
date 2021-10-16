@@ -1,13 +1,15 @@
 # Stream DVS data via Ethernet using UDP
-add_library(usbdvs SHARED usb.hpp usb.cpp)
-# target_compile_features(dvs2udp PRIVATE cxx_std_14)
-# target_include_directories(dvs2udp PRIVATE ${TORCH_INCLUDE_DIRS} ${Python3_INCLUDE_DIRS})
-# target_link_directories(dvs2udp PRIVATE ${LIBCAER_LINK_DIRECTORIES} ${TORCH_LINK_DIRECTORIES} ${CMAKE_BINARY_DIR}/res)
-# target_link_libraries(dvs2udp PRIVATE ${CAER_LIBRARY} ${TORCH_LIBRARIES} ${Python3_LIBRARIES})
+add_library(dvsusb SHARED usb.hpp usb.cpp)
+target_link_libraries(dvsusb PRIVATE ${CAER_LIBRARY})
+
+add_library(aedat4 SHARED aedat4.hpp aedat4.cpp)
+target_include_directories(aedat4 PUBLIC .)
+include_directories(aedat4 PRIVATE ${LZ4_INCLUDE_DIR})
+target_link_libraries(aedat4 PRIVATE ${LZ4_LIBRARY} ${CAER_LIBRARY})
 
 add_executable(stream stream.cpp)
 target_include_directories(stream PRIVATE ${TORCH_INCLUDE_DIRS})
-target_link_libraries(stream PRIVATE usbdvs ${TORCH_LIBRARIES} ${CAER_LIBRARY})
+target_link_libraries(stream PRIVATE dvsusb aedat4 ${TORCH_LIBRARIES})
 
 
 # Stream DVS data and transform it into sparse tensors 

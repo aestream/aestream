@@ -1,0 +1,19 @@
+
+struct PacketHeader {
+	StreamID: int32;
+	Size: int32;
+}
+
+table FileDataDefinition {
+	ByteOffset: int64;
+	PacketInfo: PacketHeader (native_inline);
+	NumElements: int64;
+	TimestampStart: int64;
+	TimestampEnd: int64;
+}
+
+table FileDataTable {
+	Table: [FileDataDefinition];
+}
+
+root_type FileDataTable;

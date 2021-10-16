@@ -1,5 +1,4 @@
-#ifndef GENERATOR_H
-#define GENERATOR_H
+#pragma once
 
 #include <coroutine>
 #include <iostream>
@@ -79,5 +78,3 @@ public:
 private:
   Handle m_coroutine;
 };
-
-#endif

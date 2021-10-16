@@ -1,0 +1,23 @@
+enum TriggerSource : int8 {
+    TimestampReset = 0,
+    ExternalSignalRisingEdge = 1,
+    ExternalSignalFallingEdge = 2,
+    ExternalSignalPulse = 3,
+    ExternalGeneratorRisingEdge = 4,
+    ExternalGeneratorFallingEdge = 5,
+    FrameBegin = 6,
+    FrameEnd = 7,
+    ExposureBegin = 8,
+    ExposureEnd = 9,
+}
+
+table Trigger {
+	t: int64;
+	source: TriggerSource = TimestampReset;
+}
+
+table TriggerPacket {
+	elements: [Trigger];
+}
+
+root_type TriggerPacket;

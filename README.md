@@ -1,14 +1,21 @@
 # AEDAT - address event encoding and streaming library
 
-AEDAT decodes event-based dynamic-vision system (DVS) data
-and streams it to a sink.
+AEDAT parses event-based dynamic-vision system (DVS) data
+from an input source and streams it to a sink.
+
+## Usage
+
+```bash
+stream input 
+```
 
 We currently support the following inputs:
 
 | Interface | Description |
 | --------- | :----------- | 
+| DAVIS           | 346x260 DVS camera, Inivation  |
 | DVXplorer       | 640x480 DVS camera, Inivation  |
-<!-- | File       | `.aedat` or `.aedat4` | | -->
+| File            | `.aedat` or `.aedat4` |
 
 We currently support the following outputs:
 

@@ -1,6 +1,4 @@
-
-#ifndef USBCONNECTION_H
-#define USBCONNECTION_H
+#pragma once
 
 #include <any>
 #include <csignal>
@@ -35,5 +33,3 @@ public:
 Generator<AEDAT::PolarityEvent>
 usb_event_generator(std::string camera, std::uint16_t deviceId,
                     std::uint8_t deviceAddress);
-
-#endif
