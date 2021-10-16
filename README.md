@@ -1,16 +1,28 @@
-# aedat - address event encoding library
+# AEDAT - address event encoding and streaming library
 
-aedat contains unofficial decoders for the [AEDAT 3.1 and 4.0](https://inivation.github.io/inivation-docs/Software%20user%20guides/AEDAT_file_formats.html) formats used by 
-the dynamic vision sensors of iniVation. In addition it provides support 
-for converting polarity events into pytorch sparse tensors, thereby providing
-a building block for using dynamic vision sensors in conjunction with pytorch
-based machine learning algorithms.
+AEDAT decodes event-based dynamic-vision system (DVS) data
+and streams it to a sink.
 
-## Dataset viewer
+We currently support the following inputs:
 
-The viewer requires SDL2, [LZ4](https://lz4.github.io/lz4/), and [flatbuffers v. >= 1.12](https://google.github.io/flatbuffers/). [libtorch](https://pytorch.org/cppdocs/installing.html) is needed to build the converter.
+| Interface | Description |
+| --------- | :----------- | 
+| DVXplorer       | 640x480 DVS camera, Inivation  |
+<!-- | File       | `.aedat` or `.aedat4` | | -->
 
-To build the viewer and converter binaries
+We currently support the following outputs:
+
+| Interface | Type | Description |
+| --------- | :--- | ----------- |
+| Ethernet - UDP | Output | Via the [SPIF](https://github.com/SpiNNakerManchester/spif) protocol |
+<!-- | File       | Output | `.aedat` or `.aedat4` | -->
+
+
+## Setup
+
+DVSStream requires [libcaer](https://github.com/inivation/libcaer) and [libtorch](https://pytorch.org/cppdocs/installing.html).
+
+To build the binaries of this repository, run the following code:
 ```
 export CMAKE_PREFIX_PATH=`absolute path to libtorch/`
 mkdir build/
@@ -18,73 +30,7 @@ cd build/
 cmake -GNinja ..
 ninja
 ```
+## Acknowledgments
 
-The viewer can then be used to view the example data
-```
-./viewer ../example_data/ibm/user01_natural.aedat
-```
-or to view data from the gesture dataset
-```
-./viewer ../example_data/ibm/user01_natural.aedat ../example_data/ibm/user01_natural_labels.csv
-```
-
-## Python bindings
-
-The Python bindings require that you have installed a version of pytorch, lz4, and flatbuffers. One
-way of ensuring these requirements is by installing them as conda packages:
-```shell
-conda install pytorch
-conda install lz4
-conda install flatbuffers
-```
-
-In order to build and install the python bindings run
-```
-python setup.py install
-```
-this assumes that you have pytorch 1.5.1 installed.
-
-A minimal example of using the AEDAT3.1 import functionality is then
-```python
-import torch # Needs to be first otherwise you will encounter an error
-import aedat
-
-data = aedat.AEDAT("example_data/ibm/user01_natural.aedat")
-events = aedat.convert_polarity_events(data.polarity_events)
-```
-
-An example working with the gesture dataset is
-```python
-import torch
-import aedat
-
-dvs = aedat.DVSGestureData(
-    "example_data/ibm/user01_natural.aedat",
-    "example_data/ibm/user01_natural_labels.csv"
-)
-
-for element in dvs.datapoints
-    label = element.label
-    events = aedat.convert_polarity_events(element.events)
-```
-
-To use the AEDAT4 formatted data you can try the following:
-
-```python
-import torch
-import aedat
-import numpy as np
-import mathplotlib.pyplot as plt
-
-data = aedat.AEDAT4("example_data/kth/example.aedat4")
-
-# display the first frame
-pixels = data.frames[0].pixels
-width, height = data.frames[0].width, data.frames[0].height
-im =  np.array(pixels).reshape(height, width, 3)
-plt.imshow(im)
-plt.show()
-
-# convert the polarity events to a sparse pytorch tensor
-events = aedat.convert_polarity_events(data.polarity_events)
-```
+- This library is based on [libcaer](https://github.com/inivation/libcaer) by iniVation AG and interfaced by Philipp Mondorf and Jens E. Pedersen.
+- The conversion of polarity events to sparse tensors is based on the [AEDAT](https://github.com/norse/aedat) library by Christian Pehle and Jens. E. Pedersen.
