@@ -4,9 +4,13 @@
 
 #include <any>
 #include <csignal>
+# include <string>
 
 #include <libcaercpp/devices/davis.hpp>
 #include <libcaercpp/devices/dvxplorer.hpp>
+
+# include <metavision/sdk/driver/camera.h>
+# include <metavision/sdk/base/events/event_cd.h>
 
 #include "aedat.hpp"
 #include "generator.hpp"
@@ -35,5 +39,8 @@ public:
 Generator<AEDAT::PolarityEvent>
 usb_event_generator(std::string camera, std::uint16_t deviceId,
                     std::uint8_t deviceAddress);
+
+Generator<AEDAT::PolarityEvent> 
+usb_event_generator(std::string filename);
 
 #endif

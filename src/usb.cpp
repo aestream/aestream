@@ -41,6 +41,7 @@ USBConnection::USBConnection(std::string camera, uint16_t deviceId,
                     CAER_HOST_CONFIG_DATAEXCHANGE_BLOCKING, true);
 }
 
+// event generator for Iniviation cameras
 Generator<AEDAT::PolarityEvent>
 usb_event_generator(std::string camera, std::uint16_t deviceId,
                     std::uint8_t deviceAddress) {
@@ -80,3 +81,53 @@ usb_event_generator(std::string camera, std::uint16_t deviceId,
     }
   }
 };
+
+// event generator for Prophesee cameras
+Generator<AEDAT::PolarityEvent> 
+usb_event_generator(std::string filename=""){
+
+    Metavision::Camera cam; 
+
+    if (filename.compare("") != 0){
+        // file has been passed
+        cam = Metavision::Camera::from_file(filename); 
+    } else {
+        // get first available camera
+        cam = Metavision::Camera::from_first_available(); 
+    }
+
+    const Metavision::EventCD *ev_start = NULL, *ev_final = NULL; 
+
+    // add event callback -> will set ev_start and ev_final to respective begin and end of event buffer
+    cam.cd().add_callback([&ev_start, &ev_final](const Metavision::EventCD *ev_begin, const Metavision::EventCD *ev_end) -> void{
+        ev_start = ev_begin; 
+        ev_final = ev_end; 
+    });
+
+    // start camera
+    cam.start();
+
+    // keep running while camera is on or video is finished
+    while (cam.is_running()){
+        if (ev_start != NULL && ev_final != NULL){
+            // iterate over events in buffer and convert to AEDAT Polarity Event
+            for (const Metavision::EventCD *ev = ev_start; ev != ev_final; ++ev){
+                const AEDAT::PolarityEvent polarityEvent = {
+                    true,
+                    ev->p,
+                    ev->x,
+                    ev->y,
+                    (uint64_t)ev->t,
+                };
+
+                co_yield polarityEvent;
+            }
+            ev_start = NULL; 
+            ev_final = NULL; 
+        }
+    }
+
+    // if video is finished, stop camera - will never get here with live camera
+    cam.stop();
+
+} 
