@@ -12,6 +12,14 @@ add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
 # Include libcaer and opencv
 find_library(CAER_LIBRARY NAMES caer)
 
+# Include MetavisionSDK
+find_package(MetavisionSDK COMPONENTS core driver REQUIRED)
+find_package(OpenCV COMPONENTS highgui REQUIRED)
+
+# Include OpenCV
+find_package (OpenCV REQUIRED)
+include_directories(${OpenCV_DIRS})
+
 # LZ4 for AEDAT encoding
 find_path(LZ4_INCLUDE_DIR NAMES	lz4.h)
 find_library(LZ4_LIBRARY NAMES lz4)

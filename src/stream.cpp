@@ -1,6 +1,7 @@
 #include <csignal>
 #include <string>
 #include <sys/types.h>
+#include <stdexcept>
 
 #include "CLI11.hpp"
 
@@ -34,6 +35,8 @@ int main(int argc, char *argv[]) {
   // Output
   //
   auto app_output = app.add_subcommand("output", "Output target. Defaults to stdout");
+  // - STDOUT
+  auto app_output_stdout = app_output->add_subcommand("stdout");
   // - SPIF
   std::string port = "3333";           // Port number
   std::string ipAddress = "localhost"; // IP Adress - if NULL, use own IP.
@@ -72,7 +75,7 @@ int main(int argc, char *argv[]) {
   //
   try {
     if (app_output_spif->parsed()) {
-      printf("SPIF not supported...\n");
+      printf("SPIF not yet supported...\n");
     } else { // Default to STDOUT
       for (AEDAT::PolarityEvent event : input_generator) {
         printf("%d,%d;", event.x, event.y);
