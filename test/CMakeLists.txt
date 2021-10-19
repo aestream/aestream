@@ -1,5 +1,5 @@
-# GoogleTest requires at least C++11
-set(CMAKE_CXX_STANDARD 11)
+# GoogleTest requires at least C++20
+set(CMAKE_CXX_STANDARD 20)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -10,5 +10,23 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+set(CMAKE_C_FLAGS_DEBUG "-g -DDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
+
 # Enable testing
 enable_testing()
+
+add_executable(
+  aedat_test
+  aedat_test.cpp
+)
+target_link_libraries(
+  aedat_test
+  aedat4
+  gtest_main ${LZ4_LIBRARY} ${CAER_LIBRARY}
+  
+)
+#include_directories("../src")
+
+include(GoogleTest)
+gtest_discover_tests(aedat_test)
