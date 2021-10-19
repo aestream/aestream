@@ -1,16 +1,15 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.20)
 project(aedat)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-#set(CMAKE_EXPERIMENTAL_CXX_MODULE_DYNDEP ON)
 set(GCC_COVERAGE_COMPILE_FLAGS "-fcoroutines")
 
 include_directories("include/")
 
 add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
 
-# Make sure libcaer can be found
+# Include libcaer and opencv
 find_library(CAER_LIBRARY NAMES caer)
 
 # Include MetavisionSDK
@@ -29,5 +28,5 @@ find_package (Python3 REQUIRED COMPONENTS Development)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 # Add subdirectories
-add_subdirectory("src")
+add_subdirectory("src") 
 add_subdirectory("test")
