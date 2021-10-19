@@ -22,10 +22,15 @@ int main(int argc, char *argv[]) {
   std::uint16_t deviceId;
   std::uint16_t deviceAddress;
   std::string camera = "davis";
-  auto app_input_dvs = app_input->add_subcommand("dvs", "DVS input source");
-  app_input_dvs->add_option("id", deviceId, "Hardware ID")->required();
-  app_input_dvs->add_option("address", deviceAddress, "Hardware address")->required();
-  app_input_dvs->add_option("camera", camera, "Type of camera; davis or dvx")->required();
+  std::string serial_number;
+  // Inivation cameras
+  auto app_input_inivation = app_input->add_subcommand("inivation", "DVS input source for inivation cameras");
+  app_input_inivation->add_option("id", deviceId, "Hardware ID")->required();
+  app_input_inivation->add_option("address", deviceAddress, "Hardware address")->required();
+  app_input_inivation->add_option("camera", camera, "Type of camera; davis or dvx")->required();
+  // Prophesee cameras 
+  auto app_input_prophesee = app_input->add_subcommand("prophesee", "DVS input source for prophesee cameras");
+  app_input_prophesee->add_option("serial", serial_number, "Serial number")->required();
   // - File
   std::string filename = "None";
   auto app_input_file = app_input->add_subcommand("file", "AEDAT4 input file");
@@ -64,8 +69,10 @@ int main(int argc, char *argv[]) {
   // Handle input
   //
   Generator<AEDAT::PolarityEvent> input_generator;
-  if (app_input_dvs->parsed()) {
+  if (app_input_inivation->parsed()) {
     input_generator = usb_event_generator(camera, deviceId, deviceAddress);
+  } else if (app_input_prophesee->parsed()) {
+    input_generator = usb_event_generator(serial_number);
   } else if (app_input_file->parsed()) {
     input_generator = file_event_generator(filename);
   }
@@ -78,7 +85,7 @@ int main(int argc, char *argv[]) {
       printf("SPIF not yet supported...\n");
     } else { // Default to STDOUT
       for (AEDAT::PolarityEvent event : input_generator) {
-        printf("%d,%d;", event.x, event.y);
+        printf("%d,%d;\n", event.x, event.y);
       }
     }
   } catch (const std::exception &e) {

@@ -1,19 +1,36 @@
 #include <csignal>
+#include <iostream>
 
 #include "aedat.hpp"
 #include "generator.hpp"
 #include "usb.hpp"
+#include "metavision/sdk/driver/camera.h"
+#include "device_discovery.hpp"
+
 
 USBConnection::USBConnection(std::string camera, uint16_t deviceId,
                              uint8_t deviceAddress) {
 
-  if (camera == "dvx") {
-    handle =
-        new libcaer::devices::dvXplorer(deviceId, deviceId, deviceAddress, "");
-  } else if (camera == "davis") {
-    handle = new libcaer::devices::davis(deviceId, deviceId, deviceAddress, "");
-  } else {
-    throw std::invalid_argument("Unknown camera '" + camera + "'");
+  try{                         
+    if (camera == "dvx") {
+      handle =
+          new libcaer::devices::dvXplorer(deviceId, deviceId, deviceAddress, "");
+    } else if (camera == "davis") {
+      handle = new libcaer::devices::davis(deviceId, deviceId, deviceAddress, "");
+    } else {
+      throw std::invalid_argument("Unknown camera '" + camera + "'");
+    }
+  } catch (const std::exception &e) {
+    std::cout << "Failure with camera: " << camera << ", deviceId: '" << deviceId << "', deviceAddress (devAddress) see below.\n" << std::endl;
+    std::cout <<  e.what() << std::endl;
+
+    std::cout << "List of available inivation cameras and configurations: " << std::endl;
+
+    int exit_status = list_devices(); 
+
+    std::cout << std::endl; 
+
+    throw std::invalid_argument("Please choose the deviceId (busNum) and deviceAddress (devAddr) of one of the above listed iniVation cameras!");
   }
 
   // Send the default configuration before using the device.
@@ -84,16 +101,27 @@ usb_event_generator(std::string camera, std::uint16_t deviceId,
 
 // event generator for Prophesee cameras
 Generator<AEDAT::PolarityEvent> 
-usb_event_generator(std::string filename=""){
+usb_event_generator(const std::string serial_number = "None"){
 
     Metavision::Camera cam; 
 
-    if (filename.compare("") != 0){
-        // file has been passed
-        cam = Metavision::Camera::from_file(filename); 
-    } else {
-        // get first available camera
-        cam = Metavision::Camera::from_first_available(); 
+    Metavision::AvailableSourcesList available_systems = cam.list_online_sources(); 
+
+    // get camera by serial number available camera
+    try{
+      cam = Metavision::Camera::from_serial(serial_number);
+    } catch (const std::exception &e) {
+      std::cout << "Failure with serial number '" << serial_number << "': " <<e.what() << std::endl;
+
+      std::cout << "Serial numbers of available cameras: " << std::endl; 
+
+      for (int i = 0; i < available_systems[Metavision::OnlineSourceType::USB].size(); i++){
+        std::cout << "- " << available_systems[Metavision::OnlineSourceType::USB][i] << std::endl;
+      }
+
+      std::cout << std::endl; 
+
+      throw std::invalid_argument("Please choose one of the above listed serial numbers and run again!"); 
     }
 
     const Metavision::EventCD *ev_start = NULL, *ev_final = NULL; 

@@ -1,6 +1,10 @@
+
+# List iniVation devices connected to USB
+add_library(list_devices SHARED device_discovery.cpp)
+
 # Reading DVS data from USB
 add_library(dvsusb SHARED usb.hpp usb.cpp)
-target_link_libraries(dvsusb PRIVATE ${CAER_LIBRARY} ${OpenCV_LIBS} MetavisionSDK::core MetavisionSDK::driver opencv_highgui)
+target_link_libraries(dvsusb PRIVATE ${CAER_LIBRARY} ${OpenCV_LIBS} MetavisionSDK::core MetavisionSDK::driver opencv_highgui list_devices)
 
 # AEDAT4 processing
 add_library(aedat4 SHARED aedat4.hpp aedat4.cpp)

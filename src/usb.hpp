@@ -37,3 +37,6 @@ public:
 Generator<AEDAT::PolarityEvent>
 usb_event_generator(std::string camera, std::uint16_t deviceId,
                     std::uint8_t deviceAddress);
+
+Generator<AEDAT::PolarityEvent> 
+usb_event_generator(const std::string serial_number); 
