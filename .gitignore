@@ -3,7 +3,11 @@ DvsGesture/
 build/
 dist/
 .vscode/
+*.a
+*.cmake
+*.ninja
 *.so
+_deps/
 aedat.egg-info/
 .ninja_deps
 .ninja_log
