@@ -126,7 +126,6 @@ usb_event_generator(const std::string serial_number = "None"){
 
     const Metavision::EventCD *ev_start = NULL, *ev_final = NULL; 
 
-
     // add event callback -> will set ev_start and ev_final to respective begin and end of event buffer
     cam.cd().add_callback([&ev_start, &ev_final](const Metavision::EventCD *ev_begin, const Metavision::EventCD *ev_end) -> void{
         ev_start = ev_begin; 
