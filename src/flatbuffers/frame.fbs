@@ -1,0 +1,21 @@
+enum FrameFormat : int8 {
+    Gray = 0,
+    Bgr = 16,
+    Bgra = 24,
+}
+
+table Frame {
+    t: int64;
+    begin_t: int64;
+    end_t: int64;
+    exposure_begin_t: int64;
+    exposure_end_t: int64;
+    format : FrameFormat = Gray;
+    width: int16;
+    height: int16;
+    offset_x: int16;
+    offset_y: int16;
+    pixels: [uint8];
+}
+
+root_type Frame;
