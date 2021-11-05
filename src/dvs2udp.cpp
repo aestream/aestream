@@ -2,7 +2,7 @@
 
 // Constructor - initialize socket
 template <typename T>
-DVS2UDP<T>::DVS2UDP(uint32_t interval, uint32_t bfsize, std::string port, std::string IP) {
+DVSToUDP<T>::DVSToUDP(uint32_t interval, uint32_t bfsize, std::string port, std::string IP) {
   struct addrinfo hints, *servinfo;
   int rv;
 
@@ -44,7 +44,7 @@ DVS2UDP<T>::DVS2UDP(uint32_t interval, uint32_t bfsize, std::string port, std::s
 
 // Process a packet of events and send it using UDP over the socket
 template <typename T>
-void DVS2UDP<T>::sendpacket(Generator<T>& input_generator, bool include_timestamp) {
+void DVSToUDP<T>::sendpacket(Generator<T>& input_generator, bool include_timestamp) {
     int numbytes;
     int event_size;
     uint16_t max_events;
@@ -107,8 +107,8 @@ void DVS2UDP<T>::sendpacket(Generator<T>& input_generator, bool include_timestam
 
 // Close the socket
 template <typename T>
-void DVS2UDP<T>::closesocket() {
+void DVSToUDP<T>::closesocket() {
   close(sockfd);
 }
 
-template class DVS2UDP<AEDAT::PolarityEvent>;
+template class DVSToUDP<AEDAT::PolarityEvent>;

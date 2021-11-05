@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
   try {
     if (app_output_spif->parsed()) {
       std::cout << "Send events to: " << ipAddress << " on port: " << port <<std::endl;
-      DVS2UDP<AEDAT::PolarityEvent> client(packetSize, bufferSize, port, ipAddress);
+      DVSToUDP<AEDAT::PolarityEvent> client(packetSize, bufferSize, port, ipAddress);
       client.sendpacket(input_generator, include_timestamp);
     } else { // Default to STDOUT
       for (AEDAT::PolarityEvent event : input_generator) {

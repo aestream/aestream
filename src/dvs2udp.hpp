@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 template<typename T>
-class DVS2UDP{
+class DVSToUDP{
     public:
         int sockfd = -1;
         std::string serverport;
@@ -31,7 +31,7 @@ class DVS2UDP{
         uint32_t message[UDP_max_bytesize / 4];
         uint64_t events_sent = 0;
 
-        DVS2UDP(uint32_t interval, uint32_t bfsize, std::string port, std::string IP); 
+        DVSToUDP(uint32_t interval, uint32_t bfsize, std::string port, std::string IP); 
 
         void sendpacket(Generator<T>& input_generator, bool include_timestamp);
         void closesocket();
