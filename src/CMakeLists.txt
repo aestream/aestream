@@ -6,7 +6,7 @@ add_library(dvsusb SHARED usb.hpp usb.cpp)
 target_link_libraries(dvsusb PRIVATE ${CAER_LIBRARY} ${OpenCV_LIBS} MetavisionSDK::core MetavisionSDK::driver opencv_highgui list_devices)
 
 # Send DVS data to Ethernet
-add_library(dvs2udp SHARED dvs2udp.cpp)
+add_library(dvs2udp SHARED dvsToUDP.cpp)
 
 # AEDAT4 processing
 add_library(aedat4 SHARED aedat4.hpp aedat4.cpp)
