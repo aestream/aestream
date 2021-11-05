@@ -8,7 +8,7 @@
 #include "aedat.hpp"
 #include "aedat4.hpp"
 #include "usb.hpp"
-#include "dvs2udp.hpp"
+#include "dvsToUDP.hpp"
 
 int main(int argc, char *argv[]) {
   CLI::App app{"Streams DVS data from a USB camera or AEDAT file to a file or "

@@ -1,5 +1,5 @@
-#ifndef DVS2UDP_HPP
-#define DVS2UDP_HPP
+#ifndef DVSTOUDP_HPP
+#define DVSTOUDP_HPP
 
 # include <string>
 #include "aedat.hpp"
