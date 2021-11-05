@@ -137,9 +137,9 @@ usb_event_generator(const std::string serial_number = "None"){
 
     // keep running while camera is on or video is finished
     while (cam.is_running()){
-        if (ev_start != NULL && ev_final != NULL){
+        if ((ev_start != NULL) && (ev_final != NULL)){
             // iterate over events in buffer and convert to AEDAT Polarity Event
-            for (const Metavision::EventCD *ev = ev_start; ev != ev_final; ++ev){
+            for (const Metavision::EventCD *ev = ev_start; ev < ev_final; ++ev){
                 const AEDAT::PolarityEvent polarityEvent = {
                     true,
                     ev->p,
@@ -147,7 +147,6 @@ usb_event_generator(const std::string serial_number = "None"){
                     ev->y,
                     (uint64_t)ev->t,
                 };
-
                 co_yield polarityEvent;
             }
             ev_start = NULL; 

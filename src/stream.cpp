@@ -8,6 +8,7 @@
 #include "aedat.hpp"
 #include "aedat4.hpp"
 #include "usb.hpp"
+#include "dvs2udp.hpp"
 
 int main(int argc, char *argv[]) {
   CLI::App app{"Streams DVS data from a USB camera or AEDAT file to a file or "
@@ -47,14 +48,13 @@ int main(int argc, char *argv[]) {
   std::string ipAddress = "localhost"; // IP Adress - if NULL, use own IP.
   std::uint32_t bufferSize = 1024;
   std::uint16_t packetSize = 128;
+  bool include_timestamp = false; 
   auto app_output_spif = app_output->add_subcommand("spif", "SpiNNaker Interface Board (SPIF) output");
-  app_output_spif->add_option("destination", ipAddress,
-                  "Destination IP. Defaults to localhost");
+  app_output_spif->add_option("destination", ipAddress, "Destination IP. Defaults to localhost");
   app_output_spif->add_option("port", port, "Destination port. Defaults to 3333");
-  app_output_spif->add_option("--buffer-size", bufferSize,
-                 "UDP buffer size. Defaults to 1024");
-  app_output_spif->add_option("--packet-size", packetSize,
-                 "Number of events in a single UDP packet. Defaults to 128");
+  app_output_spif->add_option("--buffer-size", bufferSize, "UDP buffer size. Defaults to 1024");
+  app_output_spif->add_option("--packet-size", packetSize,  "Number of events in a single UDP packet. Defaults to 128");
+  app_output_spif->add_option("--include-timestamp", include_timestamp,  "Include timestamp in events");
 
   //
   // Generate options
@@ -82,10 +82,12 @@ int main(int argc, char *argv[]) {
   //
   try {
     if (app_output_spif->parsed()) {
-      printf("SPIF not yet supported...\n");
+      std::cout << "Send events to: " << ipAddress << " on port: " << port <<std::endl;
+      DVS2UDP<AEDAT::PolarityEvent> client(packetSize, bufferSize, port, ipAddress);
+      client.sendpacket(input_generator, include_timestamp);
     } else { // Default to STDOUT
       for (AEDAT::PolarityEvent event : input_generator) {
-        printf("%d,%d;\n", event.x, event.y);
+        printf("%d,%d,%d\n", event.x, event.y, event.timestamp);
       }
     }
   } catch (const std::exception &e) {

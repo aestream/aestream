@@ -14,7 +14,7 @@ target_link_libraries(aedat4 PRIVATE ${LZ4_LIBRARY} ${CAER_LIBRARY})
 
 add_executable(stream stream.cpp)
 target_include_directories(stream PRIVATE ${TORCH_INCLUDE_DIRS})
-target_link_libraries(stream PRIVATE dvsusb aedat4 ${TORCH_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(stream PRIVATE dvsusb aedat4 dvs2udp ${TORCH_LIBRARIES} ${OpenCV_LIBS})
 
 
 # Stream DVS data and transform it into sparse tensors 
