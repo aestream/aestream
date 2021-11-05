@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
       client.sendpacket(input_generator, include_timestamp);
     } else { // Default to STDOUT
       for (AEDAT::PolarityEvent event : input_generator) {
-        printf("%d,%d,%d;\n", event.x, event.y, event.timestamp);
+        printf("%d,%d,%d\n", event.x, event.y, event.timestamp);
       }
     }
   } catch (const std::exception &e) {
