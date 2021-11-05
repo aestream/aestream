@@ -17,10 +17,10 @@ struct AEDAT {
 
   struct PolarityEvent {
     uint32_t valid : 1;
-    bool polarity : 1;
-    uint16_t x : 15;
-    uint16_t y : 15;
-    uint64_t timestamp : 32;
+    uint32_t polarity : 1;
+    uint32_t x : 15;
+    uint32_t y : 15;
+    uint32_t timestamp : 32;
   } __attribute__((packed));
 
   struct SpecialEvent {
@@ -119,8 +119,67 @@ struct AEDAT {
     uint32_t eventValid;
   } __attribute__((packed));
 
+  void load(const std::string &filename) {
+    std::fstream fs;
+    char line[128];
+    Header header;
+    std::string str = std::string(line);
+
+    fs.open(filename, std::fstream::in);
+
+    do {
+      fs.getline(line, 128);
+      str = std::string(line);
+    } while (str.rfind("#!END-HEADER", 0) != 0);
+
+    while (fs.read((char *)(&header), 28)) {
+      if (header.eventTSOverflow != 0) {
+        std::cout << "Unhandled TSOverflow "
+                  << static_cast<uint16_t>(header.eventTSOverflow) << std::endl;
+      }
+      if (header.eventType == EventType::POLARITY_EVENT) {
+        PolarityEvent polarity_event;
+        for (size_t i = 0; i < header.eventNumber; i++) {
+          fs.read((char *)(&polarity_event), header.eventSize);
+          polarity_events.push_back(polarity_event);
+        }
+        fs.ignore((header.eventCapacity - header.eventNumber) *
+                  header.eventSize);
+      } else if (header.eventType == EventType::IMU6_EVENT) {
+        IMU6Event imu6_event;
+        for (size_t i = 0; i < header.eventNumber; i++) {
+          fs.read((char *)(&imu6_event), header.eventSize);
+          imu6_events.push_back(imu6_event);
+        }
+        fs.ignore((header.eventCapacity - header.eventNumber) *
+                  header.eventSize);
+      } else if (header.eventType == EventType::IMU9_EVENT) {
+        IMU9Event imu9_event;
+        for (size_t i = 0; i < header.eventNumber; i++) {
+          fs.read((char *)(&imu9_event), header.eventSize);
+          imu9_events.push_back(imu9_event);
+        }
+        fs.ignore((header.eventCapacity - header.eventNumber) *
+                  header.eventSize);
+      } else if (header.eventType == EventType::SPIKE_EVENT) {
+        DynapSEEvent dyn_event;
+        for (size_t i = 0; i < header.eventNumber; i++) {
+          fs.read((char *)(&dyn_event), header.eventSize);
+          dynapse_events.push_back(dyn_event);
+        }
+        fs.ignore((header.eventCapacity - header.eventNumber) *
+                  header.eventSize);
+      } else {
+        std::cout << "Unhandled Event type "
+                  << static_cast<uint16_t>(header.eventType) << std::endl;
+        fs.ignore(header.eventCapacity * header.eventSize);
+      }
+    }
+    return;
+  }
+
   AEDAT() {}
-  // DVSEvents(const std::string &filename) { load(filename); }
+  AEDAT(const std::string &filename) { load(filename); }
 
   std::vector<DynapSEEvent> dynapse_events;
   std::vector<IMU6Event> imu6_events;

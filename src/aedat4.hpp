@@ -209,9 +209,9 @@ struct AEDAT4 {
         auto event_packet = GetSizePrefixedEventPacket(&dst_buffer[0]);
         for (auto event : *event_packet->elements()) {
           polarity_events.push_back(
-              AEDAT::PolarityEvent{1, static_cast<bool>(event->on()),
-                                   static_cast<uint16_t>(event->x()),
-                                   static_cast<uint16_t>(event->y()),
+              AEDAT::PolarityEvent{1, static_cast<uint32_t>(event->on()),
+                                   static_cast<uint32_t>(event->x()),
+                                   static_cast<uint32_t>(event->y()),
                                    static_cast<uint32_t>(event->t())});
         }
         break;
