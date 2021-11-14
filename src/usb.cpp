@@ -58,7 +58,7 @@ USBConnection::USBConnection(std::string camera, uint16_t deviceId,
                     CAER_HOST_CONFIG_DATAEXCHANGE_BLOCKING, true);
 }
 
-// event generator for Iniviation cameras
+// event generator for Inivation cameras
 Generator<AEDAT::PolarityEvent>
 usb_event_generator(std::string camera, std::uint16_t deviceId,
                     std::uint8_t deviceAddress) {
@@ -157,5 +157,4 @@ usb_event_generator(const std::string serial_number = "None"){
 
     // if video is finished, stop camera - will never get here with live camera
     cam.stop();
-
 } 
