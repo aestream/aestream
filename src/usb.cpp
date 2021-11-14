@@ -103,8 +103,9 @@ usb_event_generator(std::string camera, std::uint16_t deviceId,
 Generator<AEDAT::PolarityEvent> 
 usb_event_generator(const std::string serial_number = "None"){
 
-    Metavision::Camera cam; 
+    Metavision::Camera cam; // = Metavision::Camera::from_first_available(); 
 
+    
     Metavision::AvailableSourcesList available_systems = cam.list_online_sources(); 
 
     // get camera by serial number available camera
@@ -123,7 +124,7 @@ usb_event_generator(const std::string serial_number = "None"){
 
       throw std::invalid_argument("Please choose one of the above listed serial numbers and run again!"); 
     }
-
+    
     const Metavision::EventCD *ev_start = NULL, *ev_final = NULL; 
 
     // add event callback -> will set ev_start and ev_final to respective begin and end of event buffer

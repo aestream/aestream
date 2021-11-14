@@ -9,6 +9,7 @@
 #include "aedat4.hpp"
 #include "usb.hpp"
 #include "dvsToUDP.hpp"
+#include "dvsToFile.hpp"
 
 int main(int argc, char *argv[]) {
   CLI::App app{"Streams DVS data from a USB camera or AEDAT file to a file or "
@@ -55,6 +56,12 @@ int main(int argc, char *argv[]) {
   app_output_spif->add_option("--buffer-size", bufferSize, "UDP buffer size. Defaults to 1024");
   app_output_spif->add_option("--packet-size", packetSize,  "Number of events in a single UDP packet. Defaults to 128");
   app_output_spif->add_option("--include-timestamp", include_timestamp,  "Include timestamp in events");
+  
+  // - FILE
+  std::string output_filename;
+  auto app_output_file = app_output->add_subcommand("file", "File output");
+  app_output_file->add_option("output-filename", output_filename, "Output Filename");
+
 
   //
   // Generate options
@@ -82,10 +89,13 @@ int main(int argc, char *argv[]) {
   //
   try {
     if (app_output_spif->parsed()) {
-      std::cout << "Send events to: " << ipAddress << " on port: " << port <<std::endl;
+      std::cout << "Send events to: " << ipAddress << " on port: " << port << std::endl;
       DVSToUDP<AEDAT::PolarityEvent> client(packetSize, bufferSize, port, ipAddress);
       client.sendpacket(input_generator, include_timestamp);
-    } else { // Default to STDOUT
+    } else if (app_output_file->parsed()){ 
+      std::cout << "Send events to file: " << output_filename << std::endl;
+      DVSToFile<AEDAT::PolarityEvent>(input_generator, output_filename);
+      } else {// Default to STDOUT
       for (AEDAT::PolarityEvent event : input_generator) {
         std::cout << event.x << ", " << event.y << ", " << event.timestamp << ";" << std::endl;
       }

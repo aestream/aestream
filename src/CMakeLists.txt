@@ -8,6 +8,9 @@ target_link_libraries(dvsusb PRIVATE ${CAER_LIBRARY} ${OpenCV_LIBS} MetavisionSD
 # Send DVS data to Ethernet
 add_library(dvs2udp SHARED dvsToUDP.cpp)
 
+# Send DVS data to File
+add_library(dvs2file SHARED dvsToFile.cpp)
+
 # AEDAT4 processing
 add_library(aedat4 SHARED aedat4.hpp aedat4.cpp)
 target_include_directories(aedat4 PUBLIC .)
@@ -16,4 +19,4 @@ target_link_libraries(aedat4 PRIVATE ${LZ4_LIBRARY} ${CAER_LIBRARY})
 
 add_executable(stream stream.cpp)
 target_include_directories(stream PRIVATE ${TORCH_INCLUDE_DIRS})
-target_link_libraries(stream PRIVATE dvsusb aedat4 dvs2udp ${TORCH_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(stream PRIVATE dvsusb aedat4 dvs2udp dvs2file ${TORCH_LIBRARIES} ${OpenCV_LIBS})

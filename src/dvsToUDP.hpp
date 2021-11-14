@@ -28,7 +28,7 @@ class DVSToUDP{
         uint32_t buffer_size;
 
         static const uint16_t UDP_max_bytesize = 512;
-        uint32_t message[UDP_max_bytesize / 4];
+        uint32_t message[UDP_max_bytesize / 4]; // 4 bytes (32 bits) per event
         uint64_t events_sent = 0;
 
         DVSToUDP(uint32_t interval, uint32_t bfsize, std::string port, std::string IP); 
