@@ -19,7 +19,7 @@ sparse_tensor_generator(std::string camera, std::uint16_t deviceId, std::uint8_t
             continue; // Skip if nothing there.
         }
 
-        if(packet->getEventType() == POLARITYEVENT){  
+        if(packet->getEventType() == POLARITY_EVENT){  
             std::shared_ptr<const libcaer::events::PolarityEventPacket> polarity = std::static_pointer_cast<libcaer::events::PolarityEventPacket>(packet);
 
             for (const libcaer::events::PolarityEvent &evt : *polarity) {
