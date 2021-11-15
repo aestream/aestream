@@ -1,11 +1,11 @@
 #pragma once
 
-#include <any>
-#include <csignal>
+# include <any>
+# include <csignal>
 # include <string>
 
-#include <libcaercpp/devices/davis.hpp>
-#include <libcaercpp/devices/dvxplorer.hpp>
+# include <libcaercpp/devices/davis.hpp>
+# include <libcaercpp/devices/dvxplorer.hpp>
 
 # include <metavision/sdk/driver/camera.h>
 # include <metavision/sdk/base/events/event_cd.h>
