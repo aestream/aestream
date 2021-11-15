@@ -4,7 +4,6 @@
 #include "aedat.hpp"
 #include "generator.hpp"
 #include "usb.hpp"
-#include "metavision/sdk/driver/camera.h"
 #include "device_discovery.hpp"
 
 

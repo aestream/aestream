@@ -56,7 +56,6 @@ int main(int argc, char *argv[]) {
   app_output_spif->add_option("--buffer-size", bufferSize, "UDP buffer size. Defaults to 1024");
   app_output_spif->add_option("--packet-size", packetSize,  "Number of events in a single UDP packet. Defaults to 128");
   app_output_spif->add_option("--include-timestamp", include_timestamp,  "Include timestamp in events");
-  
   // - FILE
   std::string output_filename;
   auto app_output_file = app_output->add_subcommand("file", "File output");
