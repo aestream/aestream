@@ -1,5 +1,4 @@
-#include "generator.hpp"
-#include "usb.hpp"
+# include "dvsToTensor.hpp"
 
 // sparse tensor generator for Inivation cameras
 Generator<torch::Tensor>
@@ -39,7 +38,7 @@ sparse_tensor_generator(std::string camera, std::uint16_t deviceId, std::uint8_t
                 polarity_events.push_back(polarityEvent);
             }
             auto event_tensors = convert_polarity_events(polarity_events);
-            std::vector<AEDAT::PolarityEvent>().swap(polarity_events)
+            std::vector<AEDAT::PolarityEvent>().swap(polarity_events);
             co_yield event_tensors;
         }
     }
@@ -106,7 +105,7 @@ sparse_tensor_generator(const std::string serial_number = "None"){
             ev_final = NULL; 
 
             auto event_tensors = convert_polarity_events(polarity_events);
-            std::vector<AEDAT::PolarityEvent>().swap(polarity_events)
+            std::vector<AEDAT::PolarityEvent>().swap(polarity_events);
             co_yield event_tensors;
         }
     }
