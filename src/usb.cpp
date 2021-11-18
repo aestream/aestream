@@ -68,24 +68,24 @@ usb_event_generator(std::string camera, std::uint16_t deviceId,
         continue; // Skip if nothing there.
       }
 
-      std::shared_ptr<const libcaer::events::PolarityEventPacket> polarity =
-          std::static_pointer_cast<libcaer::events::PolarityEventPacket>(
-              packet);
+      if (packet->getEventType() == POLARITY_EVENT) {
+        std::shared_ptr<const libcaer::events::PolarityEventPacket> polarity = std::static_pointer_cast<libcaer::events::PolarityEventPacket>(packet);
 
-      for (const libcaer::events::PolarityEvent &evt : *polarity) {
-        if (!evt.isValid()) {
-          continue;
+        for (const libcaer::events::PolarityEvent &evt : *polarity) {
+          if (!evt.isValid()) {
+            continue;
+          }
+
+          const AEDAT::PolarityEvent polarityEvent = {
+              evt.isValid(),
+              evt.getPolarity(),
+              evt.getX(),
+              evt.getY(),
+              (uint64_t)evt.getTimestamp64(*polarity),
+          };
+
+          co_yield polarityEvent;
         }
-
-        const AEDAT::PolarityEvent polarityEvent = {
-            evt.isValid(),
-            evt.getPolarity(),
-            evt.getX(),
-            evt.getY(),
-            (uint64_t)evt.getTimestamp64(*polarity),
-        };
-
-        co_yield polarityEvent;
       }
     }
   }
