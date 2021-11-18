@@ -1,11 +1,4 @@
-#include <csignal>
-#include <iostream>
-
-#include "aedat.hpp"
-#include "generator.hpp"
 #include "usb.hpp"
-#include "device_discovery.hpp"
-
 
 USBConnection::USBConnection(std::string camera, uint16_t deviceId,
                              uint8_t deviceAddress) {

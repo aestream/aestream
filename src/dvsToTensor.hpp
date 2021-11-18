@@ -1,7 +1,6 @@
 #ifndef DVSTOTENSOR_HPP
 #define DVSTOTENSOR_HPP
 
-#include "generator.hpp"
 #include "usb.hpp"
 #include "convert.hpp"
 

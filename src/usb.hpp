@@ -3,6 +3,8 @@
 # include <any>
 # include <csignal>
 # include <string>
+#include <csignal>
+#include <iostream>
 
 # include <libcaercpp/devices/davis.hpp>
 # include <libcaercpp/devices/dvxplorer.hpp>
@@ -12,6 +14,7 @@
 
 #include "aedat.hpp"
 #include "generator.hpp"
+#include "device_discovery.hpp"
 
 class USBConnection {
   uint32_t containerInterval = 128;
