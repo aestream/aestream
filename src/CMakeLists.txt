@@ -23,6 +23,6 @@ target_include_directories(dvs2tensor PRIVATE ${TORCH_INCLUDE_DIRS} ${Python3_IN
 target_link_libraries(dvs2tensor PRIVATE ${TORCH_LIBRARIES} dvsusb)
 
 # Stream from camera
-add_executable(stream stream.cpp)
-target_include_directories(stream PRIVATE ${TORCH_INCLUDE_DIRS})
-target_link_libraries(stream PRIVATE dvsusb aedat4 dvs2udp dvs2file ${TORCH_LIBRARIES} ${OpenCV_LIBS})
+# add_executable(stream stream.cpp)
+# target_include_directories(stream PRIVATE ${TORCH_INCLUDE_DIRS})
+# target_link_libraries(stream PRIVATE dvsusb aedat4 dvs2udp dvs2file ${TORCH_LIBRARIES} ${OpenCV_LIBS} MetavisionSDK::core MetavisionSDK::driver )

@@ -7,7 +7,7 @@
 #include "generator.hpp"
 
 Generator<torch::Tensor>
-dense_tensor_generator(Generator<AEDAT::PolarityEvent>& event_generator,
+sparse_tensor_generator(Generator<AEDAT::PolarityEvent>& event_generator,
                        std::chrono::duration<double, std::micro> event_window);
 
 // Generator<torch::Tensor> sparse_tensor_generator(Generator <

@@ -8,7 +8,7 @@
 
 // dense tensor generator
 Generator<torch::Tensor>
-dense_tensor_generator(Generator<AEDAT::PolarityEvent>& event_generator,
+sparse_tensor_generator(Generator<AEDAT::PolarityEvent>& event_generator,
                        std::chrono::duration<double, std::micro> event_window) {
 
   std::vector<AEDAT::PolarityEvent> polarity_events;

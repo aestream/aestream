@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 TEST(TorchTest, GenerateTensor) {
   auto generator = file_event_generator("../example/davis.aedat4");
   auto to_tensor =
-      dense_tensor_generator(generator, std::chrono::microseconds(1s));
+      sparse_tensor_generator(generator, std::chrono::microseconds(1s));
   uint64_t sum = 0;
   for (torch::Tensor tensor : to_tensor) {
     sum += tensor.sum().item<int>();
