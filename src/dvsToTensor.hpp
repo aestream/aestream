@@ -1,14 +1,14 @@
-#ifndef DVSTOTENSOR_HPP
-#define DVSTOTENSOR_HPP
+#pragma once
 
-#include "usb.hpp"
-#include "convert.hpp"
+#include <chrono>
+#include <torch/torch.h>
 
-
-Generator<torch::Tensor>
-sparse_tensor_generator(std::string camera, std::uint16_t deviceId, std::uint8_t deviceAddress); 
+#include "aedat.hpp"
+#include "generator.hpp"
 
 Generator<torch::Tensor>
-sparse_tensor_generator(const std::string serial_number);
+dense_tensor_generator(Generator<AEDAT::PolarityEvent>& event_generator,
+                       std::chrono::duration<double, std::micro> event_window);
 
-#endif
+// Generator<torch::Tensor> sparse_tensor_generator(Generator <
+//  AEDAT::PolarityEvent);

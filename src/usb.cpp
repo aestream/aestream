@@ -3,26 +3,32 @@
 USBConnection::USBConnection(std::string camera, uint16_t deviceId,
                              uint8_t deviceAddress) {
 
-  try{                         
+  try {
     if (camera == "dvx") {
-      handle =
-          new libcaer::devices::dvXplorer(deviceId, deviceId, deviceAddress, "");
+      handle = new libcaer::devices::dvXplorer(deviceId, deviceId,
+                                               deviceAddress, "");
     } else if (camera == "davis") {
-      handle = new libcaer::devices::davis(deviceId, deviceId, deviceAddress, "");
+      handle =
+          new libcaer::devices::davis(deviceId, deviceId, deviceAddress, "");
     } else {
       throw std::invalid_argument("Unknown camera '" + camera + "'");
     }
   } catch (const std::exception &e) {
-    std::cout << "Failure with camera: " << camera << ", deviceId: '" << deviceId << "', deviceAddress (devAddress) see below.\n" << std::endl;
-    std::cout <<  e.what() << std::endl;
+    std::cout << "Failure with camera: " << camera << ", deviceId: '"
+              << deviceId << "', deviceAddress (devAddress) see below.\n"
+              << std::endl;
+    std::cout << e.what() << std::endl;
 
-    std::cout << "List of available inivation cameras and configurations: " << std::endl;
+    std::cout << "List of available inivation cameras and configurations: "
+              << std::endl;
 
-    int exit_status = list_devices(); 
+    int exit_status = list_devices();
 
-    std::cout << std::endl; 
+    std::cout << std::endl;
 
-    throw std::invalid_argument("Please choose the deviceId (busNum) and deviceAddress (devAddr) of one of the above listed iniVation cameras!");
+    throw std::invalid_argument(
+        "Please choose the deviceId (busNum) and deviceAddress (devAddr) of "
+        "one of the above listed iniVation cameras!");
   }
 
   // Send the default configuration before using the device.
@@ -69,7 +75,9 @@ usb_event_generator(std::string camera, std::uint16_t deviceId,
       }
 
       if (packet->getEventType() == POLARITY_EVENT) {
-        std::shared_ptr<const libcaer::events::PolarityEventPacket> polarity = std::static_pointer_cast<libcaer::events::PolarityEventPacket>(packet);
+        std::shared_ptr<const libcaer::events::PolarityEventPacket> polarity =
+            std::static_pointer_cast<libcaer::events::PolarityEventPacket>(
+                packet);
 
         for (const libcaer::events::PolarityEvent &evt : *polarity) {
           if (!evt.isValid()) {
@@ -77,11 +85,11 @@ usb_event_generator(std::string camera, std::uint16_t deviceId,
           }
 
           const AEDAT::PolarityEvent polarityEvent = {
-              evt.isValid(),
-              evt.getPolarity(),
+              (uint64_t)evt.getTimestamp64(*polarity),
               evt.getX(),
               evt.getY(),
-              (uint64_t)evt.getTimestamp64(*polarity),
+              evt.isValid(),
+              evt.getPolarity(),
           };
 
           co_yield polarityEvent;
@@ -92,61 +100,65 @@ usb_event_generator(std::string camera, std::uint16_t deviceId,
 };
 
 // event generator for Prophesee cameras
-Generator<AEDAT::PolarityEvent> 
-usb_event_generator(const std::string serial_number = "None"){
+Generator<AEDAT::PolarityEvent>
+usb_event_generator(const std::string serial_number = "None") {
 
-    Metavision::Camera cam; // = Metavision::Camera::from_first_available(); 
+  Metavision::Camera cam; // = Metavision::Camera::from_first_available();
 
-    
-    Metavision::AvailableSourcesList available_systems = cam.list_online_sources(); 
+  Metavision::AvailableSourcesList available_systems =
+      cam.list_online_sources();
 
-    // get camera by serial number available camera
-    try{
-      cam = Metavision::Camera::from_serial(serial_number);
-    } catch (const std::exception &e) {
-      std::cout << "Failure with serial number '" << serial_number << "': " <<e.what() << std::endl;
+  // get camera by serial number available camera
+  try {
+    cam = Metavision::Camera::from_serial(serial_number);
+  } catch (const std::exception &e) {
+    std::cout << "Failure with serial number '" << serial_number
+              << "': " << e.what() << std::endl;
 
-      std::cout << "Serial numbers of available cameras: " << std::endl; 
+    std::cout << "Serial numbers of available cameras: " << std::endl;
 
-      for (int i = 0; i < available_systems[Metavision::OnlineSourceType::USB].size(); i++){
-        std::cout << "- " << available_systems[Metavision::OnlineSourceType::USB][i] << std::endl;
+    for (int i = 0;
+         i < available_systems[Metavision::OnlineSourceType::USB].size(); i++) {
+      std::cout << "- "
+                << available_systems[Metavision::OnlineSourceType::USB][i]
+                << std::endl;
+    }
+
+    std::cout << std::endl;
+
+    throw std::invalid_argument(
+        "Please choose one of the above listed serial numbers and run again!");
+  }
+
+  const Metavision::EventCD *ev_start = NULL, *ev_final = NULL;
+
+  // add event callback -> will set ev_start and ev_final to respective begin
+  // and end of event buffer
+  cam.cd().add_callback(
+      [&ev_start, &ev_final](const Metavision::EventCD *ev_begin,
+                             const Metavision::EventCD *ev_end) -> void {
+        ev_start = ev_begin;
+        ev_final = ev_end;
+      });
+
+  // start camera
+  cam.start();
+
+  // keep running while camera is on or video is finished
+  while (cam.is_running()) {
+    if ((ev_start != NULL) && (ev_final != NULL)) {
+      // iterate over events in buffer and convert to AEDAT Polarity Event
+      for (const Metavision::EventCD *ev = ev_start; ev < ev_final; ++ev) {
+        const AEDAT::PolarityEvent polarityEvent = {
+            (uint64_t)ev->t, ev->x, ev->y, true, (bool)ev->p,
+        };
+        co_yield polarityEvent;
       }
-
-      std::cout << std::endl; 
-
-      throw std::invalid_argument("Please choose one of the above listed serial numbers and run again!"); 
+      ev_start = NULL;
+      ev_final = NULL;
     }
-    
-    const Metavision::EventCD *ev_start = NULL, *ev_final = NULL; 
+  }
 
-    // add event callback -> will set ev_start and ev_final to respective begin and end of event buffer
-    cam.cd().add_callback([&ev_start, &ev_final](const Metavision::EventCD *ev_begin, const Metavision::EventCD *ev_end) -> void{
-        ev_start = ev_begin; 
-        ev_final = ev_end; 
-    });
-
-    // start camera
-    cam.start();
-
-    // keep running while camera is on or video is finished
-    while (cam.is_running()){
-        if ((ev_start != NULL) && (ev_final != NULL)){
-            // iterate over events in buffer and convert to AEDAT Polarity Event
-            for (const Metavision::EventCD *ev = ev_start; ev < ev_final; ++ev){
-                const AEDAT::PolarityEvent polarityEvent = {
-                    true,
-                    ev->p,
-                    ev->x,
-                    ev->y,
-                    (uint64_t)ev->t,
-                };
-                co_yield polarityEvent;
-            }
-            ev_start = NULL; 
-            ev_final = NULL; 
-        }
-    }
-
-    // if video is finished, stop camera - will never get here with live camera
-    cam.stop();
-} 
+  // if video is finished, stop camera - will never get here with live camera
+  cam.stop();
+}

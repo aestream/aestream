@@ -14,10 +14,10 @@
 #include <lz4frame.h>
 
 #include "aedat.hpp"
-#include "generator.hpp"
 #include "events_generated.h"
 #include "file_data_table_generated.h"
 #include "frame_generated.h"
+#include "generator.hpp"
 #include "imus_generated.h"
 #include "ioheader_generated.h"
 #include "rapidxml.hpp"
@@ -97,7 +97,7 @@ struct AEDAT4 {
 
     rapidxml::xml_document<> doc;
 
-    //std::cout << ioheader->infoNode()->str() << std::endl;
+    // std::cout << ioheader->infoNode()->str() << std::endl;
 
     doc.parse<0>((char *)(ioheader->infoNode()->str().c_str()));
 
@@ -208,11 +208,13 @@ struct AEDAT4 {
       case OutInfo::Type::EVTS: {
         auto event_packet = GetSizePrefixedEventPacket(&dst_buffer[0]);
         for (auto event : *event_packet->elements()) {
-          polarity_events.push_back(
-              AEDAT::PolarityEvent{1, static_cast<bool>(event->on()),
-                                   static_cast<uint16_t>(event->x()),
-                                   static_cast<uint16_t>(event->y()),
-                                   static_cast<uint32_t>(event->t())});
+          polarity_events.push_back(AEDAT::PolarityEvent{
+              static_cast<uint64_t>(event->t()),
+              static_cast<uint16_t>(event->x()),
+              static_cast<uint16_t>(event->y()),
+              1,
+              static_cast<bool>(event->on()),
+          });
         }
         break;
       }
@@ -259,7 +261,6 @@ struct AEDAT4 {
   std::vector<OutInfo> outinfos;
   std::vector<Frame> frames;
   std::vector<AEDAT::PolarityEvent> polarity_events;
-
 };
 
 Generator<AEDAT::PolarityEvent> file_event_generator(std::string aedat_file);
