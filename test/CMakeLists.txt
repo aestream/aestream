@@ -17,16 +17,19 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
 enable_testing()
 
 add_executable(
-  aedat_test
+  aestream_test
+  main_test.cpp
   aedat_test.cpp
+  torch_test.cpp
 )
+target_include_directories(aestream_test PRIVATE ${TORCH_INCLUDE_DIRS})
 target_link_libraries(
-  aedat_test
+  aestream_test
   aedat4
-  gtest_main ${LZ4_LIBRARY} ${CAER_LIBRARY}
-  
+  dvs2tensor
+  gtest_main ${LZ4_LIBRARY} ${CAER_LIBRARY} ${TORCH_PYTHON_LIBRARY}
 )
 #include_directories("../src")
 
 include(GoogleTest)
-gtest_discover_tests(aedat_test)
+gtest_discover_tests(aestream_test)
