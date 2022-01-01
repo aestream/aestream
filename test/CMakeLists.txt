@@ -14,22 +14,22 @@ set(CMAKE_C_FLAGS_DEBUG "-g -DDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
 
 # Enable testing
-enable_testing()
+# enable_testing()
 
-add_executable(
-  aestream_test
-  main_test.cpp
-  aedat_test.cpp
-  torch_test.cpp
-)
-target_include_directories(aestream_test PRIVATE ${TORCH_INCLUDE_DIRS})
-target_link_libraries(
-  aestream_test
-  aedat4
-  dvs2tensor
-  gtest_main ${LZ4_LIBRARY} ${CAER_LIBRARY} ${TORCH_PYTHON_LIBRARY}
-)
-#include_directories("../src")
+# add_executable(
+#   aestream_test
+#   main_test.cpp
+#   aedat_test.cpp
+#   torch_test.cpp
+# )
+# target_include_directories(aestream_test PRIVATE ${TORCH_INCLUDE_DIRS})
+# target_link_libraries(
+#   aestream_test
+#   aedat4
+#   dvs2tensor
+#   gtest_main ${LZ4_LIBRARY} ${CAER_LIBRARY} ${TORCH_PYTHON_LIBRARY}
+# )
+# #include_directories("../src")
 
-include(GoogleTest)
-gtest_discover_tests(aestream_test)
+# include(GoogleTest)
+# gtest_discover_tests(aestream_test)

@@ -1,4 +1,4 @@
-#include "device_discovery.hpp"
+#include "inivation_device.hpp"
 
 /* This function has been taken from the example list of the libcaer 
 library <https://github.com/inivation/libcaer> developed by the iniVation AG. 

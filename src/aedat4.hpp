@@ -154,7 +154,6 @@ struct AEDAT4 {
     size_t data_table_position = ioheader->dataTablePosition();
 
     data += ioheader_offset + 4;
-    char *header_end = data;
 
     // we have to treat each packet according the compression method used,
     // which can be found in ioheader->compression()
@@ -188,6 +187,7 @@ struct AEDAT4 {
       // just here to illustrate access to the data
     }
 
+    uint64_t count = 0;
     while (data < buffer_start + data_table_position) {
       int32_t stream_id = *reinterpret_cast<int32_t *>(data);
       data += 4;
@@ -204,17 +204,26 @@ struct AEDAT4 {
         return;
       }
 
-      switch (outinfos[stream_id].type) {
-      case OutInfo::Type::EVTS: {
+      switch (stream_id) {
+      // switch (outinfos[stream_id].type) {
+      // case OutInfo::Type::EVTS: {
+      case 0: {
         auto event_packet = GetSizePrefixedEventPacket(&dst_buffer[0]);
         for (auto event : *event_packet->elements()) {
-          polarity_events.push_back(AEDAT::PolarityEvent{
+          count += 1;
+          const auto e = AEDAT::PolarityEvent{
               static_cast<uint64_t>(event->t()),
               static_cast<uint16_t>(event->x()),
               static_cast<uint16_t>(event->y()),
               1,
               static_cast<bool>(event->on()),
-          });
+          };
+          if (e.x > 640 || e.y > 480) {
+            printf("Wrong coords (%lu) %lu: %ux%u\n", count, e.timestamp, e.x,
+                   e.y);
+          }
+          // printf("Event:%lu: %3d  %3d\n", e.timestamp, e.x, e.y);
+          polarity_events.push_back(e);
         }
         break;
       }
@@ -250,6 +259,9 @@ struct AEDAT4 {
         auto trigger_packet = GetSizePrefixedTriggerPacket(&dst_buffer[0]);
         break;
       }
+      default: {
+        break;
+      }
       }
     }
   }
@@ -263,4 +275,5 @@ struct AEDAT4 {
   std::vector<AEDAT::PolarityEvent> polarity_events;
 };
 
-Generator<AEDAT::PolarityEvent> file_event_generator(std::string aedat_file);
+Generator<AEDAT::PolarityEvent>
+file_event_generator(const std::string &filename, bool ignore_time = false);
