@@ -1,8 +1,8 @@
 #include "prophesee.hpp"
 
-//event generator for Prophesee cameras
+// event generator for Prophesee cameras
 Generator<AEDAT::PolarityEvent>
-usb_event_generator(const std::string serial_number = "None") {
+prophesee_event_generator(const std::string serial_number = "None") {
 
   Metavision::Camera cam; // = Metavision::Camera::from_first_available();
 

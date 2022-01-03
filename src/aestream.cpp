@@ -13,8 +13,13 @@
 #ifdef WITH_CAER
 #include "input/inivation.hpp"
 #endif
+#ifdef WITH_METAVISION
+#include "input/prophesee.hpp"
+#endif
 
 // Output
+#include "output/dvs_to_file.hpp"
+#include "output/dvs_to_udp.hpp"
 
 int main(int argc, char *argv[]) {
   CLI::App app{"Streams DVS data from a USB camera or AEDAT file to a file or "
@@ -110,8 +115,13 @@ int main(int argc, char *argv[]) {
     throw std::invalid_argument(
         "Inivation cameras unavailable: please recompile with libcaer");
 #endif
-    // } else if (app_input_prophesee->parsed()) {
-    //   input_generator = usb_event_generator(serial_number);
+  } else if (app_input_prophesee->parsed()) {
+#ifdef WITH_METAVISION
+    input_generator = prophesee_event_generator(serial_number);
+#else
+    throw std::invalid_argument(
+        "Prophesee cameras unavailable: please recompile with MetavisionSDK");
+#endif
   } else if (app_input_file->parsed()) {
     input_generator = file_event_generator(input_filename, input_ignore_time);
   }
@@ -120,24 +130,24 @@ int main(int argc, char *argv[]) {
   // Handle output
   //
   try {
-    // if (app_output_spif->parsed()) {
-    //   std::cout << "Send events to: " << ipAddress << " on port: " << port
-    //             << std::endl;
-    //   DVSToUDP<AEDAT::PolarityEvent> client(packetSize, bufferSize, port,
-    //                                         ipAddress);
-    //   client.sendpacket(input_generator, include_timestamp);
-    // } else if (app_output_file->parsed()) {
-    //   std::cout << "Send events to file: " << output_filename << std::endl;
-    //   DVSToFile<AEDAT::PolarityEvent>(input_generator, output_filename);
-    // } else { // Default to STDOUT
-    //   uint64_t count = 0;
-    //   for (AEDAT::PolarityEvent event : input_generator) {
-    //     count += 1;
-    //     std::cout << event.x << "," << event.y << ","
-    //               << std::to_string(event.timestamp) << std::endl;
-    //   }
-    //   printf("Sent a total of %ld events\n", count);
-    // }
+    if (app_output_spif->parsed()) {
+      std::cout << "Send events to: " << ipAddress << " on port: " << port
+                << std::endl;
+      DVSToUDP<AEDAT::PolarityEvent> client(packetSize, bufferSize, port,
+                                            ipAddress);
+      client.sendpacket(input_generator, include_timestamp);
+    } else if (app_output_file->parsed()) {
+      std::cout << "Send events to file: " << output_filename << std::endl;
+      DVSToFile<AEDAT::PolarityEvent>(input_generator, output_filename);
+    } else { // Default to STDOUT
+      uint64_t count = 0;
+      for (AEDAT::PolarityEvent event : input_generator) {
+        count += 1;
+        std::cout << event.x << "," << event.y << ","
+                  << std::to_string(event.timestamp) << std::endl;
+      }
+      printf("Sent a total of %ld events\n", count);
+    }
   } catch (const std::exception &e) {
     std::cout << "Failure while streaming events: " << e.what() << "\n";
   }

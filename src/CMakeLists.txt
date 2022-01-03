@@ -50,5 +50,5 @@ find_package(Torch REQUIRED)
 # AEStream executable
 add_executable(aestream aestream.cpp)
 target_include_directories(aestream PRIVATE ${TORCH_INCLUDE_DIRS})
-target_link_libraries(aestream PRIVATE aedat4 aestream_input)
+target_link_libraries(aestream PRIVATE aedat4 aestream_input aestream_output)
 # MetavisionSDK::core MetavisionSDK::driver )

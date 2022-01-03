@@ -7,4 +7,4 @@
 #include "../generator.hpp"
 
 Generator<AEDAT::PolarityEvent>
-usb_event_generator(const std::string serial_number);
+prophesee_event_generator(const std::string serial_number);

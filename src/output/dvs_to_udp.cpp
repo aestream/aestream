@@ -1,4 +1,4 @@
-#include "dvsToUDP.hpp"
+#include "dvs_to_udp.hpp"
 
 // Constructor - initialize socket
 template <typename T>
