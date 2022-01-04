@@ -210,20 +210,11 @@ struct AEDAT4 {
       case 0: {
         auto event_packet = GetSizePrefixedEventPacket(&dst_buffer[0]);
         for (auto event : *event_packet->elements()) {
-          count += 1;
-          const auto e = AEDAT::PolarityEvent{
-              static_cast<uint64_t>(event->t()),
-              static_cast<uint16_t>(event->x()),
-              static_cast<uint16_t>(event->y()),
-              1,
-              static_cast<bool>(event->on()),
-          };
-          if (e.x > 640 || e.y > 480) {
-            printf("Wrong coords (%lu) %lu: %ux%u\n", count, e.timestamp, e.x,
-                   e.y);
-          }
-          // printf("Event:%lu: %3d  %3d\n", e.timestamp, e.x, e.y);
-          polarity_events.push_back(e);
+          polarity_events.push_back(
+              AEDAT::PolarityEvent{1, static_cast<uint32_t>(event->on()),
+                                   static_cast<uint32_t>(event->x()),
+                                   static_cast<uint32_t>(event->y()),
+                                   static_cast<uint32_t>(event->t())});
         }
         break;
       }
