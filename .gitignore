@@ -16,3 +16,6 @@ CMakeCache.txt
 CMakeFiles/
 thirdparty/
 *.ipynb
+*.cmake
+.venv/
+*.egg-info

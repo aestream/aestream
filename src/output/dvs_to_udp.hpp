@@ -1,5 +1,4 @@
-#ifndef DVSTOUDP_HPP
-#define DVSTOUDP_HPP
+#pragma once
 
 #include <string>
 
@@ -37,5 +36,3 @@ public:
   void sendpacket(Generator<T> &input_generator, bool include_timestamp);
   void closesocket();
 };
-
-#endif

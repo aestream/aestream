@@ -12,7 +12,6 @@ else()
     message(STATUS "Inivation dependencies (libcaer) not found, ignoring")
 endif()
     
-    
 # Include MetavisionSDK
 find_library(MetavisionSDK COMPONENTS core driver)
 if (MetavisionSDK)

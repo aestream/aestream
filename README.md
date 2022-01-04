@@ -1,8 +1,14 @@
-# AEStream - Address Event encoding and streaming library
+# AEStream - Address Event streaming library
 
 AEStream parses event-based dynamic-vision system (DVS) data from an input source and streams it to a sink.
 
-## Usage
+AEStream can either be used directly from the command line (CLI) or from Python.
+
+## Usage (Python)
+
+TBD...
+
+## Usage (CLI)
 
 AEStream produces a binary `stream` that requires you to specify an `input` source and an optional `output` source (defaulting to STDOUT).
 
