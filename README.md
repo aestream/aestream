@@ -70,7 +70,6 @@ cd build/
 cmake -GNinja ..
 ninja
 ```
-## Acknowledgments
 
 If your default C++ compiler doesn't support C++ 20, you can specify the compiler by providing the environmental variable `CXX` like so: `CXX=/path/to/g++ cmake -GNinja ..`
 ## Acknowledgments
