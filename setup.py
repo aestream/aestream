@@ -6,10 +6,6 @@ pwd = path.abspath(path.dirname(__file__))
 with open(path.join(pwd, "README.md"), encoding="utf-8") as fp:
     readme_text = fp.read()
 
-pwd = path.abspath(path.dirname(__file__))
-with open(path.join(pwd, "README.md"), encoding="utf-8") as fp:
-    readme_text = fp.read()
-
 setup(
     name="aestream",
     version="0.0.1",
