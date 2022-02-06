@@ -4,7 +4,6 @@ project(aestream)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(GCC_COVERAGE_COMPILE_FLAGS "-fcoroutines")
-add_compile_definitions(_GLIBCXX_USE_CXX11_ABI=0) # Required for PyTorch
 
 set(default_build_type Release)
 add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
@@ -13,10 +12,7 @@ add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
 include_directories("include/")
 
 # Add sources
-add_subdirectory("src") 
-# install(TARGETS aestream 
-#         CONFIGURATIONS Release
-#         RUNTIME DESTINATION bin)
+add_subdirectory("src")
 
 # Add tests
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
