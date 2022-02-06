@@ -20,3 +20,4 @@ thirdparty/
 .venv/
 *.egg-info
 __pycache__/
+_build/
