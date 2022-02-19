@@ -8,16 +8,25 @@ with open(path.join(pwd, "README.md"), encoding="utf-8") as fp:
 
 setup(
     name="aestream",
-    version="0.0.1",
+    version="0.1.0",
     author="Jens E. Pedersen, Christian Pehle",
     author_email="jens@jepedersen.dk, christian.pehle@gmail.com",
+    url="https://github.com/norse/aestream",
     description="Streaming library for Address-Event Representation (AER) data",
+    license="MIT",
     long_description=readme_text,
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
     python_requires=">=3.6",
     install_requires=["numpy", "torch>=1.9.0"],
     setup_requires=["setuptools", "torch"],
+    classifiers=[
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: C++",
+        "Topic :: Software Development :: Libraries",
+        "Topic :: System :: Hardware :: Universal Serial Bus (USB)"
+    ],
     ext_modules=[
         cpp_extension.CppExtension(
             name="aestream",
