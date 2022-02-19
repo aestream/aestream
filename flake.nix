@@ -47,7 +47,6 @@
       in
       rec {
         defaultPackage = aestream;
-        packages.aestream-test = aestream-test;
         devShell = aestream-python;
       }
     );
