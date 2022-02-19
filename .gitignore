@@ -21,3 +21,4 @@ thirdparty/
 *.egg-info
 __pycache__/
 _build/
+result
