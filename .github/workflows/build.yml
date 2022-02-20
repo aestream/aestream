@@ -25,7 +25,6 @@ jobs:
         with:
           python-version: '3.9'
       - run: |
-          pip install torch
           pip install -e .
           pip install pytest
           pytest .
