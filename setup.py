@@ -6,6 +6,9 @@ pwd = path.abspath(path.dirname(__file__))
 with open(path.join(pwd, "README.md"), encoding="utf-8") as fp:
     readme_text = fp.read()
 
+with open(path.join(pwd, "requirements.txt")) as fp:
+    install_requires = fp.read()
+
 setup(
     name="aestream",
     version="0.1.0",
@@ -15,11 +18,9 @@ setup(
     description="Streaming library for Address-Event Representation (AER) data",
     license="MIT",
     long_description=readme_text,
-    zip_safe=False,
-    extras_require={"test": ["pytest>=6.0"]},
     python_requires=">=3.6",
-    install_requires=["numpy", "torch>=1.9.0"],
-    setup_requires=["setuptools", "torch"],
+    install_requires=install_requires,
+    setup_requires=["setuptools", "wheel", "torch"],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
