@@ -2,12 +2,12 @@ import datetime
 import time
 
 import torch # Torch is needed to import c10 (Core TENsor) context
-from aestream import UDPInput
+from aestream import DVSInput
 
-# Start a stream, receiving tensors of shape (640, 480)
-# By default, we listen on port 3333 and send the tensors to the CPU
+# Connect to a camera, receiving tensors of shape (340, 480)
+# By default, we send the tensors to the CPU
 # The variable stream can now be `.read()` whenever a tensor is desired
-with UDPInput((640, 480)) as stream:
+with DVSInput(2, 3, (346, 260)) as stream:
 
     # In this case, we read() every 500ms
     interval = 0.5 
