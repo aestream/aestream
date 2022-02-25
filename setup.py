@@ -36,7 +36,8 @@ setup(
     description="Streaming library for Address-Event Representation (AER) data",
     license="MIT",
     long_description=readme_text,
-    python_requires=">=3.6",
+    long_description_content_type="text/markdown",
+    python_requires=">=3.7",
     install_requires=["numpy", "torch"],
     setup_requires=["setuptools", "wheel", "torch"],
     classifiers=[
@@ -51,7 +52,6 @@ setup(
             name="aestream",
             headers=cpp_headers,
             sources=cpp_sources,
-            include_dirs=["src/", "src/input/", "src/pybind/"],
             extra_compile_args=[
                 "-O3",
                 "-g",
@@ -59,7 +59,7 @@ setup(
                 "-fcoroutines",
                 "-std=c++20",
             ],
-            libraries=["caer"],
+            libraries=["caer", "opencv"],
         ),
     ],
     cmdclass={"build_ext": cpp_extension.BuildExtension},
