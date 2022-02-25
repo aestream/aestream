@@ -4,38 +4,48 @@
   inputs.nixpkgs.url = "nixpkgs/nixos-21.11";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.simpleFlake {
-      inherit self nixpkgs;
-      name = "aestream";
-      shell = { pkgs ? import <nixpkgs> }:
-        let py = pkgs.python39Packages;
-        in
-        pkgs.mkShell {
-          buildInputs = [
+  outputs = { self, nixpkgs, flake-utils, mach-nix }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+        py = pkgs.python39Packages;
+        python-requirements = builtins.readFile ./requirements.txt;
+        aestream = pkgs.stdenv.mkDerivation {
+          name = "aestream";
+          version = "0.1.0";
+          src = ./.;
+          nativeBuildInputs = [
             pkgs.cmake
-            pkgs.flatbuffers
             pkgs.gcc
-            pkgs.lz4
-            pkgs.ninja
-            py.pytorch
-            py.pip
-            py.pybind11
-            # py.venvShellHook
           ];
-          shellHook = ''
-            export PIP_PREFIX=$(pwd)/_build/pip_packages
-            export PYTHONPATH="$PIP_PREFIX/${pkgs.python3.sitePackages}:$PYTHONPATH"
-            export PATH="$PIP_PREFIX/bin:$PATH"
-            export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath [pkgs.stdenv.cc.cc]}
-            unset SOURCE_DATE_EPOCH
+          buildInputs = [
+            pkgs.flatbuffers
+            pkgs.ninja
+            pkgs.lz4
+          ];
+          configurePhase = "cmake -GNinja -Bbuild/ .";
+          buildPhase = "ninja -C build";
+          installPhase = ''
+            mkdir -p $out/lib $out/bin
+            mv build/src/**/*.so $out/lib/
+            mv build/src/*.so $out/lib/
+            mv build/src/aestream $out/bin/
           '';
-          # venvDir = "./.venv";
-          # postShellHook = ''
-          #   export LD_LIBRARY_PATH=${stdenv.cc.cc.lib}/lib/:/run/opengl-driver/lib/
-          #   # allow pip to install wheels
-          #   unset SOURCE_DATE_EPOCH
-          # '';
         };
-    };
+        aestream-python = mach-nix.lib.${system}.buildPythonPackage {
+          pname = "aestream";
+          version = "0.1.0";
+          src = ./.;
+          requirements = python-requirements;
+
+          nativeBuildInputs = [
+            pkgs.which
+          ];
+        };
+      in
+      rec {
+        defaultPackage = aestream;
+        devShell = aestream-python;
+      }
+    );
 }
