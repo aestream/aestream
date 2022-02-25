@@ -18,6 +18,15 @@ cpp_sources = [
     "src/pybind/usb.cpp",
 ]
 
+cpp_headers = [
+    "src/aedat.hpp",
+    # Inputs
+    "src/input/inivation.hpp",
+    # Python class headers
+    "src/pybind/tensor_buffer.hpp",
+    "src/pybind/udp_client.hpp",
+]
+
 setup(
     name="aestream",
     version="0.1.0",
@@ -40,8 +49,9 @@ setup(
     ext_modules=[
         cpp_extension.CppExtension(
             name="aestream",
+            headers=cpp_headers,
             sources=cpp_sources,
-            # include_dirs=["src", "src/pybind"],
+            include_dirs=["src/", "src/input/", "src/pybind/"],
             extra_compile_args=[
                 "-O3",
                 "-g",

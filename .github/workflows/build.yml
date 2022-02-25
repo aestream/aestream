@@ -25,6 +25,7 @@ jobs:
         with:
           python-version: '3.9'
       - run: |
+          sudo apt update && sudo search libcaer && sudo apt install libcaer libflatbuffers-dev liblz4-dev
           CC=gcc-10 CXX=g++-10 pip install -e .
           pip install pytest
           pytest .

@@ -1,5 +1,4 @@
-#include "inivation.hpp"
-#include "inivation_device.hpp"
+#include "./inivation.hpp"
 
 CAERUSBConnection::CAERUSBConnection(std::string camera, uint16_t deviceId,
                                      uint8_t deviceAddress) {
