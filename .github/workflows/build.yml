@@ -25,6 +25,6 @@ jobs:
         with:
           python-version: '3.9'
       - run: |
-          pip install -e .
+          CC=gcc-10 CXX=g++-10 pip install -e .
           pip install pytest
           pytest .
