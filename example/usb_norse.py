@@ -27,9 +27,9 @@ fig.canvas.blit(fig.bbox)
 net = snn.LICell().cuda()
 state = None
 
-# Start streaming from a DVS camera on USB 2:3 and put them on the GPU
+# Start streaming from a DVS camera on USB 2:8 and put them on the GPU
 try:
-    with DVSInput(2, 7, (346, 260), device="cuda") as stream:
+    with DVSInput(2, 8, (346, 260), device="cuda") as stream:
         while True:
             # Read a tensor (346, 260) tensor from the camera
             tensor = stream.read()

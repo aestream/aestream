@@ -4,7 +4,7 @@ import time
 import torch # Torch is needed to import c10 (Core TENsor) context
 from aestream import DVSInput
 
-# Connect to a camera, receiving tensors of shape (340, 480)
+# Connect to a USB camera at address 2:3, receiving tensors of shape (340, 480)
 # By default, we send the tensors to the CPU
 # The variable stream can now be `.read()` whenever a tensor is desired
 with DVSInput(2, 3, (346, 260)) as stream:

@@ -9,10 +9,7 @@
       let
         pkgs = import nixpkgs { inherit system; };
         py = pkgs.python39Packages;
-<<<<<<< HEAD
         python-requirements = builtins.readFile ./requirements.txt;
-=======
->>>>>>> 63aaeb5 (Added nix build)
         aestream = pkgs.stdenv.mkDerivation {
           name = "aestream";
           version = "0.1.0";
