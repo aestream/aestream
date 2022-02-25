@@ -9,6 +9,7 @@
       let
         pkgs = import nixpkgs { inherit system; };
         py = pkgs.python39Packages;
+        python-requirements = builtins.readFile ./requirements.txt;
         aestream = pkgs.stdenv.mkDerivation {
           name = "aestream";
           version = "0.1.0";
@@ -35,10 +36,7 @@
           pname = "aestream";
           version = "0.1.0";
           src = ./.;
-          requirements = ''
-            numpy
-            torch
-          '';
+          requirements = python-requirements;
 
           nativeBuildInputs = [
             pkgs.which
