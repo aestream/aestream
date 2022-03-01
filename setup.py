@@ -6,6 +6,9 @@ pwd = path.abspath(path.dirname(__file__))
 with open(path.join(pwd, "README.md"), encoding="utf-8") as fp:
     readme_text = fp.read()
 
+with open(path.join(pwd, "requirements.txt"), encoding="utf-8") as fp:
+    install_requires = fp.read()
+
 cpp_sources = [
     # Module code
     "src/pybind/module.cpp",
@@ -38,7 +41,7 @@ setup(
     long_description=readme_text,
     long_description_content_type="text/markdown",
     python_requires=">=3.7",
-    install_requires=["numpy", "torch"],
+    install_requires=install_requires,
     setup_requires=["setuptools", "wheel", "torch"],
     classifiers=[
         "License :: OSI Approved :: MIT License",
@@ -58,8 +61,9 @@ setup(
                 "-D_GLIBCXX_USE_CXX11_ABI=0",
                 "-fcoroutines",
                 "-std=c++20",
+                "-I/usr/include/opencv4"
             ],
-            libraries=["caer", "opencv"],
+            libraries=["caer"],
         ),
     ],
     cmdclass={"build_ext": cpp_extension.BuildExtension},
