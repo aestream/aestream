@@ -42,7 +42,7 @@ setup(
     long_description_content_type="text/markdown",
     python_requires=">=3.7",
     install_requires=install_requires,
-    setup_requires=["setuptools", "wheel", "torch"],
+    setup_requires=["setuptools", "wheel", "torch", "numpy", "ninja"],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
@@ -61,7 +61,7 @@ setup(
                 "-D_GLIBCXX_USE_CXX11_ABI=0",
                 "-fcoroutines",
                 "-std=c++20",
-                "-I/usr/include/opencv4"
+                "-I/usr/include/opencv4",
             ],
             libraries=["caer"],
         ),
