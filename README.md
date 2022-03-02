@@ -29,15 +29,15 @@ Then install `aestream` via pip: `pip install aestream`
 
 ```python
 # Stream events from a DVS camera over USB at address 2:4
-with DVSInput((640, 480)) as stream:
+with DVSInput(2, 4, (640, 480)) as stream:
     while True:
         frame = stream.read() # Provides a (640, 480) tensor
         ...
 ```
 
 ```python
-# Stream events UDP port 3333
-with UDPInput((640, 480)) as stream:
+# Stream events from UDP port 3333 (default)
+with UDPInput((640, 480), port=3333) as stream:
     while True:
         frame = stream.read() # Provides a (640, 480) tensor
         ...
