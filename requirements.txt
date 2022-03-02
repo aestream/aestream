@@ -1,2 +1,3 @@
+ninja
 numpy
 torch>=1.9
