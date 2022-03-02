@@ -1,5 +1,22 @@
 # AEStream - Address Event streaming library
 
+<p align="center">
+    <a href="https://github.com/norse/aestream/actions">
+        <img src="https://github.com/norse/aestream/workflows/Build%20and%20test/badge.svg" alt="Test status"></a>
+    <a href="https://pypi.org/project/aestream/" alt="PyPi">
+        <img src="https://img.shields.io/pypi/v/aestream" />
+    </a>
+    <a href="https://github.com/norse/aestream/pulse" alt="Activity">
+        <img src="https://img.shields.io/github/last-commit/norse/aestream" />
+    </a>
+    <a href="https://discord.gg/7fGN359">
+        <img src="https://img.shields.io/discord/723215296399147089"
+            alt="chat on Discord"></a>
+    <a href="https://www.codacy.com/gh/norse/aestream/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=norse/aestream&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/0a04a852daf540a9b9bbe9d78df9eea7"/></a>
+    <a href="https://doi.org/10.5281/zenodo.6322829"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6322829.svg" alt="DOI"></a>
+</p>
+
+
 AEDAT parses event-based dynamic-vision system (DVS) data
 from an input source and streams it to a sink.
 
@@ -94,3 +111,21 @@ AEStream is created by
 The work has received funding from the EC Horizon 2020 Framework Programme under Grant Agreements 785907 and 945539 (HBP) and by the Deutsche Forschungsgemeinschaft (DFG, German Research Fundation) under Germany's Excellence Strategy EXC 2181/1 - 390900948 (the Heidelberg STRUCTURES Excellence Cluster).
 
 Thanks to [Philipp Mondorf](https://github.com/PMMon) for interfacing with Metavision SDK and preliminary network code.
+
+## Citation
+
+Please cite `aestream` if you use it in your work:
+
+```bibtex
+@software{aestream2022,
+  author       = {Pedersen, Jens Egholm and
+                  Pehle, Christian Gernot},
+  title        = {AEStream - Address Event Streaming library},
+  month        = {March},
+  year         = 2022,
+  publisher    = {Zenodo},
+  version      = {0.1.0},
+  doi          = {10.5281/zenodo.6322829},
+  url          = {https://doi.org/10.5281/zenodo.6322829}
+}
+```
