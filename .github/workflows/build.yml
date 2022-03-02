@@ -16,6 +16,7 @@ jobs:
           nix build
       # git lfs install && git lfs pull
       # test/aestream_test
+
   test-python:
     name: "Build and test: Python"
     runs-on: ubuntu-latest
@@ -24,13 +25,30 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.9'
-      - run: |
-          # Install PyTorch prerequisite
-          #pip install --upgrade pip
-          # Downgrade pip to resolve https://github.com/pypa/pip/issues/10825
-          #pip3 install --no-cache --upgrade pip==21.3.1
-          #pip3 install torch==1.10.2+cpu torchvision==0.11.3+cpu torchaudio==0.10.2+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
-
-          pip install -e .
+      - name: Install prerequisites
+        run: |
+          sudo add-apt-repository ppa:inivation-ppa/inivation -y
+          sudo apt update && sudo apt install libcaer-dev libflatbuffers-dev liblz4-dev libopencv-core-dev ninja-build -y
+          CC=gcc-10 CXX=g++-10 pip install -e .
           pip install pytest
-          pytest .
+      - name: Test
+        run: pytest .
+
+  build-pypi:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.9] #[3.7, 3.8, 3.9]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: build wheel
+        run: |
+          sudo add-apt-repository ppa:inivation-ppa/inivation -y
+          sudo apt update && sudo apt install libcaer-dev libflatbuffers-dev liblz4-dev libopencv-dev -y
+          pip install build
+          CC=gcc-10 CXX=g++-10 python -m build

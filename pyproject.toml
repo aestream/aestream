@@ -1,2 +1,3 @@
 [build-system]
-requires = ["setuptools", "wheel", "pybind11", "torch"]
+requires = ["setuptools", "wheel", "pybind11", "torch", "numpy", "ninja"]
+build-backend = "setuptools.build_meta"
