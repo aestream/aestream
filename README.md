@@ -7,7 +7,8 @@ AEStream is built in C++, but can be interfaced via CLI or Python (work in progr
 
 ## Usage (Python)
 
-Install via pip: `pip install aestream`
+First, install [PyTorch](https://pytorch.org/) and [libcaer](https://github.com/inivation/libcaer). 
+Then install `aestream` via pip: `pip install aestream`
 
 ```python
 # Stream events from a DVS camera over USB at address 2:4
@@ -24,6 +25,8 @@ with UDPInput((640, 480)) as stream:
         frame = stream.read() # Provides a (640, 480) tensor
         ...
 ```
+
+More examples can be found in [our example folder](https://github.com/norse/aestream/tree/master/example).
 
 ## Usage (CLI)
 
@@ -62,8 +65,7 @@ We currently support the following outputs:
 | Stream Prophesee 640x480 (serial Prophesee:hal_plugin_gen31_fx3:00001464) to STDOUT (Note, requires Metavision SDK) | `aestream input prophesee Prophesee:hal_plugin_gen31_fx3:00001464 output stdout` |
 | Read file to remote machine X.X.X.X | `aestream input file example/davis.aedat4 output udp X.X.X.X` |
 
-
-## Setup
+## Setup (C++)
 
 AEStream requires [libtorch](https://pytorch.org/cppdocs/installing.html). [Metavision SDK](https://docs.prophesee.ai/stable/metavision_sdk/index.html), [libcaer](https://github.com/inivation/libcaer) and [OpenCV](https://github.com/opencv/opencv) are optional dependencies, but are needed for some functionality.
 
@@ -79,7 +81,9 @@ cmake -GNinja ..
 ninja
 ```
 
-If your default C++ compiler doesn't support C++ 20, you can specify the compiler by providing the environmental variable `CXX` like so: `CXX=/path/to/g++ cmake -GNinja ..`
+If your default C++ compiler doesn't support C++ 20, you will have to install an up-to-date compiler and provide the environmental variable `CXX`.
+For instance like this: `CXX=/path/to/g++ cmake -GNinja ..`
+
 ## Acknowledgments
 
 AEStream is created by
