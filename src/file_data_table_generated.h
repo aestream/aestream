@@ -9,88 +9,113 @@
 struct PacketHeader;
 
 struct FileDataDefinition;
+struct FileDataDefinitionBuilder;
 
 struct FileDataTable;
+struct FileDataTableBuilder;
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) PacketHeader FLATBUFFERS_FINAL_CLASS {
  private:
-  int32_t StreamID_;
-  int32_t Size_;
+  int32_t stream_id_;
+  int32_t size_;
 
  public:
-  PacketHeader() {
-    memset(static_cast<void *>(this), 0, sizeof(PacketHeader));
+  PacketHeader()
+      : stream_id_(0),
+        size_(0) {
   }
-  PacketHeader(int32_t _StreamID, int32_t _Size)
-      : StreamID_(flatbuffers::EndianScalar(_StreamID)),
-        Size_(flatbuffers::EndianScalar(_Size)) {
+  PacketHeader(int32_t _stream_id, int32_t _size)
+      : stream_id_(flatbuffers::EndianScalar(_stream_id)),
+        size_(flatbuffers::EndianScalar(_size)) {
   }
-  int32_t StreamID() const {
-    return flatbuffers::EndianScalar(StreamID_);
+  int32_t stream_id() const {
+    return flatbuffers::EndianScalar(stream_id_);
   }
-  int32_t Size() const {
-    return flatbuffers::EndianScalar(Size_);
+  void mutate_stream_id(int32_t _stream_id) {
+    flatbuffers::WriteScalar(&stream_id_, _stream_id);
+  }
+  int32_t size() const {
+    return flatbuffers::EndianScalar(size_);
+  }
+  void mutate_size(int32_t _size) {
+    flatbuffers::WriteScalar(&size_, _size);
   }
 };
 FLATBUFFERS_STRUCT_END(PacketHeader, 8);
 
 struct FileDataDefinition FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FileDataDefinitionBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_BYTEOFFSET = 4,
-    VT_PACKETINFO = 6,
-    VT_NUMELEMENTS = 8,
-    VT_TIMESTAMPSTART = 10,
-    VT_TIMESTAMPEND = 12
+    VT_BYTE_OFFSET = 4,
+    VT_PACKET_INFO = 6,
+    VT_NUM_ELEMENTS = 8,
+    VT_TIMESTAMP_START = 10,
+    VT_TIMESTAMP_END = 12
   };
-  int64_t ByteOffset() const {
-    return GetField<int64_t>(VT_BYTEOFFSET, 0);
+  int64_t byte_offset() const {
+    return GetField<int64_t>(VT_BYTE_OFFSET, 0);
   }
-  const PacketHeader *PacketInfo() const {
-    return GetStruct<const PacketHeader *>(VT_PACKETINFO);
+  bool mutate_byte_offset(int64_t _byte_offset) {
+    return SetField<int64_t>(VT_BYTE_OFFSET, _byte_offset, 0);
   }
-  int64_t NumElements() const {
-    return GetField<int64_t>(VT_NUMELEMENTS, 0);
+  const PacketHeader *packet_info() const {
+    return GetStruct<const PacketHeader *>(VT_PACKET_INFO);
   }
-  int64_t TimestampStart() const {
-    return GetField<int64_t>(VT_TIMESTAMPSTART, 0);
+  PacketHeader *mutable_packet_info() {
+    return GetStruct<PacketHeader *>(VT_PACKET_INFO);
   }
-  int64_t TimestampEnd() const {
-    return GetField<int64_t>(VT_TIMESTAMPEND, 0);
+  int64_t num_elements() const {
+    return GetField<int64_t>(VT_NUM_ELEMENTS, 0);
+  }
+  bool mutate_num_elements(int64_t _num_elements) {
+    return SetField<int64_t>(VT_NUM_ELEMENTS, _num_elements, 0);
+  }
+  int64_t timestamp_start() const {
+    return GetField<int64_t>(VT_TIMESTAMP_START, 0);
+  }
+  bool mutate_timestamp_start(int64_t _timestamp_start) {
+    return SetField<int64_t>(VT_TIMESTAMP_START, _timestamp_start, 0);
+  }
+  int64_t timestamp_end() const {
+    return GetField<int64_t>(VT_TIMESTAMP_END, 0);
+  }
+  bool mutate_timestamp_end(int64_t _timestamp_end) {
+    return SetField<int64_t>(VT_TIMESTAMP_END, _timestamp_end, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int64_t>(verifier, VT_BYTEOFFSET) &&
-           VerifyField<PacketHeader>(verifier, VT_PACKETINFO) &&
-           VerifyField<int64_t>(verifier, VT_NUMELEMENTS) &&
-           VerifyField<int64_t>(verifier, VT_TIMESTAMPSTART) &&
-           VerifyField<int64_t>(verifier, VT_TIMESTAMPEND) &&
+           VerifyField<int64_t>(verifier, VT_BYTE_OFFSET) &&
+           VerifyField<PacketHeader>(verifier, VT_PACKET_INFO) &&
+           VerifyField<int64_t>(verifier, VT_NUM_ELEMENTS) &&
+           VerifyField<int64_t>(verifier, VT_TIMESTAMP_START) &&
+           VerifyField<int64_t>(verifier, VT_TIMESTAMP_END) &&
            verifier.EndTable();
   }
 };
 
 struct FileDataDefinitionBuilder {
+  typedef FileDataDefinition Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_ByteOffset(int64_t ByteOffset) {
-    fbb_.AddElement<int64_t>(FileDataDefinition::VT_BYTEOFFSET, ByteOffset, 0);
+  void add_byte_offset(int64_t byte_offset) {
+    fbb_.AddElement<int64_t>(FileDataDefinition::VT_BYTE_OFFSET, byte_offset, 0);
   }
-  void add_PacketInfo(const PacketHeader *PacketInfo) {
-    fbb_.AddStruct(FileDataDefinition::VT_PACKETINFO, PacketInfo);
+  void add_packet_info(const PacketHeader *packet_info) {
+    fbb_.AddStruct(FileDataDefinition::VT_PACKET_INFO, packet_info);
   }
-  void add_NumElements(int64_t NumElements) {
-    fbb_.AddElement<int64_t>(FileDataDefinition::VT_NUMELEMENTS, NumElements, 0);
+  void add_num_elements(int64_t num_elements) {
+    fbb_.AddElement<int64_t>(FileDataDefinition::VT_NUM_ELEMENTS, num_elements, 0);
   }
-  void add_TimestampStart(int64_t TimestampStart) {
-    fbb_.AddElement<int64_t>(FileDataDefinition::VT_TIMESTAMPSTART, TimestampStart, 0);
+  void add_timestamp_start(int64_t timestamp_start) {
+    fbb_.AddElement<int64_t>(FileDataDefinition::VT_TIMESTAMP_START, timestamp_start, 0);
   }
-  void add_TimestampEnd(int64_t TimestampEnd) {
-    fbb_.AddElement<int64_t>(FileDataDefinition::VT_TIMESTAMPEND, TimestampEnd, 0);
+  void add_timestamp_end(int64_t timestamp_end) {
+    fbb_.AddElement<int64_t>(FileDataDefinition::VT_TIMESTAMP_END, timestamp_end, 0);
   }
   explicit FileDataDefinitionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  FileDataDefinitionBuilder &operator=(const FileDataDefinitionBuilder &);
   flatbuffers::Offset<FileDataDefinition> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<FileDataDefinition>(end);
@@ -100,47 +125,51 @@ struct FileDataDefinitionBuilder {
 
 inline flatbuffers::Offset<FileDataDefinition> CreateFileDataDefinition(
     flatbuffers::FlatBufferBuilder &_fbb,
-    int64_t ByteOffset = 0,
-    const PacketHeader *PacketInfo = 0,
-    int64_t NumElements = 0,
-    int64_t TimestampStart = 0,
-    int64_t TimestampEnd = 0) {
+    int64_t byte_offset = 0,
+    const PacketHeader *packet_info = 0,
+    int64_t num_elements = 0,
+    int64_t timestamp_start = 0,
+    int64_t timestamp_end = 0) {
   FileDataDefinitionBuilder builder_(_fbb);
-  builder_.add_TimestampEnd(TimestampEnd);
-  builder_.add_TimestampStart(TimestampStart);
-  builder_.add_NumElements(NumElements);
-  builder_.add_ByteOffset(ByteOffset);
-  builder_.add_PacketInfo(PacketInfo);
+  builder_.add_timestamp_end(timestamp_end);
+  builder_.add_timestamp_start(timestamp_start);
+  builder_.add_num_elements(num_elements);
+  builder_.add_byte_offset(byte_offset);
+  builder_.add_packet_info(packet_info);
   return builder_.Finish();
 }
 
 struct FileDataTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FileDataTableBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TABLE = 4
   };
-  const flatbuffers::Vector<flatbuffers::Offset<FileDataDefinition>> *Table() const {
+  const flatbuffers::Vector<flatbuffers::Offset<FileDataDefinition>> *table() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FileDataDefinition>> *>(VT_TABLE);
+  }
+  flatbuffers::Vector<flatbuffers::Offset<FileDataDefinition>> *mutable_table() {
+    return GetPointer<flatbuffers::Vector<flatbuffers::Offset<FileDataDefinition>> *>(VT_TABLE);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_TABLE) &&
-           verifier.VerifyVector(Table()) &&
-           verifier.VerifyVectorOfTables(Table()) &&
+           verifier.VerifyVector(table()) &&
+           verifier.VerifyVectorOfTables(table()) &&
            verifier.EndTable();
   }
 };
 
 struct FileDataTableBuilder {
+  typedef FileDataTable Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Table(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FileDataDefinition>>> Table) {
-    fbb_.AddOffset(FileDataTable::VT_TABLE, Table);
+  void add_table(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FileDataDefinition>>> table) {
+    fbb_.AddOffset(FileDataTable::VT_TABLE, table);
   }
   explicit FileDataTableBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  FileDataTableBuilder &operator=(const FileDataTableBuilder &);
   flatbuffers::Offset<FileDataTable> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<FileDataTable>(end);
@@ -150,19 +179,19 @@ struct FileDataTableBuilder {
 
 inline flatbuffers::Offset<FileDataTable> CreateFileDataTable(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FileDataDefinition>>> Table = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FileDataDefinition>>> table = 0) {
   FileDataTableBuilder builder_(_fbb);
-  builder_.add_Table(Table);
+  builder_.add_table(table);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<FileDataTable> CreateFileDataTableDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<flatbuffers::Offset<FileDataDefinition>> *Table = nullptr) {
-  auto Table__ = Table ? _fbb.CreateVector<flatbuffers::Offset<FileDataDefinition>>(*Table) : 0;
+    const std::vector<flatbuffers::Offset<FileDataDefinition>> *table = nullptr) {
+  auto table__ = table ? _fbb.CreateVector<flatbuffers::Offset<FileDataDefinition>>(*table) : 0;
   return CreateFileDataTable(
       _fbb,
-      Table__);
+      table__);
 }
 
 inline const FileDataTable *GetFileDataTable(const void *buf) {
@@ -171,6 +200,10 @@ inline const FileDataTable *GetFileDataTable(const void *buf) {
 
 inline const FileDataTable *GetSizePrefixedFileDataTable(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<FileDataTable>(buf);
+}
+
+inline FileDataTable *GetMutableFileDataTable(void *buf) {
+  return flatbuffers::GetMutableRoot<FileDataTable>(buf);
 }
 
 inline bool VerifyFileDataTableBuffer(

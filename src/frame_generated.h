@@ -7,6 +7,7 @@
 #include "flatbuffers/flatbuffers.h"
 
 struct Frame;
+struct FrameBuilder;
 
 enum FrameFormat {
   FrameFormat_Gray = 0,
@@ -35,6 +36,7 @@ inline const char *EnumNameFrameFormat(FrameFormat e) {
 }
 
 struct Frame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FrameBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_T = 4,
     VT_BEGIN_T = 6,
@@ -51,35 +53,68 @@ struct Frame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int64_t t() const {
     return GetField<int64_t>(VT_T, 0);
   }
+  bool mutate_t(int64_t _t) {
+    return SetField<int64_t>(VT_T, _t, 0);
+  }
   int64_t begin_t() const {
     return GetField<int64_t>(VT_BEGIN_T, 0);
+  }
+  bool mutate_begin_t(int64_t _begin_t) {
+    return SetField<int64_t>(VT_BEGIN_T, _begin_t, 0);
   }
   int64_t end_t() const {
     return GetField<int64_t>(VT_END_T, 0);
   }
+  bool mutate_end_t(int64_t _end_t) {
+    return SetField<int64_t>(VT_END_T, _end_t, 0);
+  }
   int64_t exposure_begin_t() const {
     return GetField<int64_t>(VT_EXPOSURE_BEGIN_T, 0);
+  }
+  bool mutate_exposure_begin_t(int64_t _exposure_begin_t) {
+    return SetField<int64_t>(VT_EXPOSURE_BEGIN_T, _exposure_begin_t, 0);
   }
   int64_t exposure_end_t() const {
     return GetField<int64_t>(VT_EXPOSURE_END_T, 0);
   }
+  bool mutate_exposure_end_t(int64_t _exposure_end_t) {
+    return SetField<int64_t>(VT_EXPOSURE_END_T, _exposure_end_t, 0);
+  }
   FrameFormat format() const {
     return static_cast<FrameFormat>(GetField<int8_t>(VT_FORMAT, 0));
+  }
+  bool mutate_format(FrameFormat _format) {
+    return SetField<int8_t>(VT_FORMAT, static_cast<int8_t>(_format), 0);
   }
   int16_t width() const {
     return GetField<int16_t>(VT_WIDTH, 0);
   }
+  bool mutate_width(int16_t _width) {
+    return SetField<int16_t>(VT_WIDTH, _width, 0);
+  }
   int16_t height() const {
     return GetField<int16_t>(VT_HEIGHT, 0);
+  }
+  bool mutate_height(int16_t _height) {
+    return SetField<int16_t>(VT_HEIGHT, _height, 0);
   }
   int16_t offset_x() const {
     return GetField<int16_t>(VT_OFFSET_X, 0);
   }
+  bool mutate_offset_x(int16_t _offset_x) {
+    return SetField<int16_t>(VT_OFFSET_X, _offset_x, 0);
+  }
   int16_t offset_y() const {
     return GetField<int16_t>(VT_OFFSET_Y, 0);
   }
+  bool mutate_offset_y(int16_t _offset_y) {
+    return SetField<int16_t>(VT_OFFSET_Y, _offset_y, 0);
+  }
   const flatbuffers::Vector<uint8_t> *pixels() const {
     return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_PIXELS);
+  }
+  flatbuffers::Vector<uint8_t> *mutable_pixels() {
+    return GetPointer<flatbuffers::Vector<uint8_t> *>(VT_PIXELS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -100,6 +135,7 @@ struct Frame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct FrameBuilder {
+  typedef Frame Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_t(int64_t t) {
@@ -139,7 +175,6 @@ struct FrameBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  FrameBuilder &operator=(const FrameBuilder &);
   flatbuffers::Offset<Frame> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Frame>(end);
@@ -210,6 +245,10 @@ inline const Frame *GetFrame(const void *buf) {
 
 inline const Frame *GetSizePrefixedFrame(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<Frame>(buf);
+}
+
+inline Frame *GetMutableFrame(void *buf) {
+  return flatbuffers::GetMutableRoot<Frame>(buf);
 }
 
 inline bool VerifyFrameBuffer(

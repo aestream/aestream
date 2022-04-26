@@ -9,6 +9,7 @@
 struct Event;
 
 struct EventPacket;
+struct EventPacketBuilder;
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Event FLATBUFFERS_FINAL_CLASS {
  private:
@@ -19,8 +20,15 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Event FLATBUFFERS_FINAL_CLASS {
   int8_t padding0__;  int16_t padding1__;
 
  public:
-  Event() {
-    memset(static_cast<void *>(this), 0, sizeof(Event));
+  Event()
+      : t_(0),
+        x_(0),
+        y_(0),
+        on_(0),
+        padding0__(0),
+        padding1__(0) {
+    (void)padding0__;
+    (void)padding1__;
   }
   Event(int64_t _t, int16_t _x, int16_t _y, bool _on)
       : t_(flatbuffers::EndianScalar(_t)),
@@ -29,29 +37,44 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Event FLATBUFFERS_FINAL_CLASS {
         on_(flatbuffers::EndianScalar(static_cast<uint8_t>(_on))),
         padding0__(0),
         padding1__(0) {
-    (void)padding0__;    (void)padding1__;
   }
   int64_t t() const {
     return flatbuffers::EndianScalar(t_);
   }
+  void mutate_t(int64_t _t) {
+    flatbuffers::WriteScalar(&t_, _t);
+  }
   int16_t x() const {
     return flatbuffers::EndianScalar(x_);
+  }
+  void mutate_x(int16_t _x) {
+    flatbuffers::WriteScalar(&x_, _x);
   }
   int16_t y() const {
     return flatbuffers::EndianScalar(y_);
   }
+  void mutate_y(int16_t _y) {
+    flatbuffers::WriteScalar(&y_, _y);
+  }
   bool on() const {
     return flatbuffers::EndianScalar(on_) != 0;
+  }
+  void mutate_on(bool _on) {
+    flatbuffers::WriteScalar(&on_, static_cast<uint8_t>(_on));
   }
 };
 FLATBUFFERS_STRUCT_END(Event, 16);
 
 struct EventPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef EventPacketBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ELEMENTS = 4
   };
   const flatbuffers::Vector<const Event *> *elements() const {
     return GetPointer<const flatbuffers::Vector<const Event *> *>(VT_ELEMENTS);
+  }
+  flatbuffers::Vector<const Event *> *mutable_elements() {
+    return GetPointer<flatbuffers::Vector<const Event *> *>(VT_ELEMENTS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -62,6 +85,7 @@ struct EventPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct EventPacketBuilder {
+  typedef EventPacket Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_elements(flatbuffers::Offset<flatbuffers::Vector<const Event *>> elements) {
@@ -71,7 +95,6 @@ struct EventPacketBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  EventPacketBuilder &operator=(const EventPacketBuilder &);
   flatbuffers::Offset<EventPacket> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<EventPacket>(end);
@@ -102,6 +125,10 @@ inline const EventPacket *GetEventPacket(const void *buf) {
 
 inline const EventPacket *GetSizePrefixedEventPacket(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<EventPacket>(buf);
+}
+
+inline EventPacket *GetMutableEventPacket(void *buf) {
+  return flatbuffers::GetMutableRoot<EventPacket>(buf);
 }
 
 inline bool VerifyEventPacketBuffer(

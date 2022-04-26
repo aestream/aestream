@@ -7,10 +7,13 @@
 #include "flatbuffers/flatbuffers.h"
 
 struct Imu;
+struct ImuBuilder;
 
 struct ImuPacket;
+struct ImuPacketBuilder;
 
 struct Imu FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ImuBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_T = 4,
     VT_TEMPERATURE = 6,
@@ -27,35 +30,68 @@ struct Imu FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int64_t t() const {
     return GetField<int64_t>(VT_T, 0);
   }
+  bool mutate_t(int64_t _t) {
+    return SetField<int64_t>(VT_T, _t, 0);
+  }
   float temperature() const {
     return GetField<float>(VT_TEMPERATURE, 0.0f);
+  }
+  bool mutate_temperature(float _temperature) {
+    return SetField<float>(VT_TEMPERATURE, _temperature, 0.0f);
   }
   float accelerometer_x() const {
     return GetField<float>(VT_ACCELEROMETER_X, 0.0f);
   }
+  bool mutate_accelerometer_x(float _accelerometer_x) {
+    return SetField<float>(VT_ACCELEROMETER_X, _accelerometer_x, 0.0f);
+  }
   float accelerometer_y() const {
     return GetField<float>(VT_ACCELEROMETER_Y, 0.0f);
+  }
+  bool mutate_accelerometer_y(float _accelerometer_y) {
+    return SetField<float>(VT_ACCELEROMETER_Y, _accelerometer_y, 0.0f);
   }
   float accelerometer_z() const {
     return GetField<float>(VT_ACCELEROMETER_Z, 0.0f);
   }
+  bool mutate_accelerometer_z(float _accelerometer_z) {
+    return SetField<float>(VT_ACCELEROMETER_Z, _accelerometer_z, 0.0f);
+  }
   float gyroscope_x() const {
     return GetField<float>(VT_GYROSCOPE_X, 0.0f);
+  }
+  bool mutate_gyroscope_x(float _gyroscope_x) {
+    return SetField<float>(VT_GYROSCOPE_X, _gyroscope_x, 0.0f);
   }
   float gyroscope_y() const {
     return GetField<float>(VT_GYROSCOPE_Y, 0.0f);
   }
+  bool mutate_gyroscope_y(float _gyroscope_y) {
+    return SetField<float>(VT_GYROSCOPE_Y, _gyroscope_y, 0.0f);
+  }
   float gyroscope_z() const {
     return GetField<float>(VT_GYROSCOPE_Z, 0.0f);
+  }
+  bool mutate_gyroscope_z(float _gyroscope_z) {
+    return SetField<float>(VT_GYROSCOPE_Z, _gyroscope_z, 0.0f);
   }
   float magnetometer_x() const {
     return GetField<float>(VT_MAGNETOMETER_X, 0.0f);
   }
+  bool mutate_magnetometer_x(float _magnetometer_x) {
+    return SetField<float>(VT_MAGNETOMETER_X, _magnetometer_x, 0.0f);
+  }
   float magnetometer_y() const {
     return GetField<float>(VT_MAGNETOMETER_Y, 0.0f);
   }
+  bool mutate_magnetometer_y(float _magnetometer_y) {
+    return SetField<float>(VT_MAGNETOMETER_Y, _magnetometer_y, 0.0f);
+  }
   float magnetometer_z() const {
     return GetField<float>(VT_MAGNETOMETER_Z, 0.0f);
+  }
+  bool mutate_magnetometer_z(float _magnetometer_z) {
+    return SetField<float>(VT_MAGNETOMETER_Z, _magnetometer_z, 0.0f);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -75,6 +111,7 @@ struct Imu FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct ImuBuilder {
+  typedef Imu Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_t(int64_t t) {
@@ -114,7 +151,6 @@ struct ImuBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ImuBuilder &operator=(const ImuBuilder &);
   flatbuffers::Offset<Imu> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Imu>(end);
@@ -151,11 +187,15 @@ inline flatbuffers::Offset<Imu> CreateImu(
 }
 
 struct ImuPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ImuPacketBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ELEMENTS = 4
   };
   const flatbuffers::Vector<flatbuffers::Offset<Imu>> *elements() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Imu>> *>(VT_ELEMENTS);
+  }
+  flatbuffers::Vector<flatbuffers::Offset<Imu>> *mutable_elements() {
+    return GetPointer<flatbuffers::Vector<flatbuffers::Offset<Imu>> *>(VT_ELEMENTS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -167,6 +207,7 @@ struct ImuPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct ImuPacketBuilder {
+  typedef ImuPacket Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_elements(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Imu>>> elements) {
@@ -176,7 +217,6 @@ struct ImuPacketBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ImuPacketBuilder &operator=(const ImuPacketBuilder &);
   flatbuffers::Offset<ImuPacket> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<ImuPacket>(end);
@@ -207,6 +247,10 @@ inline const ImuPacket *GetImuPacket(const void *buf) {
 
 inline const ImuPacket *GetSizePrefixedImuPacket(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<ImuPacket>(buf);
+}
+
+inline ImuPacket *GetMutableImuPacket(void *buf) {
+  return flatbuffers::GetMutableRoot<ImuPacket>(buf);
 }
 
 inline bool VerifyImuPacketBuffer(

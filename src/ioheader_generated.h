@@ -7,6 +7,7 @@
 #include "flatbuffers/flatbuffers.h"
 
 struct IOHeader;
+struct IOHeaderBuilder;
 
 enum CompressionType {
   CompressionType_NONE = 0,
@@ -30,7 +31,7 @@ inline const CompressionType (&EnumValuesCompressionType())[5] {
 }
 
 inline const char * const *EnumNamesCompressionType() {
-  static const char * const names[] = {
+  static const char * const names[6] = {
     "NONE",
     "LZ4",
     "LZ4_HIGH",
@@ -42,53 +43,63 @@ inline const char * const *EnumNamesCompressionType() {
 }
 
 inline const char *EnumNameCompressionType(CompressionType e) {
-  if (e < CompressionType_NONE || e > CompressionType_ZSTD_HIGH) return "";
+  if (flatbuffers::IsOutRange(e, CompressionType_NONE, CompressionType_ZSTD_HIGH)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesCompressionType()[index];
 }
 
 struct IOHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef IOHeaderBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_COMPRESSION = 4,
-    VT_DATATABLEPOSITION = 6,
-    VT_INFONODE = 8
+    VT_DATA_TABLE_POSITION = 6,
+    VT_INFO_NODE = 8
   };
   CompressionType compression() const {
     return static_cast<CompressionType>(GetField<int32_t>(VT_COMPRESSION, 0));
   }
-  int64_t dataTablePosition() const {
-    return GetField<int64_t>(VT_DATATABLEPOSITION, -1);
+  bool mutate_compression(CompressionType _compression) {
+    return SetField<int32_t>(VT_COMPRESSION, static_cast<int32_t>(_compression), 0);
   }
-  const flatbuffers::String *infoNode() const {
-    return GetPointer<const flatbuffers::String *>(VT_INFONODE);
+  int64_t data_table_position() const {
+    return GetField<int64_t>(VT_DATA_TABLE_POSITION, -1LL);
+  }
+  bool mutate_data_table_position(int64_t _data_table_position) {
+    return SetField<int64_t>(VT_DATA_TABLE_POSITION, _data_table_position, -1LL);
+  }
+  const flatbuffers::String *info_node() const {
+    return GetPointer<const flatbuffers::String *>(VT_INFO_NODE);
+  }
+  flatbuffers::String *mutable_info_node() {
+    return GetPointer<flatbuffers::String *>(VT_INFO_NODE);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_COMPRESSION) &&
-           VerifyField<int64_t>(verifier, VT_DATATABLEPOSITION) &&
-           VerifyOffset(verifier, VT_INFONODE) &&
-           verifier.VerifyString(infoNode()) &&
+           VerifyField<int64_t>(verifier, VT_DATA_TABLE_POSITION) &&
+           VerifyOffset(verifier, VT_INFO_NODE) &&
+           verifier.VerifyString(info_node()) &&
            verifier.EndTable();
   }
 };
 
 struct IOHeaderBuilder {
+  typedef IOHeader Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_compression(CompressionType compression) {
     fbb_.AddElement<int32_t>(IOHeader::VT_COMPRESSION, static_cast<int32_t>(compression), 0);
   }
-  void add_dataTablePosition(int64_t dataTablePosition) {
-    fbb_.AddElement<int64_t>(IOHeader::VT_DATATABLEPOSITION, dataTablePosition, -1);
+  void add_data_table_position(int64_t data_table_position) {
+    fbb_.AddElement<int64_t>(IOHeader::VT_DATA_TABLE_POSITION, data_table_position, -1LL);
   }
-  void add_infoNode(flatbuffers::Offset<flatbuffers::String> infoNode) {
-    fbb_.AddOffset(IOHeader::VT_INFONODE, infoNode);
+  void add_info_node(flatbuffers::Offset<flatbuffers::String> info_node) {
+    fbb_.AddOffset(IOHeader::VT_INFO_NODE, info_node);
   }
   explicit IOHeaderBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  IOHeaderBuilder &operator=(const IOHeaderBuilder &);
   flatbuffers::Offset<IOHeader> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<IOHeader>(end);
@@ -99,11 +110,11 @@ struct IOHeaderBuilder {
 inline flatbuffers::Offset<IOHeader> CreateIOHeader(
     flatbuffers::FlatBufferBuilder &_fbb,
     CompressionType compression = CompressionType_NONE,
-    int64_t dataTablePosition = -1,
-    flatbuffers::Offset<flatbuffers::String> infoNode = 0) {
+    int64_t data_table_position = -1LL,
+    flatbuffers::Offset<flatbuffers::String> info_node = 0) {
   IOHeaderBuilder builder_(_fbb);
-  builder_.add_dataTablePosition(dataTablePosition);
-  builder_.add_infoNode(infoNode);
+  builder_.add_data_table_position(data_table_position);
+  builder_.add_info_node(info_node);
   builder_.add_compression(compression);
   return builder_.Finish();
 }
@@ -111,14 +122,14 @@ inline flatbuffers::Offset<IOHeader> CreateIOHeader(
 inline flatbuffers::Offset<IOHeader> CreateIOHeaderDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     CompressionType compression = CompressionType_NONE,
-    int64_t dataTablePosition = -1,
-    const char *infoNode = nullptr) {
-  auto infoNode__ = infoNode ? _fbb.CreateString(infoNode) : 0;
+    int64_t data_table_position = -1LL,
+    const char *info_node = nullptr) {
+  auto info_node__ = info_node ? _fbb.CreateString(info_node) : 0;
   return CreateIOHeader(
       _fbb,
       compression,
-      dataTablePosition,
-      infoNode__);
+      data_table_position,
+      info_node__);
 }
 
 inline const IOHeader *GetIOHeader(const void *buf) {
@@ -127,6 +138,10 @@ inline const IOHeader *GetIOHeader(const void *buf) {
 
 inline const IOHeader *GetSizePrefixedIOHeader(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<IOHeader>(buf);
+}
+
+inline IOHeader *GetMutableIOHeader(void *buf) {
+  return flatbuffers::GetMutableRoot<IOHeader>(buf);
 }
 
 inline bool VerifyIOHeaderBuffer(
