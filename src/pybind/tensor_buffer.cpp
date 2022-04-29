@@ -11,8 +11,8 @@
 TensorBuffer::TensorBuffer(torch::IntArrayRef size, std::string device)
     : shape(size.vec()) {
   options_buffer = torch::TensorOptions()
-                       .dtype(torch::kBool)
-                       .device(torch::kCPU)
+                       .dtype(torch::kUInt8)
+                       .device(device)
                        .memory_format(c10::MemoryFormat::Contiguous);
   options_copy = torch::TensorOptions().dtype(torch::kFloat32).device(device);
   buffer1 = std::make_shared<torch::Tensor>(torch::zeros(size, options_buffer));
@@ -22,21 +22,21 @@ TensorBuffer::TensorBuffer(torch::IntArrayRef size, std::string device)
 void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
   const auto length = numbytes >> 1;
   buffer_lock.lock();
-  bool *array = (bool *)buffer1->data_ptr();
+  char *array = (char *)buffer1->data_ptr();
   for (int i = 0; i < length; i = i + 2) {
     // Decode x, y
     const uint16_t y_coord = data[i] & 0x7FFF;
     const uint16_t x_coord = data[i + 1] & 0x7FFF;
-    *(array + shape[1] * x_coord + y_coord) = true;
+    (*(array + shape[1] * x_coord + y_coord))++;
   }
   buffer_lock.unlock();
 }
 
 void TensorBuffer::set_vector(std::vector<AEDAT::PolarityEvent> events) {
   buffer_lock.lock();
-  bool *array = (bool *)buffer1->data_ptr();
+  char *array = (char *)buffer1->data_ptr();
   for (auto event : events) {
-    *(array + shape[1] * event.x + event.y) = true;
+    (*(array + shape[1] * event.x + event.y))++;
   }
   buffer_lock.unlock();
 }
