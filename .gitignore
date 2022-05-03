@@ -24,3 +24,6 @@ __pycache__/
 _build/
 result
 .eggs/
+*.flv
+*.dat
+*.mp4

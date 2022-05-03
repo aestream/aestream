@@ -34,4 +34,5 @@ public:
 
 Generator<AEDAT::PolarityEvent>
 inivation_event_generator(std::string camera, std::uint16_t deviceId,
-                          std::uint8_t deviceAddress);
+                          std::uint8_t deviceAddress,
+                          const std::atomic<bool> &runFlag);

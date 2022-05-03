@@ -31,16 +31,16 @@ net.weight = torch.nn.Parameter(torch.tensor([[[
     [0, 0, 0],
     [1, 2, 1]
 ]]], dtype=torch.float32))
-net = net.cuda()
+#net = net.cuda
 
 # Start streaming from a DVS camera on USB 2:7 and put them on the GPU
-try:
-    with DVSInput(2, 7, (346, 260), device="cuda") as stream:
+with DVSInput(2, 4, (640, 480), device="cpu") as stream:
+    try:
         while True:
             # Read a tensor (346, 260) tensor from the camera
             tensor = stream.read()
             with torch.inference_mode():
-                filtered = net(tensor.view(1, 1, 346, 260))
+                filtered = net(tensor.view(1, 640, 480))
 
             # Redraw figure
             fig.canvas.restore_region(bg)
@@ -53,5 +53,5 @@ try:
 
             # Pause to only loop 10 times per second
             plt.pause(0.01)
-except Exception as e:
-    print("Error", e)
+    except Exception as e:
+        print("Error", e)

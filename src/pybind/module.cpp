@@ -19,6 +19,8 @@ PYBIND11_MODULE(aestream, m) {
              i.stop_stream();
              return true;
            })
+      .def("start_stream", &DVSInput::start_stream)
+      .def("stop_stream", &DVSInput::stop_stream)
       .def("read", &DVSInput::read);
 
   py::class_<UDPInput>(m, "UDPInput")
@@ -30,5 +32,7 @@ PYBIND11_MODULE(aestream, m) {
              i.stop_server();
              return true;
            })
+      .def("start_stream", &UDPInput::start_server)
+      .def("stop_stream", &UDPInput::stop_server)
       .def("read", &UDPInput::read);
 }

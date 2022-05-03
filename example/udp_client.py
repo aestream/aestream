@@ -7,7 +7,7 @@ from aestream import UDPInput
 # Start a stream, receiving tensors of shape (640, 480)
 # By default, we listen on port 3333 and send the tensors to the CPU
 # The variable stream can now be `.read()` whenever a tensor is desired
-with UDPInput((640, 480)) as stream:
+with UDPInput((640, 480), "cpu", 4301) as stream:
 
     # In this case, we read() every 500ms
     interval = 0.5 
