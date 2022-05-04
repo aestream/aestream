@@ -20,3 +20,4 @@ target_link_libraries(aestream_lib PUBLIC aedat4 aestream_input aestream_output)
 # AEStream executable
 add_executable(aestream aestream.cpp)
 target_link_libraries(aestream PRIVATE aestream_lib)
+install(IMPORTED_RUNTIME_ARTIFACTS aestream DESTINATION bin)
