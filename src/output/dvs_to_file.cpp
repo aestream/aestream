@@ -2,9 +2,9 @@
 #include <fstream>
 #include <string>
 
-#include "../aedat.hpp"
-#include "../aedat4.hpp"
-#include "../generator.hpp"
+#include "aedat.hpp"
+#include "aedat4.hpp"
+#include "generator.hpp"
 #include "dvs_to_file.hpp"
 
 void dvs_to_file_aedat(Generator<AEDAT::PolarityEvent> &input_generator,

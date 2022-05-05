@@ -6,10 +6,17 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+// Ensure the included flatbuffers.h is the same version as when this file was
+// generated, otherwise it may not be compatible.
+static_assert(FLATBUFFERS_VERSION_MAJOR == 2 &&
+              FLATBUFFERS_VERSION_MINOR == 0 &&
+              FLATBUFFERS_VERSION_REVISION == 6,
+             "Non-compatible flatbuffers version included");
+
 struct IOHeader;
 struct IOHeaderBuilder;
 
-enum CompressionType {
+enum CompressionType : int32_t {
   CompressionType_NONE = 0,
   CompressionType_LZ4 = 1,
   CompressionType_LZ4_HIGH = 2,
@@ -58,25 +65,16 @@ struct IOHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   CompressionType compression() const {
     return static_cast<CompressionType>(GetField<int32_t>(VT_COMPRESSION, 0));
   }
-  bool mutate_compression(CompressionType _compression) {
-    return SetField<int32_t>(VT_COMPRESSION, static_cast<int32_t>(_compression), 0);
-  }
   int64_t data_table_position() const {
     return GetField<int64_t>(VT_DATA_TABLE_POSITION, -1LL);
-  }
-  bool mutate_data_table_position(int64_t _data_table_position) {
-    return SetField<int64_t>(VT_DATA_TABLE_POSITION, _data_table_position, -1LL);
   }
   const flatbuffers::String *info_node() const {
     return GetPointer<const flatbuffers::String *>(VT_INFO_NODE);
   }
-  flatbuffers::String *mutable_info_node() {
-    return GetPointer<flatbuffers::String *>(VT_INFO_NODE);
-  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int32_t>(verifier, VT_COMPRESSION) &&
-           VerifyField<int64_t>(verifier, VT_DATA_TABLE_POSITION) &&
+           VerifyField<int32_t>(verifier, VT_COMPRESSION, 4) &&
+           VerifyField<int64_t>(verifier, VT_DATA_TABLE_POSITION, 8) &&
            VerifyOffset(verifier, VT_INFO_NODE) &&
            verifier.VerifyString(info_node()) &&
            verifier.EndTable();
@@ -138,10 +136,6 @@ inline const IOHeader *GetIOHeader(const void *buf) {
 
 inline const IOHeader *GetSizePrefixedIOHeader(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<IOHeader>(buf);
-}
-
-inline IOHeader *GetMutableIOHeader(void *buf) {
-  return flatbuffers::GetMutableRoot<IOHeader>(buf);
 }
 
 inline bool VerifyIOHeaderBuffer(

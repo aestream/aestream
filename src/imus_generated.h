@@ -6,6 +6,13 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+// Ensure the included flatbuffers.h is the same version as when this file was
+// generated, otherwise it may not be compatible.
+static_assert(FLATBUFFERS_VERSION_MAJOR == 2 &&
+              FLATBUFFERS_VERSION_MINOR == 0 &&
+              FLATBUFFERS_VERSION_REVISION == 6,
+             "Non-compatible flatbuffers version included");
+
 struct Imu;
 struct ImuBuilder;
 
@@ -30,82 +37,49 @@ struct Imu FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int64_t t() const {
     return GetField<int64_t>(VT_T, 0);
   }
-  bool mutate_t(int64_t _t) {
-    return SetField<int64_t>(VT_T, _t, 0);
-  }
   float temperature() const {
     return GetField<float>(VT_TEMPERATURE, 0.0f);
-  }
-  bool mutate_temperature(float _temperature) {
-    return SetField<float>(VT_TEMPERATURE, _temperature, 0.0f);
   }
   float accelerometer_x() const {
     return GetField<float>(VT_ACCELEROMETER_X, 0.0f);
   }
-  bool mutate_accelerometer_x(float _accelerometer_x) {
-    return SetField<float>(VT_ACCELEROMETER_X, _accelerometer_x, 0.0f);
-  }
   float accelerometer_y() const {
     return GetField<float>(VT_ACCELEROMETER_Y, 0.0f);
-  }
-  bool mutate_accelerometer_y(float _accelerometer_y) {
-    return SetField<float>(VT_ACCELEROMETER_Y, _accelerometer_y, 0.0f);
   }
   float accelerometer_z() const {
     return GetField<float>(VT_ACCELEROMETER_Z, 0.0f);
   }
-  bool mutate_accelerometer_z(float _accelerometer_z) {
-    return SetField<float>(VT_ACCELEROMETER_Z, _accelerometer_z, 0.0f);
-  }
   float gyroscope_x() const {
     return GetField<float>(VT_GYROSCOPE_X, 0.0f);
-  }
-  bool mutate_gyroscope_x(float _gyroscope_x) {
-    return SetField<float>(VT_GYROSCOPE_X, _gyroscope_x, 0.0f);
   }
   float gyroscope_y() const {
     return GetField<float>(VT_GYROSCOPE_Y, 0.0f);
   }
-  bool mutate_gyroscope_y(float _gyroscope_y) {
-    return SetField<float>(VT_GYROSCOPE_Y, _gyroscope_y, 0.0f);
-  }
   float gyroscope_z() const {
     return GetField<float>(VT_GYROSCOPE_Z, 0.0f);
-  }
-  bool mutate_gyroscope_z(float _gyroscope_z) {
-    return SetField<float>(VT_GYROSCOPE_Z, _gyroscope_z, 0.0f);
   }
   float magnetometer_x() const {
     return GetField<float>(VT_MAGNETOMETER_X, 0.0f);
   }
-  bool mutate_magnetometer_x(float _magnetometer_x) {
-    return SetField<float>(VT_MAGNETOMETER_X, _magnetometer_x, 0.0f);
-  }
   float magnetometer_y() const {
     return GetField<float>(VT_MAGNETOMETER_Y, 0.0f);
-  }
-  bool mutate_magnetometer_y(float _magnetometer_y) {
-    return SetField<float>(VT_MAGNETOMETER_Y, _magnetometer_y, 0.0f);
   }
   float magnetometer_z() const {
     return GetField<float>(VT_MAGNETOMETER_Z, 0.0f);
   }
-  bool mutate_magnetometer_z(float _magnetometer_z) {
-    return SetField<float>(VT_MAGNETOMETER_Z, _magnetometer_z, 0.0f);
-  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int64_t>(verifier, VT_T) &&
-           VerifyField<float>(verifier, VT_TEMPERATURE) &&
-           VerifyField<float>(verifier, VT_ACCELEROMETER_X) &&
-           VerifyField<float>(verifier, VT_ACCELEROMETER_Y) &&
-           VerifyField<float>(verifier, VT_ACCELEROMETER_Z) &&
-           VerifyField<float>(verifier, VT_GYROSCOPE_X) &&
-           VerifyField<float>(verifier, VT_GYROSCOPE_Y) &&
-           VerifyField<float>(verifier, VT_GYROSCOPE_Z) &&
-           VerifyField<float>(verifier, VT_MAGNETOMETER_X) &&
-           VerifyField<float>(verifier, VT_MAGNETOMETER_Y) &&
-           VerifyField<float>(verifier, VT_MAGNETOMETER_Z) &&
+           VerifyField<int64_t>(verifier, VT_T, 8) &&
+           VerifyField<float>(verifier, VT_TEMPERATURE, 4) &&
+           VerifyField<float>(verifier, VT_ACCELEROMETER_X, 4) &&
+           VerifyField<float>(verifier, VT_ACCELEROMETER_Y, 4) &&
+           VerifyField<float>(verifier, VT_ACCELEROMETER_Z, 4) &&
+           VerifyField<float>(verifier, VT_GYROSCOPE_X, 4) &&
+           VerifyField<float>(verifier, VT_GYROSCOPE_Y, 4) &&
+           VerifyField<float>(verifier, VT_GYROSCOPE_Z, 4) &&
+           VerifyField<float>(verifier, VT_MAGNETOMETER_X, 4) &&
+           VerifyField<float>(verifier, VT_MAGNETOMETER_Y, 4) &&
+           VerifyField<float>(verifier, VT_MAGNETOMETER_Z, 4) &&
            verifier.EndTable();
   }
 };
@@ -194,9 +168,6 @@ struct ImuPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<flatbuffers::Offset<Imu>> *elements() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Imu>> *>(VT_ELEMENTS);
   }
-  flatbuffers::Vector<flatbuffers::Offset<Imu>> *mutable_elements() {
-    return GetPointer<flatbuffers::Vector<flatbuffers::Offset<Imu>> *>(VT_ELEMENTS);
-  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_ELEMENTS) &&
@@ -247,10 +218,6 @@ inline const ImuPacket *GetImuPacket(const void *buf) {
 
 inline const ImuPacket *GetSizePrefixedImuPacket(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<ImuPacket>(buf);
-}
-
-inline ImuPacket *GetMutableImuPacket(void *buf) {
-  return flatbuffers::GetMutableRoot<ImuPacket>(buf);
 }
 
 inline bool VerifyImuPacketBuffer(

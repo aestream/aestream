@@ -31,7 +31,6 @@ net.weight = torch.nn.Parameter(torch.tensor([[[
     [0, 0, 0],
     [1, 2, 1]
 ]]], dtype=torch.float32))
-#net = net.cuda
 
 # Start streaming from a DVS camera on USB 2:7 and put them on the GPU
 with DVSInput(2, 4, (640, 480), device="cpu") as stream:

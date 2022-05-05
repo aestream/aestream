@@ -8,7 +8,7 @@
 #include <torch/extension.h>
 #include <torch/torch.h>
 
-TensorBuffer::TensorBuffer(torch::IntArrayRef size, std::string device)
+TensorBuffer::TensorBuffer(torch::IntArrayRef size, torch::Device device)
     : shape(size.vec()) {
   options_buffer = torch::TensorOptions()
                        .dtype(torch::kUInt8)

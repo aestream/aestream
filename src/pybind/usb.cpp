@@ -34,7 +34,7 @@ private:
 
 public:
   DVSInput(uint16_t deviceId, uint8_t deviceAddress, torch::IntArrayRef shape,
-           std::string device)
+           torch::Device device)
       : buffer(shape, device) {
     try {
       generator = inivation_event_generator("dvx", deviceId, deviceAddress,

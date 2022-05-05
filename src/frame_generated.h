@@ -6,10 +6,17 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+// Ensure the included flatbuffers.h is the same version as when this file was
+// generated, otherwise it may not be compatible.
+static_assert(FLATBUFFERS_VERSION_MAJOR == 2 &&
+              FLATBUFFERS_VERSION_MINOR == 0 &&
+              FLATBUFFERS_VERSION_REVISION == 6,
+             "Non-compatible flatbuffers version included");
+
 struct Frame;
 struct FrameBuilder;
 
-enum FrameFormat {
+enum FrameFormat : int8_t {
   FrameFormat_Gray = 0,
   FrameFormat_Bgr = 16,
   FrameFormat_Bgra = 24,
@@ -53,81 +60,48 @@ struct Frame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int64_t t() const {
     return GetField<int64_t>(VT_T, 0);
   }
-  bool mutate_t(int64_t _t) {
-    return SetField<int64_t>(VT_T, _t, 0);
-  }
   int64_t begin_t() const {
     return GetField<int64_t>(VT_BEGIN_T, 0);
-  }
-  bool mutate_begin_t(int64_t _begin_t) {
-    return SetField<int64_t>(VT_BEGIN_T, _begin_t, 0);
   }
   int64_t end_t() const {
     return GetField<int64_t>(VT_END_T, 0);
   }
-  bool mutate_end_t(int64_t _end_t) {
-    return SetField<int64_t>(VT_END_T, _end_t, 0);
-  }
   int64_t exposure_begin_t() const {
     return GetField<int64_t>(VT_EXPOSURE_BEGIN_T, 0);
-  }
-  bool mutate_exposure_begin_t(int64_t _exposure_begin_t) {
-    return SetField<int64_t>(VT_EXPOSURE_BEGIN_T, _exposure_begin_t, 0);
   }
   int64_t exposure_end_t() const {
     return GetField<int64_t>(VT_EXPOSURE_END_T, 0);
   }
-  bool mutate_exposure_end_t(int64_t _exposure_end_t) {
-    return SetField<int64_t>(VT_EXPOSURE_END_T, _exposure_end_t, 0);
-  }
   FrameFormat format() const {
     return static_cast<FrameFormat>(GetField<int8_t>(VT_FORMAT, 0));
-  }
-  bool mutate_format(FrameFormat _format) {
-    return SetField<int8_t>(VT_FORMAT, static_cast<int8_t>(_format), 0);
   }
   int16_t width() const {
     return GetField<int16_t>(VT_WIDTH, 0);
   }
-  bool mutate_width(int16_t _width) {
-    return SetField<int16_t>(VT_WIDTH, _width, 0);
-  }
   int16_t height() const {
     return GetField<int16_t>(VT_HEIGHT, 0);
-  }
-  bool mutate_height(int16_t _height) {
-    return SetField<int16_t>(VT_HEIGHT, _height, 0);
   }
   int16_t offset_x() const {
     return GetField<int16_t>(VT_OFFSET_X, 0);
   }
-  bool mutate_offset_x(int16_t _offset_x) {
-    return SetField<int16_t>(VT_OFFSET_X, _offset_x, 0);
-  }
   int16_t offset_y() const {
     return GetField<int16_t>(VT_OFFSET_Y, 0);
-  }
-  bool mutate_offset_y(int16_t _offset_y) {
-    return SetField<int16_t>(VT_OFFSET_Y, _offset_y, 0);
   }
   const flatbuffers::Vector<uint8_t> *pixels() const {
     return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_PIXELS);
   }
-  flatbuffers::Vector<uint8_t> *mutable_pixels() {
-    return GetPointer<flatbuffers::Vector<uint8_t> *>(VT_PIXELS);
-  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int64_t>(verifier, VT_T) &&
-           VerifyField<int64_t>(verifier, VT_BEGIN_T) &&
-           VerifyField<int64_t>(verifier, VT_END_T) &&
-           VerifyField<int64_t>(verifier, VT_EXPOSURE_BEGIN_T) &&
-           VerifyField<int64_t>(verifier, VT_EXPOSURE_END_T) &&
-           VerifyField<int8_t>(verifier, VT_FORMAT) &&
-           VerifyField<int16_t>(verifier, VT_WIDTH) &&
-           VerifyField<int16_t>(verifier, VT_HEIGHT) &&
-           VerifyField<int16_t>(verifier, VT_OFFSET_X) &&
-           VerifyField<int16_t>(verifier, VT_OFFSET_Y) &&
+           VerifyField<int64_t>(verifier, VT_T, 8) &&
+           VerifyField<int64_t>(verifier, VT_BEGIN_T, 8) &&
+           VerifyField<int64_t>(verifier, VT_END_T, 8) &&
+           VerifyField<int64_t>(verifier, VT_EXPOSURE_BEGIN_T, 8) &&
+           VerifyField<int64_t>(verifier, VT_EXPOSURE_END_T, 8) &&
+           VerifyField<int8_t>(verifier, VT_FORMAT, 1) &&
+           VerifyField<int16_t>(verifier, VT_WIDTH, 2) &&
+           VerifyField<int16_t>(verifier, VT_HEIGHT, 2) &&
+           VerifyField<int16_t>(verifier, VT_OFFSET_X, 2) &&
+           VerifyField<int16_t>(verifier, VT_OFFSET_Y, 2) &&
            VerifyOffset(verifier, VT_PIXELS) &&
            verifier.VerifyVector(pixels()) &&
            verifier.EndTable();
@@ -245,10 +219,6 @@ inline const Frame *GetFrame(const void *buf) {
 
 inline const Frame *GetSizePrefixedFrame(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<Frame>(buf);
-}
-
-inline Frame *GetMutableFrame(void *buf) {
-  return flatbuffers::GetMutableRoot<Frame>(buf);
 }
 
 inline bool VerifyFrameBuffer(

@@ -24,4 +24,4 @@ with UDPInput((640, 480)) as stream:
         time.sleep(0.001)
 
     # Save the tensor to a binary file
-    torch.save(torch.stack(images), "rpi0_local.dat")
+    torch.save(torch.stack(images), "aestream.dat")

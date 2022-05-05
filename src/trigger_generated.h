@@ -6,13 +6,20 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+// Ensure the included flatbuffers.h is the same version as when this file was
+// generated, otherwise it may not be compatible.
+static_assert(FLATBUFFERS_VERSION_MAJOR == 2 &&
+              FLATBUFFERS_VERSION_MINOR == 0 &&
+              FLATBUFFERS_VERSION_REVISION == 6,
+             "Non-compatible flatbuffers version included");
+
 struct Trigger;
 struct TriggerBuilder;
 
 struct TriggerPacket;
 struct TriggerPacketBuilder;
 
-enum TriggerSource {
+enum TriggerSource : int8_t {
   TriggerSource_TimestampReset = 0,
   TriggerSource_ExternalSignalRisingEdge = 1,
   TriggerSource_ExternalSignalFallingEdge = 2,
@@ -75,19 +82,13 @@ struct Trigger FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int64_t t() const {
     return GetField<int64_t>(VT_T, 0);
   }
-  bool mutate_t(int64_t _t) {
-    return SetField<int64_t>(VT_T, _t, 0);
-  }
   TriggerSource source() const {
     return static_cast<TriggerSource>(GetField<int8_t>(VT_SOURCE, 0));
   }
-  bool mutate_source(TriggerSource _source) {
-    return SetField<int8_t>(VT_SOURCE, static_cast<int8_t>(_source), 0);
-  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int64_t>(verifier, VT_T) &&
-           VerifyField<int8_t>(verifier, VT_SOURCE) &&
+           VerifyField<int64_t>(verifier, VT_T, 8) &&
+           VerifyField<int8_t>(verifier, VT_SOURCE, 1) &&
            verifier.EndTable();
   }
 };
@@ -130,9 +131,6 @@ struct TriggerPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   };
   const flatbuffers::Vector<flatbuffers::Offset<Trigger>> *elements() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Trigger>> *>(VT_ELEMENTS);
-  }
-  flatbuffers::Vector<flatbuffers::Offset<Trigger>> *mutable_elements() {
-    return GetPointer<flatbuffers::Vector<flatbuffers::Offset<Trigger>> *>(VT_ELEMENTS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -184,10 +182,6 @@ inline const TriggerPacket *GetTriggerPacket(const void *buf) {
 
 inline const TriggerPacket *GetSizePrefixedTriggerPacket(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<TriggerPacket>(buf);
-}
-
-inline TriggerPacket *GetMutableTriggerPacket(void *buf) {
-  return flatbuffers::GetMutableRoot<TriggerPacket>(buf);
 }
 
 inline bool VerifyTriggerPacketBuffer(
