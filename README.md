@@ -70,7 +70,7 @@ We currently support the following outputs:
 | Output | Description | Usage |
 | --------- | ----------- | ----- |
 | STDOUT    | Standard output (default output) | `output stdout`
-| Ethernet over UDP | Outputs to a given IP and port using the [SPIF protocol](https://github.com/SpiNNakerManchester/spif)  | `output spif 10.0.0.1 1234` |
+| Ethernet over UDP | Outputs to a given IP and port using the [SPIF protocol](https://github.com/SpiNNakerManchester/spif)  | `output udp 10.0.0.1 1234` |
 | File       | Output to file | `output file my_file.txt` |
 
 ### CLI examples
