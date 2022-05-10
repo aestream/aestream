@@ -37,7 +37,10 @@
             libcaer
           ];
           configurePhase = "cmake -GNinja -Bbuild/ .";
-          buildPhase = "ninja -C build";
+          buildPhase = ''
+            flatc --cpp -o src/ src/flatbuffers/*
+            ninja -C build
+            '';
           installPhase = ''
             mkdir -p $out/lib $out/bin
             mv build/src/**/*.so $out/lib/
@@ -51,7 +54,7 @@
           src = ./.;
           requirements = python-requirements;
 
-          buildInputs = [ libcaer ];
+          buildInputs = [ libcaer py.pytorch ];
           nativeBuildInputs = [
             pkgs.which
           ];
