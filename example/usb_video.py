@@ -21,7 +21,7 @@ ax.draw_artist(image)
 fig.canvas.blit(fig.bbox)
 
 # Start streaming from a DVS camera on USB 2:3
-with DVSInput(2, 3, (346, 260)) as stream:
+with DVSInput(2, 2, (640, 480)) as stream:
     while True:
         # Read a tensor (346, 260) tensor from the camera
         tensor = stream.read()

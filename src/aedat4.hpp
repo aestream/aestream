@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <stdlib.h>
 #include <vector>
 
@@ -12,6 +13,8 @@
 
 #include <lz4.h>
 #include <lz4frame.h>
+
+#include <flatbuffers/flatbuffers.h>
 
 #include "aedat.hpp"
 #include "events_generated.h"
@@ -97,53 +100,51 @@ struct AEDAT4 {
 
     rapidxml::xml_document<> doc;
 
-    // std::cout << ioheader->infoNode()->str() << std::endl;
-
-    doc.parse<0>((char *)(ioheader->infoNode()->str().c_str()));
+    // doc.parse<0>((char *)(ioheader->info_node()->str().c_str()));
 
     // extract necessary data from XML
-    auto node = doc.first_node();
-    for (rapidxml::xml_node<> *outinfo = node->first_node(); outinfo;
-         outinfo = outinfo->next_sibling()) {
+    // auto node = doc.first_node();
+    // for (rapidxml::xml_node<> *outinfo = node->first_node(); outinfo;
+    //      outinfo = outinfo->next_sibling()) {
 
-      auto attributes = collect_attributes(outinfo);
-      if (attributes["name"] != "outInfo") {
-        continue;
-      }
+    //   auto attributes = collect_attributes(outinfo);
+    //   if (attributes["name"] != "outInfo") {
+    //     continue;
+    //   }
 
-      for (rapidxml::xml_node<> *child = outinfo->first_node(); child;
-           child = child->next_sibling()) {
-        OutInfo info;
-        auto attributes = collect_attributes(child);
-        if (!attributes.contains("name")) {
-          continue;
-        }
+    //   for (rapidxml::xml_node<> *child = outinfo->first_node(); child;
+    //        child = child->next_sibling()) {
+    //     OutInfo info;
+    //     auto attributes = collect_attributes(child);
+    //     if (!attributes.contains("name")) {
+    //       continue;
+    //     }
 
-        info.name = std::stoi(attributes["name"]);
+    //     info.name = std::stoi(attributes["name"]);
 
-        for (rapidxml::xml_node<> *attr = child->first_node(); attr;
-             attr = attr->next_sibling()) {
-          auto attributes = collect_attributes(attr);
-          if (attributes["key"] == "compression") {
-            info.compression = attr->value();
-          } else if (attributes["key"] == "typeIdentifier") {
-            info.type = OutInfo::to_type(attr->value());
-          } else if (attributes["name"] == "info") {
-            for (rapidxml::xml_node<> *info_node = attr->first_node();
-                 info_node; info_node = info_node->next_sibling()) {
-              auto infos = collect_attributes(info_node);
+    //     for (rapidxml::xml_node<> *attr = child->first_node(); attr;
+    //          attr = attr->next_sibling()) {
+    //       auto attributes = collect_attributes(attr);
+    //       if (attributes["key"] == "compression") {
+    //         info.compression = attr->value();
+    //       } else if (attributes["key"] == "typeIdentifier") {
+    //         info.type = OutInfo::to_type(attr->value());
+    //       } else if (attributes["name"] == "info") {
+    //         for (rapidxml::xml_node<> *info_node = attr->first_node();
+    //              info_node; info_node = info_node->next_sibling()) {
+    //           auto infos = collect_attributes(info_node);
 
-              if (infos["key"] == "sizeX") {
-                info.size_x = std::stoi(info_node->value());
-              } else if (infos["key"] == "sizeY") {
-                info.size_y = std::stoi(info_node->value());
-              }
-            }
-          }
-        }
-        outinfos.push_back(info);
-      }
-    }
+    //           if (infos["key"] == "sizeX") {
+    //             info.size_x = std::stoi(info_node->value());
+    //           } else if (infos["key"] == "sizeY") {
+    //             info.size_y = std::stoi(info_node->value());
+    //           }
+    //         }
+    //       }
+    //     }
+    //     outinfos.push_back(info);
+    //   }
+    // }
 
     // for (auto info : outinfos) {
     //   std::cout << "{" << info.name << ", " << info.compression << ", "
@@ -151,7 +152,12 @@ struct AEDAT4 {
     //             << "}" << std::endl;
     // }
 
-    size_t data_table_position = ioheader->dataTablePosition();
+    int64_t data_table_position = ioheader->data_table_position();
+
+    if (data_table_position < 0) {
+      throw std::runtime_error(
+          "AEDAT files without datatables are currently not supported");
+    }
 
     data += ioheader_offset + 4;
 
@@ -166,7 +172,7 @@ struct AEDAT4 {
         LZ4F_createDecompressionContext(&ctx, LZ4F_VERSION);
 
     if (LZ4F_isError(lz4_error)) {
-      printf("Decompression error: %s\n", LZ4F_getErrorName(lz4_error));
+      printf("Decompression context error: %s\n", LZ4F_getErrorName(lz4_error));
       return;
     }
 
@@ -177,13 +183,13 @@ struct AEDAT4 {
     auto ret = LZ4F_decompress(ctx, &dst_buffer[0], &dst_size, data_table_start,
                                &data_table_size, nullptr);
     if (LZ4F_isError(ret)) {
-      printf("Decompression error: %s\n", LZ4F_getErrorName(ret));
+      printf("Decompression DataTable error: %s\n", LZ4F_getErrorName(ret));
       return;
     }
 
     auto file_data_table = GetSizePrefixedFileDataTable(&dst_buffer[0]);
 
-    for (auto elem : *file_data_table->Table()) {
+    for (auto elem : *file_data_table->table()) {
       // just here to illustrate access to the data
     }
 
@@ -200,7 +206,7 @@ struct AEDAT4 {
       data += size;
 
       if (LZ4F_isError(ret)) {
-        printf("Decompression error: %s\n", LZ4F_getErrorName(ret));
+        printf("Decompression package error: %s\n", LZ4F_getErrorName(ret));
         return;
       }
 
@@ -222,7 +228,6 @@ struct AEDAT4 {
             printf("Wrong coords (%lu) %lu: %ux%u\n", count, e.timestamp, e.x,
                    e.y);
           }
-          // printf("Event:%lu: %3d  %3d\n", e.timestamp, e.x, e.y);
           polarity_events.push_back(e);
         }
         break;
@@ -264,6 +269,106 @@ struct AEDAT4 {
       }
       }
     }
+  }
+
+  static std::tuple<char *, size_t> compress_lz4(char *buffer, size_t size) {
+    auto lz4FrameBound = LZ4F_compressBound(size, nullptr);
+    auto new_buffer = new char[lz4FrameBound];
+
+    auto compression =
+        LZ4F_compressFrame(new_buffer, lz4FrameBound, buffer, size, nullptr);
+    return {new_buffer, compression};
+    // LZ4F_compressionContext_t ctx;
+    // auto contextCreation = LZ4F_createCompressionContext(&ctx, LZ4F_VERSION);
+    // auto headerSize =
+    //     LZ4F_compressBegin(ctx, new_buffer, lz4FrameBound, nullptr);
+    // if (LZ4F_isError(headerSize)) {
+    //   std::stringstream err;
+    //   err << "Compression error: " << LZ4F_getErrorName(headerSize);
+    //   throw std::runtime_error(err.str());
+    // }
+
+    // auto packetSize = LZ4F_compressUpdate(ctx, new_buffer, lz4FrameBound,
+    //                                       buffer, size, nullptr);
+    // auto footerSize = LZ4F_compressEnd(ctx, new_buffer, lz4FrameBound,
+    // nullptr);
+    // return {new_buffer, headerSize + packetSize + footerSize};
+  }
+
+  static size_t save_header(std::fstream &stream) {
+    stream << "#!AER-DAT4.0\r\n";
+    // Save header
+    flatbuffers::FlatBufferBuilder fbb;
+    fbb.ForceDefaults(true);
+    auto infoNode = "<dv version=\"4.0\"><node name=\"outInfo\"></node></dv>";
+    auto headerOffset =
+        CreateIOHeaderDirect(fbb, CompressionType_LZ4, -1L, infoNode);
+    fbb.FinishSizePrefixed(headerOffset);
+    stream.write((char *)fbb.GetBufferPointer(), fbb.GetSize());
+    std::cout << "Data " << stream.tellp() << std::endl;
+    return fbb.GetSize();
+  }
+
+  static void save_footer(std::fstream &stream, size_t headerSize,
+                          int64_t timestampStart, int64_t timestampEnd,
+                          size_t eventCount) {
+    flatbuffers::FlatBufferBuilder fbb;
+    // Mutate offset to data table
+    size_t tableOffset = stream.tellp();
+    stream.seekg(14); // 14 bytes for version
+    auto length = headerSize;
+    char *data = new char[length];
+    stream.read(data, length);
+    auto header = GetSizePrefixedIOHeader(data);
+    auto new_header = CreateIOHeaderDirect(
+        fbb, header->compression(), tableOffset, header->info_node()->c_str());
+    fbb.FinishSizePrefixed(new_header);
+    stream.seekp(14); // 14 bytes for version
+    stream.write((char *)fbb.GetBufferPointer(), fbb.GetSize());
+    stream.seekp(tableOffset);
+
+    // Write data table
+    fbb.Clear();
+    auto defBuilder = FileDataDefinitionBuilder(fbb);
+    auto packetHeader = PacketHeader(0, eventCount);
+    defBuilder.add_packet_info(&packetHeader);
+    defBuilder.add_num_elements(1);
+    defBuilder.add_timestamp_start(timestampStart);
+    defBuilder.add_timestamp_end(timestampEnd);
+    auto dataDefinition = defBuilder.Finish();
+    auto tables = std::vector{dataDefinition};
+    auto tableVector = fbb.CreateVector(tables);
+    auto dataTable = CreateFileDataTable(fbb, tableVector);
+    fbb.FinishSizePrefixed(dataTable);
+    auto [compressed, size] =
+        compress_lz4((char *)fbb.GetBufferPointer(), fbb.GetSize());
+    stream.write(compressed, size);
+    std::cout << "Table " << tableOffset << std::endl;
+  }
+
+  static void save_events(std::fstream &stream,
+                          std::vector<AEDAT::PolarityEvent> events) {
+    // Create event buffer
+    flatbuffers::FlatBufferBuilder fbb;
+    fbb.ForceDefaults(true);
+    std::vector<Event> bufferEvents;
+    for (auto event : events) {
+      const Event e = Event(static_cast<int64_t>(event.timestamp),
+                            static_cast<int16_t>(event.x),
+                            static_cast<int16_t>(event.y), event.polarity);
+      bufferEvents.push_back(e);
+    }
+    auto eventVector = CreateEventPacketDirect(fbb, &bufferEvents);
+    FinishSizePrefixedEventPacketBuffer(fbb, eventVector);
+    auto [compressed, size] =
+        compress_lz4((char *)fbb.GetBufferPointer(), fbb.GetSize());
+
+    // Write packet header
+    auto packetHeader = PacketHeader(0, size);
+    stream.write((char *)&packetHeader, 8);
+
+    // Write events
+    stream.write(compressed, size);
   }
 
   AEDAT4() {}

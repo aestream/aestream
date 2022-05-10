@@ -1,3 +1,5 @@
+#include <atomic> 
+
 #include "./inivation.hpp"
 
 CAERUSBConnection::CAERUSBConnection(std::string camera, uint16_t deviceId,
@@ -40,13 +42,14 @@ CAERUSBConnection::CAERUSBConnection(std::string camera, uint16_t deviceId,
 // event generator for Inivation cameras
 Generator<AEDAT::PolarityEvent>
 inivation_event_generator(std::string camera, std::uint16_t deviceId,
-                          std::uint8_t deviceAddress) {
+                          std::uint8_t deviceAddress,
+                          const std::atomic<bool> &runFlag) {
 
   auto connection = CAERUSBConnection(camera, deviceId, deviceAddress);
 
   std::unique_ptr<libcaer::events::EventPacketContainer> packetContainer;
   try {
-    while (true) {
+    while (runFlag.load()) {
       do {
         packetContainer = connection.getPacket();
       } while (packetContainer == nullptr);

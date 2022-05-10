@@ -6,11 +6,21 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+// Ensure the included flatbuffers.h is the same version as when this file was
+// generated, otherwise it may not be compatible.
+static_assert(FLATBUFFERS_VERSION_MAJOR == 2 &&
+              FLATBUFFERS_VERSION_MINOR == 0 &&
+              FLATBUFFERS_VERSION_REVISION == 6,
+             "Non-compatible flatbuffers version included");
+
 struct Imu;
+struct ImuBuilder;
 
 struct ImuPacket;
+struct ImuPacketBuilder;
 
 struct Imu FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ImuBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_T = 4,
     VT_TEMPERATURE = 6,
@@ -59,22 +69,23 @@ struct Imu FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int64_t>(verifier, VT_T) &&
-           VerifyField<float>(verifier, VT_TEMPERATURE) &&
-           VerifyField<float>(verifier, VT_ACCELEROMETER_X) &&
-           VerifyField<float>(verifier, VT_ACCELEROMETER_Y) &&
-           VerifyField<float>(verifier, VT_ACCELEROMETER_Z) &&
-           VerifyField<float>(verifier, VT_GYROSCOPE_X) &&
-           VerifyField<float>(verifier, VT_GYROSCOPE_Y) &&
-           VerifyField<float>(verifier, VT_GYROSCOPE_Z) &&
-           VerifyField<float>(verifier, VT_MAGNETOMETER_X) &&
-           VerifyField<float>(verifier, VT_MAGNETOMETER_Y) &&
-           VerifyField<float>(verifier, VT_MAGNETOMETER_Z) &&
+           VerifyField<int64_t>(verifier, VT_T, 8) &&
+           VerifyField<float>(verifier, VT_TEMPERATURE, 4) &&
+           VerifyField<float>(verifier, VT_ACCELEROMETER_X, 4) &&
+           VerifyField<float>(verifier, VT_ACCELEROMETER_Y, 4) &&
+           VerifyField<float>(verifier, VT_ACCELEROMETER_Z, 4) &&
+           VerifyField<float>(verifier, VT_GYROSCOPE_X, 4) &&
+           VerifyField<float>(verifier, VT_GYROSCOPE_Y, 4) &&
+           VerifyField<float>(verifier, VT_GYROSCOPE_Z, 4) &&
+           VerifyField<float>(verifier, VT_MAGNETOMETER_X, 4) &&
+           VerifyField<float>(verifier, VT_MAGNETOMETER_Y, 4) &&
+           VerifyField<float>(verifier, VT_MAGNETOMETER_Z, 4) &&
            verifier.EndTable();
   }
 };
 
 struct ImuBuilder {
+  typedef Imu Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_t(int64_t t) {
@@ -114,7 +125,6 @@ struct ImuBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ImuBuilder &operator=(const ImuBuilder &);
   flatbuffers::Offset<Imu> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Imu>(end);
@@ -151,6 +161,7 @@ inline flatbuffers::Offset<Imu> CreateImu(
 }
 
 struct ImuPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ImuPacketBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ELEMENTS = 4
   };
@@ -167,6 +178,7 @@ struct ImuPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct ImuPacketBuilder {
+  typedef ImuPacket Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_elements(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Imu>>> elements) {
@@ -176,7 +188,6 @@ struct ImuPacketBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ImuPacketBuilder &operator=(const ImuPacketBuilder &);
   flatbuffers::Offset<ImuPacket> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<ImuPacket>(end);

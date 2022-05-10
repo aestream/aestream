@@ -20,7 +20,7 @@ private:
   std::shared_ptr<torch::Tensor> buffer2;
 
 public:
-  TensorBuffer(torch::IntArrayRef size, std::string device);
+  TensorBuffer(torch::IntArrayRef size, torch::Device device);
   void set_buffer(uint16_t data[], int numbytes);
   void set_vector(std::vector<AEDAT::PolarityEvent> events);
   at::Tensor read();

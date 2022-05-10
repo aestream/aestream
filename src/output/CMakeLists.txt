@@ -4,8 +4,7 @@ set(output_libraries aedat4)
 
 # Include Torch
 find_package(Torch)
-find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
-if (TORCH_PYTHON_LIBRARY)
+if (Torch)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
     set(output_definitions ${output_definitions} WITH_TORCH)
     set(output_sources ${output_sources} dvs_to_tensor.hpp dvs_to_tensor.cpp)
@@ -16,5 +15,6 @@ endif()
 
 # Create the output library
 add_library(aestream_output SHARED ${output_sources})
-target_link_libraries(aestream_output PRIVATE ${output_libraries})
+target_link_libraries(aestream_output PUBLIC ${output_libraries})
 target_compile_definitions(aestream_output PUBLIC ${output_definitions})
+target_include_directories(aestream_output PRIVATE ../)

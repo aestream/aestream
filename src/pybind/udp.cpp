@@ -21,7 +21,7 @@ private:
 
 public:
   uint64_t count = 0;
-  UDPInput(torch::IntArrayRef shape, std::string device, int port)
+  UDPInput(torch::IntArrayRef shape, torch::Device device, int port)
       : buffer(shape, device), port(port) {}
 
   UDPInput *start_server() {

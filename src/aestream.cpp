@@ -1,3 +1,4 @@
+#include <atomic>
 #include <csignal>
 #include <stdexcept>
 #include <string>
@@ -22,7 +23,14 @@
 #include "output/dvs_to_file.hpp"
 #include "output/dvs_to_udp.hpp"
 
+// Interrupt
+auto runFlag = std::atomic<bool>(true);
+void signalHandler(int signum) { runFlag.store(false); }
+
+// Main
 int main(int argc, char *argv[]) {
+  signal(SIGINT, signalHandler); // Register interrupt
+
   CLI::App app{"Streams DVS data from a USB camera or AEDAT file to a file or "
                "UDP socket"};
 
@@ -46,6 +54,11 @@ int main(int argc, char *argv[]) {
   app_input_inivation
       ->add_option("camera", camera, "Type of camera; davis or dvx")
       ->required();
+  uint64_t timeLimitMs;
+  app_input_inivation
+      ->add_option("timeout", timeLimitMs,
+                   "Time limit of the stream in ms. Defaults to infinity")
+      ->default_val(-1);
   // Prophesee cameras
   auto app_input_prophesee = app_input->add_subcommand(
       "prophesee", "DVS input source for prophesee cameras");
@@ -92,7 +105,7 @@ int main(int argc, char *argv[]) {
   std::string output_filename;
   auto app_output_file = app_output->add_subcommand("file", "File output");
   app_output_file->add_option("output-filename", output_filename,
-                              "Output Filename");
+                              "Output Filename. Supports .txt or .aedat4");
 
   //
   // Generate options
@@ -111,7 +124,7 @@ int main(int argc, char *argv[]) {
   if (app_input_inivation->parsed()) {
 #ifdef WITH_CAER
     input_generator =
-        inivation_event_generator(camera, deviceId, deviceAddress);
+        inivation_event_generator(camera, deviceId, deviceAddress, runFlag);
 #else
     throw std::invalid_argument(
         "Inivation cameras unavailable: please recompile with libcaer");
@@ -134,12 +147,19 @@ int main(int argc, char *argv[]) {
     if (app_output_udp->parsed()) {
       std::cout << "Send events to: " << ipAddress << " on port: " << port
                 << std::endl;
-      DVSToUDP<AEDAT::PolarityEvent> client(packetSize, bufferSize, port,
-                                            ipAddress);
+      DVSToUDP<AEDAT::PolarityEvent> client(bufferSize, port, ipAddress);
       client.stream(input_generator, include_timestamp);
     } else if (app_output_file->parsed()) {
-      std::cout << "Send events to file: " << output_filename << std::endl;
-      dvs_to_file(input_generator, output_filename);
+      std::cout << "Sending events to file " << output_filename << std::endl;
+      if (output_filename.ends_with(".txt")) {
+        dvs_to_file_txt(input_generator, output_filename);
+      } else if (output_filename.ends_with(".aedat4")) {
+        dvs_to_file_aedat(input_generator, output_filename);
+      } else {
+        std::stringstream error;
+        error << "Unsupported file ending" << output_filename;
+        throw std::invalid_argument(error.str());
+      }
     } else { // Default to STDOUT
       uint64_t count = 0;
       for (AEDAT::PolarityEvent event : input_generator) {
