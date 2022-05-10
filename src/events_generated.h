@@ -6,9 +6,17 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+// Ensure the included flatbuffers.h is the same version as when this file was
+// generated, otherwise it may not be compatible.
+static_assert(FLATBUFFERS_VERSION_MAJOR == 2 &&
+              FLATBUFFERS_VERSION_MINOR == 0 &&
+              FLATBUFFERS_VERSION_REVISION == 6,
+             "Non-compatible flatbuffers version included");
+
 struct Event;
 
 struct EventPacket;
+struct EventPacketBuilder;
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Event FLATBUFFERS_FINAL_CLASS {
  private:
@@ -19,8 +27,15 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Event FLATBUFFERS_FINAL_CLASS {
   int8_t padding0__;  int16_t padding1__;
 
  public:
-  Event() {
-    memset(static_cast<void *>(this), 0, sizeof(Event));
+  Event()
+      : t_(0),
+        x_(0),
+        y_(0),
+        on_(0),
+        padding0__(0),
+        padding1__(0) {
+    (void)padding0__;
+    (void)padding1__;
   }
   Event(int64_t _t, int16_t _x, int16_t _y, bool _on)
       : t_(flatbuffers::EndianScalar(_t)),
@@ -29,7 +44,8 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Event FLATBUFFERS_FINAL_CLASS {
         on_(flatbuffers::EndianScalar(static_cast<uint8_t>(_on))),
         padding0__(0),
         padding1__(0) {
-    (void)padding0__;    (void)padding1__;
+    (void)padding0__;
+    (void)padding1__;
   }
   int64_t t() const {
     return flatbuffers::EndianScalar(t_);
@@ -47,6 +63,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Event FLATBUFFERS_FINAL_CLASS {
 FLATBUFFERS_STRUCT_END(Event, 16);
 
 struct EventPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef EventPacketBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ELEMENTS = 4
   };
@@ -62,6 +79,7 @@ struct EventPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct EventPacketBuilder {
+  typedef EventPacket Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_elements(flatbuffers::Offset<flatbuffers::Vector<const Event *>> elements) {
@@ -71,7 +89,6 @@ struct EventPacketBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  EventPacketBuilder &operator=(const EventPacketBuilder &);
   flatbuffers::Offset<EventPacket> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<EventPacket>(end);

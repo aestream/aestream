@@ -34,9 +34,15 @@ private:
 
 public:
   DVSInput(uint16_t deviceId, uint8_t deviceAddress, torch::IntArrayRef shape,
-           std::string device)
+           torch::Device device)
       : buffer(shape, device) {
-    generator = inivation_event_generator("davis", deviceId, deviceAddress);
+    try {
+      generator = inivation_event_generator("dvx", deviceId, deviceAddress,
+                                            is_streaming);
+    } catch (std::exception &e) {
+      generator = inivation_event_generator("davis", deviceId, deviceAddress,
+                                            is_streaming);
+    }
   }
 
   at::Tensor read() { return buffer.read(); }

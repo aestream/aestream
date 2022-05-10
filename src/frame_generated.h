@@ -6,9 +6,17 @@
 
 #include "flatbuffers/flatbuffers.h"
 
-struct Frame;
+// Ensure the included flatbuffers.h is the same version as when this file was
+// generated, otherwise it may not be compatible.
+static_assert(FLATBUFFERS_VERSION_MAJOR == 2 &&
+              FLATBUFFERS_VERSION_MINOR == 0 &&
+              FLATBUFFERS_VERSION_REVISION == 6,
+             "Non-compatible flatbuffers version included");
 
-enum FrameFormat {
+struct Frame;
+struct FrameBuilder;
+
+enum FrameFormat : int8_t {
   FrameFormat_Gray = 0,
   FrameFormat_Bgr = 16,
   FrameFormat_Bgra = 24,
@@ -35,6 +43,7 @@ inline const char *EnumNameFrameFormat(FrameFormat e) {
 }
 
 struct Frame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FrameBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_T = 4,
     VT_BEGIN_T = 6,
@@ -83,16 +92,16 @@ struct Frame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int64_t>(verifier, VT_T) &&
-           VerifyField<int64_t>(verifier, VT_BEGIN_T) &&
-           VerifyField<int64_t>(verifier, VT_END_T) &&
-           VerifyField<int64_t>(verifier, VT_EXPOSURE_BEGIN_T) &&
-           VerifyField<int64_t>(verifier, VT_EXPOSURE_END_T) &&
-           VerifyField<int8_t>(verifier, VT_FORMAT) &&
-           VerifyField<int16_t>(verifier, VT_WIDTH) &&
-           VerifyField<int16_t>(verifier, VT_HEIGHT) &&
-           VerifyField<int16_t>(verifier, VT_OFFSET_X) &&
-           VerifyField<int16_t>(verifier, VT_OFFSET_Y) &&
+           VerifyField<int64_t>(verifier, VT_T, 8) &&
+           VerifyField<int64_t>(verifier, VT_BEGIN_T, 8) &&
+           VerifyField<int64_t>(verifier, VT_END_T, 8) &&
+           VerifyField<int64_t>(verifier, VT_EXPOSURE_BEGIN_T, 8) &&
+           VerifyField<int64_t>(verifier, VT_EXPOSURE_END_T, 8) &&
+           VerifyField<int8_t>(verifier, VT_FORMAT, 1) &&
+           VerifyField<int16_t>(verifier, VT_WIDTH, 2) &&
+           VerifyField<int16_t>(verifier, VT_HEIGHT, 2) &&
+           VerifyField<int16_t>(verifier, VT_OFFSET_X, 2) &&
+           VerifyField<int16_t>(verifier, VT_OFFSET_Y, 2) &&
            VerifyOffset(verifier, VT_PIXELS) &&
            verifier.VerifyVector(pixels()) &&
            verifier.EndTable();
@@ -100,6 +109,7 @@ struct Frame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 };
 
 struct FrameBuilder {
+  typedef Frame Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_t(int64_t t) {
@@ -139,7 +149,6 @@ struct FrameBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  FrameBuilder &operator=(const FrameBuilder &);
   flatbuffers::Offset<Frame> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Frame>(end);

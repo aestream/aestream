@@ -29,7 +29,7 @@ state = None
 
 # Start streaming from a DVS camera on USB 2:8 and put them on the GPU
 try:
-    with DVSInput(2, 8, (346, 260), device="cuda") as stream:
+    with DVSInput(2, 2, (640, 480), device="cuda") as stream:
         while True:
             # Read a tensor (346, 260) tensor from the camera
             tensor = stream.read()

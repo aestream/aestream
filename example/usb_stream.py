@@ -6,8 +6,8 @@ from aestream import DVSInput
 
 # Connect to a USB camera at address 2:3, receiving tensors of shape (340, 480)
 # By default, we send the tensors to the CPU
-# The variable stream can now be `.read()` whenever a tensor is desired
-with DVSInput(2, 3, (346, 260)) as stream:
+# The variable "stream" can now be `.read()` whenever a tensor is desired
+with DVSInput(2, 4, (640, 480)) as stream:
 
     # In this case, we read() every 500ms
     interval = 0.5 

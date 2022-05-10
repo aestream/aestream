@@ -2,13 +2,11 @@
 
 // Constructor - initialize socket
 template <typename T>
-DVSToUDP<T>::DVSToUDP(uint32_t interval, uint32_t bfsize, std::string port,
-                      std::string IP) {
+DVSToUDP<T>::DVSToUDP(uint32_t bfsize, std::string port, std::string IP) {
   struct addrinfo hints, *servinfo;
   int rv;
 
   // Packet configs
-  container_interval = interval;
   buffer_size = bfsize;
 
   // UDP configs
