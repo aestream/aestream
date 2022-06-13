@@ -24,7 +24,7 @@ AEStream is built in C++, but can be interfaced via CLI or Python (work in progr
 
 ## Usage (Python)
 
-First, install [PyTorch](https://pytorch.org/) and [libcaer](https://github.com/inivation/libcaer). 
+First, install [PyTorch](https://pytorch.org/) and [libcaer](https://gitlab.com/inivation/dv/libcaer/). 
 Then install `aestream` via pip: `pip install aestream`
 
 ```python
