@@ -27,7 +27,7 @@ fig.canvas.blit(fig.bbox)
 net = snn.LICell().cuda()
 state = None
 
-# Start streaming from a DVS camera on USB 2:8 and put them on the GPU
+# Start streaming from a DVS camera on USB 2:2 and put them on the GPU
 try:
     with DVSInput(2, 2, (640, 480), device="cuda") as stream:
         while True:
@@ -45,7 +45,7 @@ try:
             fig.canvas.blit(fig.bbox)
             fig.canvas.flush_events()
 
-            # Pause to only loop 10 times per second
+            # Pause to only loop 100 times per second
             plt.pause(0.01)
 except Exception as e:
     print("Error", e)
