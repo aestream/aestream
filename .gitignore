@@ -2,6 +2,7 @@ bin/
 libtorch/
 DvsGesture/
 build/
+build_python/
 dist/
 .vscode/
 *.a
