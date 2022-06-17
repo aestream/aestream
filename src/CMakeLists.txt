@@ -2,6 +2,11 @@
 find_path(LZ4_INCLUDE_DIR NAMES	lz4.h)
 find_library(LZ4_LIBRARY NAMES lz4 REQUIRED)
 
+find_package (OpenCV 4.0.0 REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+
+include_directories(../../flatbuffers/include)
+
 # AEDAT4 processing
 add_library(aedat4 SHARED aedat.hpp aedat4.hpp generator.hpp)
 include_directories(aedat4 PRIVATE ${LZ4_INCLUDE_DIR})

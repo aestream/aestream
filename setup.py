@@ -62,6 +62,7 @@ setup(
                 "-fcoroutines",
                 "-std=c++20",
                 "-I/usr/include/opencv4",
+                "-I/home/emijan/norse/flatbuffers/include",
             ],
             libraries=["caer"],
         ),
