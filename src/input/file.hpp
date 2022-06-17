@@ -1,4 +1,5 @@
 #include <string>
+#include <atomic>
 
 #include "../aedat.hpp"
 #include "../generator.hpp"
@@ -14,4 +15,5 @@
  * @return A Generator of PolarityEvents
  */
 Generator<AEDAT::PolarityEvent> file_event_generator(const std::string filename,
+                                                     const std::atomic<bool> &runFlag,
                                                      bool ignore_time = false);

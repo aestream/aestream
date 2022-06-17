@@ -9,6 +9,7 @@
 #include <iostream>
 
 Generator<AEDAT::PolarityEvent> file_event_generator(const std::string filename,
+                                                     const std::atomic<bool> &runFlag,
                                                      bool ignore_time) {
   AEDAT4 aedat_file = AEDAT4(filename);
   const auto polarity_events = aedat_file.polarity_events;
@@ -16,6 +17,8 @@ Generator<AEDAT::PolarityEvent> file_event_generator(const std::string filename,
   const int64_t time_start_us = polarity_events[0].timestamp;
 
   for (auto event : polarity_events) {
+    if (!runFlag.load()) break;
+    
     // Sleep to align with real-time, unless ignore_time is set
     if (!ignore_time) {
       const int64_t time_diff =

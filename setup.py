@@ -19,12 +19,16 @@ cpp_sources = [
     # USB
     "src/input/inivation.cpp",
     "src/pybind/usb.cpp",
+    # File
+    "src/input/file.cpp",
+    "src/pybind/file.cpp",
 ]
 
 cpp_headers = [
     "src/aedat.hpp",
     # Inputs
     "src/input/inivation.hpp",
+    "src/input/file.hpp",
     # Python class headers
     "src/pybind/tensor_buffer.hpp",
     "src/pybind/udp_client.hpp",
@@ -62,9 +66,10 @@ setup(
                 "-fcoroutines",
                 "-std=c++20",
                 "-I/usr/include/opencv4",
+                "-I/home/emijan/norse/aestream/include",
                 "-I/home/emijan/norse/flatbuffers/include",
             ],
-            libraries=["caer"],
+            libraries=["caer", "lz4"],
         ),
     ],
     cmdclass={"build_ext": cpp_extension.BuildExtension},
