@@ -21,7 +21,7 @@ TensorBuffer::TensorBuffer(torch::IntArrayRef size, torch::Device device)
 
 void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
   const auto length = numbytes >> 1;
-  buffer_lock.lock();
+  const std::lock_guard lock{buffer_lock};
   char *array = (char *)buffer1->data_ptr();
   for (int i = 0; i < length; i = i + 2) {
     // Decode x, y
@@ -29,23 +29,22 @@ void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
     const uint16_t x_coord = data[i + 1] & 0x7FFF;
     (*(array + shape[1] * x_coord + y_coord))++;
   }
-  buffer_lock.unlock();
 }
 
 void TensorBuffer::set_vector(std::vector<AEDAT::PolarityEvent> events) {
-  buffer_lock.lock();
+  const std::lock_guard lock{buffer_lock};
   char *array = (char *)buffer1->data_ptr();
   for (auto event : events) {
     (*(array + shape[1] * event.x + event.y))++;
   }
-  buffer_lock.unlock();
 }
 
 at::Tensor TensorBuffer::read() {
   // Swap out old pointer
-  buffer_lock.lock();
-  buffer1.swap(buffer2);
-  buffer_lock.unlock();
+  {
+    const std::lock_guard lock{buffer_lock};
+    buffer1.swap(buffer2);
+  }
   // Copy and clean
   auto copy = buffer2->to(options_copy, true, true);
   buffer2->index_put_({torch::indexing::Slice()}, false);
