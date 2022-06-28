@@ -17,7 +17,7 @@ PYBIND11_MODULE(aestream, m) {
       .def("__exit__",
            [&](DVSInput &i, py::object t, py::object v, py::object trace) {
              i.stop_stream();
-             return true;
+             return false;
            })
       .def("read", &DVSInput::read);
 
@@ -28,7 +28,7 @@ PYBIND11_MODULE(aestream, m) {
       .def("__exit__",
            [&](UDPInput &i, py::object t, py::object v, py::object trace) {
              i.stop_server();
-             return true;
+             return false;
            })
       .def("read", &UDPInput::read);
 }
