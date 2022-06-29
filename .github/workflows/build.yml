@@ -33,22 +33,3 @@ jobs:
           pip install pytest
       - name: Test
         run: pytest .
-
-  build-pypi:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        python-version: [3.9] #[3.7, 3.8, 3.9]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: build wheel
-        run: |
-          sudo add-apt-repository ppa:inivation-ppa/inivation -y
-          sudo apt update && sudo apt install libcaer-dev libflatbuffers-dev liblz4-dev libopencv-dev -y
-          pip install build
-          CC=gcc-10 CXX=g++-10 python -m build

@@ -1,34 +1,71 @@
 name: Publish to PyPi
 
-on:
-  push:
-    tags:
-      - "v*"
+on: [push, pull_request]
 
+# Thanks to https://github.com/pypa/cibuildwheel/blob/main/examples/github-deploy.yml
 jobs:
-  publish-pypi:
+  build-wheels:
+    name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    env:
-      TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
-      TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.6, 3.7, 3.8, 3.9]
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: build wheel
-        run: |
-          sudo add-apt-repository ppa:inivation-ppa/inivation -y
-          sudo apt update && sudo apt install libcaer-dev libflatbuffers-dev liblz4-dev libopencv-dev -y
-          pip install build
-          CC=gcc-10 CXX=g++-10 python -m build
-      - name: upload wheel
-        run: |
-          pip install twine
-          twine upload dist/*.tar.gz
-        continue-on-error: true
+          python-version: 3.x
+      - run: pip install pipx
+
+      - name: Build wheels
+        run: pipx run cibuildwheel==2.7.0
+        env:
+          CIBW_SKIP: cp36-* cp37-*
+          CIBW_BUILD: cp3*-manylinux*
+          CIBW_ARCHS: x86_64 aarch64
+          # Note: We need 2_28 because libcaer requires recent linux headers
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_28
+          CIBW_BEFORE_BUILD: .github/deps/manylinux_dependencies.sh
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: 'LD_LIBRARY_PATH=/libtorch/lib:${LD_LIBRARY_PATH} auditwheel repair -w {dest_dir} {wheel}'
+
+      - uses: actions/upload-artifact@v3
+        with:
+          path: ./wheelhouse/*.whl
+
+  build-sdist:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - run: pip install pipx
+
+      - name: Build sdist
+        run: pipx run build --sdist
+
+      - uses: actions/upload-artifact@v3
+        with:
+          path: dist/*.tar.gz
+
+  upload_pypi:
+    needs: [build-wheels, build-sdist]
+    runs-on: ubuntu-latest
+    
+    # alternatively, to publish when a GitHub Release is created, use the following rule:
+    if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          # unpacks default artifact into dist/
+          name: artifact
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@v1.5.0
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
