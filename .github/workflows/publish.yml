@@ -21,7 +21,7 @@ jobs:
       - name: Build wheels
         run: pipx run cibuildwheel==2.7.0
         env:
-          CIBW_BUILD: "cp3{7,8,9,10}"
+          CIBW_BUILD: "cp3{7,8,9,10}*"
           CIBW_SKIP: "*musllinux*"
           CIBW_ARCHS: x86_64
           # Note: We need 2_28 because libcaer requires recent linux headers
