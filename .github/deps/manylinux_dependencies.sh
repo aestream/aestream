@@ -1,4 +1,7 @@
+# System dependencies
 yum install -y zlib-devel ninja-build libgusb-devel wget
+
+cd / # Ensure root directory
 
 # Install libtorch
 wget https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip -O libtorch.zip
