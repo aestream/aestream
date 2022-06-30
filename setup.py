@@ -22,7 +22,7 @@ setup(
         cpp_extension.CppExtension(
             name="aestream",
             sources=["src/pybind/udp_client.cpp", "src/pybind/udp_listener.cpp"],
-            extra_compile_args=["-O3", "-g", "-D_GLIBCXX_USE_CXX11_ABI=0"],
+            extra_compile_args=["-O3", "-g", "-D_GLIBCXX_USE_CXX11_ABI=0", "-std=c++17"],
         ),
     ],
     cmdclass={"build_ext": cpp_extension.BuildExtension},
