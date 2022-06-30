@@ -21,13 +21,13 @@ jobs:
       - name: Build wheels
         run: pipx run cibuildwheel==2.7.0
         env:
-          CIBW_BUILD: "cp3{7,8,9}*"
+          CIBW_BUILD: "cp3{7,8,9,10}*"
           CIBW_SKIP: "*musllinux*"
           CIBW_ARCHS: x86_64
           # Note: We need 2_28 because libcaer requires recent linux headers
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
           CIBW_BEFORE_BUILD: .github/deps/manylinux_dependencies.sh
-          CIBW_REPAIR_WHEEL_COMMAND_LINUX: 'LD_LIBRARY_PATH=/libtorch/lib:${LD_LIBRARY_PATH} auditwheel repair -w {dest_dir} {wheel}'
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: 'LD_LIBRARY_PATH=/root/libtorch/lib:${LD_LIBRARY_PATH} auditwheel repair -w {dest_dir} {wheel}'
 
       - uses: actions/upload-artifact@v3
         with:
