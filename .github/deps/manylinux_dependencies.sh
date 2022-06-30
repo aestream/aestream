@@ -6,6 +6,8 @@ yum install -y zlib-devel ninja-build libgusb-devel
 # Ensure we're in the root directory to align paths with publish.yml
 cd /root
 
+cd / # Ensure root directory
+
 # Install libtorch
 curl -L -s -m 100 https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip > libtorch.zip
 # We use Python to Unzip because
