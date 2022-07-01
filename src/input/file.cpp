@@ -25,8 +25,7 @@ Generator<AEDAT::PolarityEvent> file_event_generator(const std::string filename,
       const int64_t file_diff = event.timestamp - time_start_us;
       const int64_t time_offset = file_diff - time_diff;
       if (time_offset > 1000) {
-        const auto sleep_time = std::min((int64_t)1000, time_offset);
-        std::this_thread::sleep_for(std::chrono::microseconds(sleep_time));
+        std::this_thread::sleep_for(std::chrono::microseconds(time_offset));
       }
     }
     co_yield event;
