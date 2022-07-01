@@ -8,7 +8,7 @@ cd /root
 
 echo `pwd`
 
-# Ensure we're in the root
+# Ensure we're in the root directory to align paths with publish.yml
 cd /root
 
 # Install libtorch
