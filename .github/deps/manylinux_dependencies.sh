@@ -1,7 +1,7 @@
+#!/usr/bin/env bash
+
 # System dependencies
 yum install -y zlib-devel ninja-build libgusb-devel
-
-echo `pwd`
 
 # Ensure we're in the root directory to align paths with publish.yml
 cd /root
