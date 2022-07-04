@@ -119,7 +119,7 @@ Please cite `aestream` if you use it in your work:
 ```bibtex
 @software{aestream2022,
   author       = {Pedersen, Jens Egholm and
-                  Pehle, Christian Gernot},
+                  Pehle, Christian-Gernot},
   title        = {AEStream - Address Event Streaming library},
   month        = {March},
   year         = 2022,
