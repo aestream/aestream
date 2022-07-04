@@ -1,8 +1,11 @@
 {
   description = "Address Event Streaming library";
 
-  inputs.nixpkgs.url = "nixpkgs/nixos-21.11";
-  inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs = {
+    nixpkgs.url = "nixpkgs/nixos-21.11";
+    flake-utils.url = "github:numtide/flake-utils";
+    mach-nix.url = "mach-nix/3.5.0";
+  };
 
   outputs = { self, nixpkgs, flake-utils, mach-nix }:
     flake-utils.lib.eachDefaultSystem (system:
@@ -48,6 +51,13 @@
             mv build/src/aestream $out/bin/
           '';
         };
+        aestream-test = aestream.overrideAttrs (parent: {
+          name = "aestream-test";
+          configurePhase = "cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -Bbuild/ .";
+          installPhase = parent.installPhase + ''
+            mv build/test/aestream-test $out/bin/
+          '';
+        });
         aestream-python = mach-nix.lib.${system}.buildPythonPackage {
           pname = "aestream";
           version = "0.1.0";
@@ -61,8 +71,13 @@
         };
       in
       rec {
-        defaultPackage = aestream;
-        devShell = aestream-python;
+        devShells = flake-utils.lib.flattenTree {
+          default = aestream-python;
+        };
+        packages = flake-utils.lib.flattenTree {
+          default = aestream;
+          test = aestream-test;
+        };
       }
     );
 }

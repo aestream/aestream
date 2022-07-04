@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "aedat4.hpp"
-#include "input/file.hpp"
+#include "../src/aedat4.hpp"
+#include "../src/input/file.hpp"
 
 TEST(FileTest, FailEmptyFile) {
   EXPECT_THROW(AEDAT4("idonotexist.aedat4"), std::runtime_error);

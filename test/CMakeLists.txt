@@ -23,11 +23,12 @@ add_executable(
   aedat_test.cpp
   torch_test.cpp
 )
-# target_include_directories(aestream_test PRIVATE ${TORCH_INCLUDE_DIRS})
 target_link_libraries(
   aestream_test
   gtest_main 
-  aestream_lib
+  aedat4
+  aestream_input
+  aestream_output
   ${LZ4_LIBRARY}
   ${TORCH_LIBRARIES}
 )
