@@ -5,11 +5,11 @@
 
 #include <gtest/gtest.h>
 
-#include "../src/aedat4.hpp"
-#include "../src/generator.hpp"
+#include "aedat4.hpp"
+#include "generator.hpp"
 
-#include "../src/input/file.hpp"
-#include "../src/output/dvs_to_tensor.hpp"
+#include "input/file.hpp"
+#include "output/dvs_to_tensor.hpp"
 
 using namespace std::chrono_literals;
 

@@ -24,6 +24,21 @@
             pkg-config libusb1 cmake gcc flatbuffers ninja lz4
           ];
         };
+        libtorch = pkgs.stdenv.mkDerivation {
+          pname = "libtorch";
+          version = "1.12.0";
+          src = pkgs.fetchzip {
+            name = "libtorch";
+            url = "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.12.0%2Bcpu.zip";
+            hash = "sha256-coeCeX8OYQyMhLjDurZjXs1uII25xaOC51XmOK3uMTk=";
+          };
+          nativeBuildInputs = [ pkgs.unzip ];
+          buildPhase = ''
+            mkdir $out
+            mv * $out/
+          '';
+          phases = [ "unpackPhase" "buildPhase" ];
+        };
         aestream = pkgs.stdenv.mkDerivation {
           name = "aestream";
           version = "0.1.0";
@@ -31,12 +46,13 @@
           nativeBuildInputs = [
             pkgs.cmake
             pkgs.gcc
+            pkgs.python39
+            libtorch
           ];
           buildInputs = [
             pkgs.flatbuffers
             pkgs.ninja
             pkgs.lz4
-            pkgs.libtorch-bin
             libcaer
           ];
           configurePhase = "cmake -GNinja -Bbuild/ .";
@@ -45,6 +61,7 @@
             ninja -C build
             '';
           installPhase = ''
+            ls -alh build/**
             mkdir -p $out/lib $out/bin
             mv build/src/**/*.so $out/lib/
             mv build/src/*.so $out/lib/
@@ -52,10 +69,10 @@
           '';
         };
         aestream-test = aestream.overrideAttrs (parent: {
-          name = "aestream-test";
-          configurePhase = "cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -Bbuild/ .";
+          name = "aestream_test";
+          configurePhase = "cmake -DCMAKE_PREFIX_PATH=${libtorch} -DCMAKE_BUILD_TYPE=Debug -GNinja -Bbuild/ .";
           installPhase = parent.installPhase + ''
-            mv build/test/aestream-test $out/bin/
+            mv build/test/aestream_test $out/bin/
           '';
         });
         aestream-python = mach-nix.lib.${system}.buildPythonPackage {

@@ -1,20 +1,20 @@
 # Include flatbuffers
 find_library(flatbuffers NAMES flatbuffers QUIET)
-if (NOT flatbuffers)
+
+if(NOT flatbuffers)
     message(STATUS "flatbuffers not found, fetching from source")
     include(FetchContent)
     FetchContent_Declare(
         flatbuffers
-        GIT_REPOSITORY  https://github.com/google/flatbuffers.git
-        GIT_TAG         v2.0.0
+        GIT_REPOSITORY https://github.com/google/flatbuffers.git
+        GIT_TAG v2.0.0
     )
 
     FetchContent_MakeAvailable(flatbuffers)
 endif()
 
-
 # LZ4 for AEDAT encoding
-find_path(LZ4_INCLUDE_DIR NAMES	lz4.h)
+find_path(LZ4_INCLUDE_DIR NAMES lz4.h)
 find_library(LZ4_LIBRARY NAMES lz4 REQUIRED)
 
 # AEDAT4 processing

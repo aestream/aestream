@@ -14,7 +14,8 @@ jobs:
           extra_nix_config: |
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
       - run: |
-          nix-shell -p git-lfs --run "git lfs install && git lfs pull"
+          nix-shell -p git-lfs 
+          git lfs install && git lfs pull
           nix --extra-experimental-features "nix-command flakes" run .#test
 
   test-python:
