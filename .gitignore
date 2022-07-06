@@ -28,3 +28,4 @@ result
 *.flv
 *.dat
 *.mp4
+*generated.h
