@@ -47,15 +47,15 @@
           version = "0.1.0";
           src = ./.;
           nativeBuildInputs = [
+            pkgs.flatbuffers
             pkgs.cmake
             pkgs.gcc
             pkgs.python39
+            pkgs.ninja
+            pkgs.lz4
             libtorch
           ];
           buildInputs = [
-            pkgs.flatbuffers
-            pkgs.ninja
-            pkgs.lz4
             libcaer
           ];
           configurePhase = "cmake -GNinja -Bbuild/ .";

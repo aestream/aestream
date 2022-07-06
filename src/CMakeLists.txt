@@ -19,8 +19,8 @@ find_library(LZ4_LIBRARY NAMES lz4 REQUIRED)
 
 # AEDAT4 processing
 add_library(aedat4 SHARED aedat.hpp aedat4.hpp generator.hpp)
-include_directories(aedat4 PRIVATE ${LZ4_INCLUDE_DIR} ${flatbuffers_SOURCE_DIR}/include/)
-target_link_libraries(aedat4 PRIVATE ${LZ4_LIBRARY} ${flatbuffers})
+include_directories(aedat4 PRIVATE ${LZ4_INCLUDE_DIR})
+target_include_directories(aedat4 PUBLIC ${flatbuffers_SOURCE_DIR}/include/)
 set_target_properties(aedat4 PROPERTIES LINKER_LANGUAGE CXX)
 
 # Add subdirectories

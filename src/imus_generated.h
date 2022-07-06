@@ -6,13 +6,6 @@
 
 #include "flatbuffers/flatbuffers.h"
 
-// Ensure the included flatbuffers.h is the same version as when this file was
-// generated, otherwise it may not be compatible.
-static_assert(FLATBUFFERS_VERSION_MAJOR == 2 &&
-              FLATBUFFERS_VERSION_MINOR == 0 &&
-              FLATBUFFERS_VERSION_REVISION == 6,
-             "Non-compatible flatbuffers version included");
-
 struct Imu;
 struct ImuBuilder;
 
@@ -69,17 +62,17 @@ struct Imu FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int64_t>(verifier, VT_T, 8) &&
-           VerifyField<float>(verifier, VT_TEMPERATURE, 4) &&
-           VerifyField<float>(verifier, VT_ACCELEROMETER_X, 4) &&
-           VerifyField<float>(verifier, VT_ACCELEROMETER_Y, 4) &&
-           VerifyField<float>(verifier, VT_ACCELEROMETER_Z, 4) &&
-           VerifyField<float>(verifier, VT_GYROSCOPE_X, 4) &&
-           VerifyField<float>(verifier, VT_GYROSCOPE_Y, 4) &&
-           VerifyField<float>(verifier, VT_GYROSCOPE_Z, 4) &&
-           VerifyField<float>(verifier, VT_MAGNETOMETER_X, 4) &&
-           VerifyField<float>(verifier, VT_MAGNETOMETER_Y, 4) &&
-           VerifyField<float>(verifier, VT_MAGNETOMETER_Z, 4) &&
+           VerifyField<int64_t>(verifier, VT_T) &&
+           VerifyField<float>(verifier, VT_TEMPERATURE) &&
+           VerifyField<float>(verifier, VT_ACCELEROMETER_X) &&
+           VerifyField<float>(verifier, VT_ACCELEROMETER_Y) &&
+           VerifyField<float>(verifier, VT_ACCELEROMETER_Z) &&
+           VerifyField<float>(verifier, VT_GYROSCOPE_X) &&
+           VerifyField<float>(verifier, VT_GYROSCOPE_Y) &&
+           VerifyField<float>(verifier, VT_GYROSCOPE_Z) &&
+           VerifyField<float>(verifier, VT_MAGNETOMETER_X) &&
+           VerifyField<float>(verifier, VT_MAGNETOMETER_Y) &&
+           VerifyField<float>(verifier, VT_MAGNETOMETER_Z) &&
            verifier.EndTable();
   }
 };
