@@ -16,9 +16,12 @@
         libcaer = pkgs.stdenv.mkDerivation {
           pname = "libcaer";
           version = "1.0";
-          src = pkgs.fetchurl {
-            url = https://gitlab.com/inivation/dv/libcaer/-/archive/54191a3b27db4645ae3f83d96cf9bad5e1d646da/libcaer-54191a3b27db4645ae3f83d96cf9bad5e1d646da.tar.bz2;
-            sha1 = "3b531ddda80513e169227b2a77823ad64f0aedfb";
+          src = pkgs.fetchFromGitLab {
+            owner = "dv";
+            group = "inivation";
+            repo = "libcaer";
+            rev = "3.3.14";
+            hash = "sha1-ZszisfBWVLM7cXCGq7y1FeJ3RJA=";
           };
           nativeBuildInputs = with pkgs; [
             pkg-config libusb1 cmake gcc flatbuffers ninja lz4

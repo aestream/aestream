@@ -16,6 +16,7 @@ curl -L -s -m 100 https://download.pytorch.org/libtorch/nightly/cpu/libtorch-sha
 # We use Python to Unzip because
 #  - Modern linux systems uses PIDs above 65k
 #  - Old versions of unzip do not cope well with high PIDs
+echo "Extracting"
 /usr/local/bin/python3.9 -c '
 import zipfile
 with zipfile.ZipFile("libtorch.zip", "r") as zip_ref:
