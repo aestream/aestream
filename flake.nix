@@ -47,35 +47,48 @@
           version = "0.1.0";
           src = ./.;
           nativeBuildInputs = [
-            pkgs.flatbuffers
             pkgs.cmake
             pkgs.gcc
+            pkgs.autoPatchelfHook
+          ];
+          buildInputs = [
+            pkgs.flatbuffers
             pkgs.python39
             pkgs.ninja
             pkgs.lz4
+            libcaer
             libtorch
           ];
-          buildInputs = [
-            libcaer
+          cmakeFlags = [
+            "-GNinja"
+            "-DCMAKE_PREFIX_PATH=${libtorch}"
+            "-DFLATBUFFERS_SOURCE_DIR=${pkgs.flatbuffers.src}"
           ];
-          configurePhase = "cmake -GNinja -Bbuild/ .";
-          buildPhase = ''
-            flatc --cpp -o src/ src/flatbuffers/*
-            ninja -C build
-            '';
+          preBuild = ''
+            addAutoPatchelfSearchPath src/
+            addAutoPatchelfSearchPath src/input
+            addAutoPatchelfSearchPath src/output
+          '';
           installPhase = ''
-            ls -alh build/**
-            mkdir -p $out/lib $out/bin
-            mv build/src/**/*.so $out/lib/
-            mv build/src/*.so $out/lib/
-            mv build/src/aestream $out/bin/
+            install -m555 -D -t $out/lib/ src/*.so src/input/*.so src/output/*.so
+            install -m755 -D src/aestream $out/bin/aestream
           '';
         };
         aestream-test = aestream.overrideAttrs (parent: {
           name = "aestream_test";
-          configurePhase = "cmake -DCMAKE_PREFIX_PATH=${libtorch} -DCMAKE_BUILD_TYPE=Debug -GNinja -Bbuild/ .";
+          nativeBuildInputs = parent.nativeBuildInputs ++ [
+            pkgs.makeWrapper
+          ];
+          buildInputs = parent.buildInputs ++ [
+            pkgs.gtest
+          ];
+          cmakeFlags = parent.cmakeFlags ++ [
+            "-DCMAKE_BUILD_TYPE=Debug"
+            "-DCMAKE_PREFIX_PATH=${libtorch};${pkgs.gtest}"
+          ];
           installPhase = parent.installPhase + ''
-            mv build/test/aestream_test $out/bin/
+            install -m555 -D $src/example/davis.aedat4 $out/example/davis.aedat4
+            install -m755 -D test/aestream_test $out/bin/aestream_test
           '';
         });
         aestream-python = mach-nix.lib.${system}.buildPythonPackage {
