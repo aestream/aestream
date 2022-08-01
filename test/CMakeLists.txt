@@ -32,9 +32,3 @@ target_link_libraries(
   ${LZ4_LIBRARY}
   ${TORCH_LIBRARIES}
 )
-
-# include(GoogleTest)
-# gtest_discover_tests(
-#   aestream_test
-#   WORKING_DIRECTORY ${TEST_WORKING_DIR}
-# )
