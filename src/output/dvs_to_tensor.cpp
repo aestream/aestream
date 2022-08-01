@@ -9,7 +9,7 @@
 torch::Tensor
 convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events,
                         const torch::IntArrayRef &shape,
-                        const torch::Device &device) {
+                        const torch::Device device) {
   const int64_t size = polarity_events.size();
   auto ind = torch::empty(
       {4, size}, torch::TensorOptions().dtype(torch::kInt64).device(device));
@@ -33,9 +33,7 @@ convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events,
   if (shape.empty()) {
     return torch::sparse_coo_tensor(ind, val, sparse_options);
   } else {
-    auto new_shape =
-        torch::IntArrayRef({indices[size - 1] + 1, 2, shape[0], shape[1]});
-    return torch::sparse_coo_tensor(ind, val, new_shape, sparse_options);
+    return torch::sparse_coo_tensor(ind, val, {indices[size - 1] + 1, 2, shape[0], shape[1]}, sparse_options);
   }
 }
 
@@ -43,7 +41,7 @@ Generator<torch::Tensor>
 sparse_tensor_generator(Generator<AEDAT::PolarityEvent> &event_generator,
                         std::chrono::duration<double, std::micro> event_window,
                         const torch::IntArrayRef shape,
-                        const torch::Device &device) {
+                        const torch::Device device) {
 
   std::vector<AEDAT::PolarityEvent> polarity_events;
   auto start = std::chrono::high_resolution_clock::now();
