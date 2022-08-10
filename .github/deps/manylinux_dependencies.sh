@@ -6,11 +6,17 @@ yum install -y zlib-devel ninja-build libgusb-devel
 # Ensure we're in the root directory to align paths with publish.yml
 cd /root
 
+echo `pwd`
+
+# Ensure we're in the root directory to align paths with publish.yml
+cd /root
+
 # Install libtorch
 curl -L -s -m 100 https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip > libtorch.zip
 # We use Python to Unzip because
 #  - Modern linux systems uses PIDs above 65k
 #  - Old versions of unzip do not cope well with high PIDs
+echo "Extracting"
 /usr/local/bin/python3.9 -c '
 import zipfile
 with zipfile.ZipFile("libtorch.zip", "r") as zip_ref:

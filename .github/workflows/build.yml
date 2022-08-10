@@ -8,14 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: cachix/install-nix-action@v16
+        with: 
+          lfs: True
+      - uses: cachix/install-nix-action@v17
         with:
-          extra_nix_config: |
-            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-      - run: |
-          nix build
-      # git lfs install && git lfs pull
-      # test/aestream_test
+          nix_path: nixpkgs=channel:nixos-22.05
+      - run: nix run .#test
 
   test-python:
     name: "Build and test: Python"
