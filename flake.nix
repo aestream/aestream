@@ -44,7 +44,7 @@
         };
         aestream = pkgs.stdenv.mkDerivation {
           name = "aestream";
-          version = "0.1.0";
+          version = "0.2.0";
           src = ./.;
           nativeBuildInputs = [
             pkgs.cmake
@@ -93,7 +93,7 @@
         });
         aestream-python = mach-nix.lib.${system}.buildPythonPackage {
           pname = "aestream";
-          version = "0.1.0";
+          version = "0.2.0";
           src = ./.;
           requirements = python-requirements;
 

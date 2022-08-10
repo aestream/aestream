@@ -59,10 +59,10 @@ We currently support the following inputs:
 
 | Input | Description | Usage |
 | --------- | :----------- | ----- |
-| DAVIS           | 346x260 DVS camera, Inivation  | `input inivation X Y davis` |
-| DVXplorer       | 640x480 DVS camera, Inivation  | `input inivation X Y dvx` |
-| Prophesee       | 640x480 DVS camera, Prophesee  | `input prophesee X` |
-| Prophesee       | 1280x720 DVS camera, Prophesee  | `input prophesee X` |
+| DAVIS           | 346x260 DVS camera with USB address `X:Y`, Inivation  | `input inivation X Y davis` |
+| DVXplorer       | 640x480 DVS camera with USB address `X:Y`, Inivation  | `input inivation X Y dvx` |
+| Prophesee       | 640x480 DVS camera with USB address `X`, Prophesee  | `input prophesee X` |
+| Prophesee       | 1280x720 DVS camera with USB address `X`, Prophesee  | `input prophesee X` |
 | File            | `.aedat` or `.aedat4` | `input file x.aedat4` |
 
 We currently support the following outputs:
@@ -71,7 +71,8 @@ We currently support the following outputs:
 | --------- | ----------- | ----- |
 | STDOUT    | Standard output (default output) | `output stdout`
 | Ethernet over UDP | Outputs to a given IP and port using the [SPIF protocol](https://github.com/SpiNNakerManchester/spif)  | `output udp 10.0.0.1 1234` |
-| File       | Output to file | `output file my_file.txt` |
+| `.aedat4` file  | Output to [`.aedat4` format](https://gitlab.com/inivation/inivation-docs/blob/master/Software%20user%20guides/AEDAT_file_formats.md#aedat-40) | `output file my_file.aedat4` |
+| CSV file       | Output to comma-separated-value (CSV) file format | `output file my_file.txt` |
 
 ### CLI examples
 
@@ -121,10 +122,10 @@ Please cite `aestream` if you use it in your work:
   author       = {Pedersen, Jens Egholm and
                   Pehle, Christian-Gernot},
   title        = {AEStream - Address Event Streaming library},
-  month        = {March},
+  month        = {August},
   year         = 2022,
   publisher    = {Zenodo},
-  version      = {0.1.0},
+  version      = {0.2.0},
   doi          = {10.5281/zenodo.6322829},
   url          = {https://doi.org/10.5281/zenodo.6322829}
 }
