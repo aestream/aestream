@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
   std::uint16_t deviceId;
   std::uint16_t deviceAddress;
   std::string camera = "davis";
-  std::string serial_number;
+  std::optional<std::string> serial_number = std::nullopt;
   // Inivation cameras
   auto app_input_inivation = app_input->add_subcommand(
       "inivation", "DVS input source for inivation cameras");
@@ -62,8 +62,7 @@ int main(int argc, char *argv[]) {
   // Prophesee cameras
   auto app_input_prophesee = app_input->add_subcommand(
       "prophesee", "DVS input source for prophesee cameras");
-  app_input_prophesee->add_option("serial", serial_number, "Serial number")
-      ->required();
+  app_input_prophesee->add_option("serial", serial_number, "Serial number (optional). Defaults to first available camera.");
   // - File
   std::string input_filename = "None";
   bool input_ignore_time = false;

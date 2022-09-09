@@ -7,4 +7,4 @@
 #include "generator.hpp"
 
 Generator<AEDAT::PolarityEvent>
-prophesee_event_generator(const std::string serial_number);
+prophesee_event_generator(const std::optional<std::string> serial_number);

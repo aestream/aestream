@@ -102,6 +102,17 @@ ninja
 If your default C++ compiler doesn't support C++ 20, you will have to install an up-to-date compiler and provide the environmental variable `CXX`.
 For instance like this: `CXX=/path/to/g++ cmake -GNinja ..`
 
+### Inivation cameras
+For [Inivation](https://inivation.com/) cameras, the [libcaer](https://gitlab.com/inivation/dv/libcaer/) library needs to be available, either by a `-DCMAKE_PREFIX_PATH` flag to `cmake` or included in the `PATH` environmental variable.
+For examble: `cmake -GNinja -DCMAKE_PREFIX_PATH=/path/to/libcaer`.
+Inivation made the library available for most operating systems, but you may have to build it yourself.
+
+### Prophesee cameras
+For [Prophesee](https://www.prophesee.ai/) cameras, a version of the [Metavision SDK](https://www.prophesee.ai/metavision-intelligence/) needs to be present.
+The open-source version the SDK `openeb` is available with installation instructions at https://github.com/prophesee-ai/openeb.
+Using `openeb`, it should be sufficient to install it using `cmake && make && make install` to put it in your path.
+Otherwise, you can point to it using the `-DCMAKE_PREFIX_PATH` option in `cmake`.
+
 ## Acknowledgments
 
 AEStream is created by

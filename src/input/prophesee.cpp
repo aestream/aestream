@@ -1,22 +1,30 @@
 #include "prophesee.hpp"
 
 // event generator for Prophesee cameras
-Generator<AEDAT::PolarityEvent>
-prophesee_event_generator(const std::string serial_number = "None") {
+Generator<AEDAT::PolarityEvent> prophesee_event_generator(
+    const std::optional<std::string> serial_number = std::nullopt) {
 
-  Metavision::Camera cam; // = Metavision::Camera::from_first_available();
+  Metavision::Camera cam;
 
-  Metavision::AvailableSourcesList available_systems =
-      cam.list_online_sources();
-
-  // get camera by serial number available camera
+  // get camera
   try {
-    cam = Metavision::Camera::from_serial(serial_number);
+    if (serial_number.has_value()) {
+      cam = Metavision::Camera::from_serial(serial_number.value());
+    } else {
+      cam = Metavision::Camera::from_first_available();
+    }
   } catch (const std::exception &e) {
-    std::cout << "Failure with serial number '" << serial_number
-              << "': " << e.what() << std::endl;
+    if (serial_number.has_value()) {
+      std::cout << "Failure with serial number '" << serial_number.value()
+                << "': " << e.what() << std::endl;
+    } else {
+      std::cout << "Failure to identify Prophesee camera: " << e.what() << std::endl;
+    }
 
-    std::cout << "Serial numbers of available cameras: " << std::endl;
+    std::cout << "Available cameras: " << std::endl;
+
+    Metavision::AvailableSourcesList available_systems =
+        cam.list_online_sources();
 
     for (int i = 0;
          i < available_systems[Metavision::OnlineSourceType::USB].size(); i++) {
