@@ -26,11 +26,9 @@ fig.canvas.blit(fig.bbox)
 net = torch.nn.Conv2d(1, 3, 5, padding=1, bias=False)
 normal = torch.distributions.Normal(0, 1)
 gaussian = normal
-net.weight = torch.nn.Parameter(torch.tensor([[[
-    [-1, -2, -1],
-    [0, 0, 0],
-    [1, 2, 1]
-]]], dtype=torch.float32))
+net.weight = torch.nn.Parameter(
+    torch.tensor([[[[-1, -2, -1], [0, 0, 0], [1, 2, 1]]]], dtype=torch.float32)
+)
 
 # Start streaming from a DVS camera on USB 2:7 and put them on the GPU
 with DVSInput(2, 4, (640, 480), device="cpu") as stream:
