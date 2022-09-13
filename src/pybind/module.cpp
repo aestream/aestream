@@ -10,12 +10,12 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(aestream, m) {
   py::class_<DVSInput>(m, "DVSInput")
-      .def(py::init<int, int, torch::IntArrayRef, torch::Device>(),
-           py::arg("device_id"), py::arg("device_address"), py::arg("shape"),
-           py::arg("device") = torch::DeviceType::CPU)
-      .def(py::init<int, int, torch::IntArrayRef, std::string>(),
-           py::arg("device_id"), py::arg("device_address"), py::arg("shape"),
-           py::arg("device") = "cpu")
+      .def(py::init<torch::IntArrayRef, torch::Device, int, int>(),
+           py::arg("shape"), py::arg("device") = torch::DeviceType::CPU,
+           py::arg("device_id") = 0, py::arg("device_address") = 0)
+      .def(py::init<torch::IntArrayRef, std::string, int, int>(),
+           py::arg("shape"), py::arg("device") = "cpu",
+           py::arg("device_id") = 0, py::arg("device_address") = 0)
       .def("__enter__", &DVSInput::start_stream)
       .def("__exit__",
            [&](DVSInput &i, py::object t, py::object v, py::object trace) {

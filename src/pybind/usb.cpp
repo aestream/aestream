@@ -33,15 +33,19 @@ private:
   };
 
 public:
-  DVSInput(uint16_t deviceId, uint8_t deviceAddress, torch::IntArrayRef shape,
-           torch::Device device)
+  DVSInput(torch::IntArrayRef shape, torch::Device device, uint16_t deviceId,
+           uint16_t deviceAddress)
       : buffer(shape, device) {
-    try {
-      generator = inivation_event_generator("dvx", deviceId, deviceAddress,
-                                            is_streaming);
-    } catch (std::exception &e) {
-      generator = inivation_event_generator("davis", deviceId, deviceAddress,
-                                            is_streaming);
+    if (deviceId > 0) {
+      try {
+        auto address = InivationDeviceAddress{"dvx", deviceId, deviceAddress};
+        generator = inivation_event_generator(address, is_streaming);
+      } catch (std::exception &e) {
+        auto address = InivationDeviceAddress{"davis", deviceId, deviceAddress};
+        generator = inivation_event_generator(address, is_streaming);
+      }
+    } else {
+      generator = inivation_event_generator({}, is_streaming);
     }
   }
 

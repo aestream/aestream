@@ -1,17 +1,59 @@
-#include <atomic> 
+#include <atomic>
 
 #include "./inivation.hpp"
 
-CAERUSBConnection::CAERUSBConnection(std::string camera, uint16_t deviceId,
-                                     uint8_t deviceAddress) {
+std::optional<libcaer::devices::device *> find_device() {
+  caerDeviceDiscoveryResult discovered;
+  ssize_t result = caerDeviceDiscover(CAER_DEVICE_DISCOVER_ALL, &discovered);
 
-  if (camera == "dvx") {
-    handle =
-        new libcaer::devices::dvXplorer(deviceId, deviceId, deviceAddress, "");
-  } else if (camera == "davis") {
-    handle = new libcaer::devices::davis(deviceId, deviceId, deviceAddress, "");
+  if (result < 0) {
+    return {};
   } else {
-    throw std::invalid_argument("Unsupported camera '" + camera + "'");
+    const auto device = discovered[0];
+    switch (device.deviceType) {
+    case CAER_DEVICE_DAVIS:
+
+    case CAER_DEVICE_DVS128:
+      return new libcaer::devices::davis(1);
+
+    case CAER_DEVICE_DVXPLORER:
+      return new libcaer::devices::dvXplorer(1);
+
+      // case CAER_DEVICE_SAMSUNG_EVK:
+      // case CAER_DEVICE_DAVIS_FX2:
+      // case CAER_DEVICE_DAVIS_FX3:
+      // case CAER_DEVICE_DAVIS_RPI:
+      // case CAER_DEVICE_DYNAPSE:
+
+    default:
+      throw std::runtime_error("Cannot connect to unknown device of type " +
+                               std::to_string(device.deviceType));
+    };
+  }
+}
+
+
+CAERUSBConnection::CAERUSBConnection(
+    std::optional<InivationDeviceAddress> deviceAddress) {
+
+  if (deviceAddress.has_value()) {
+    const auto &[camera, deviceId, deviceHardwareAddress] = deviceAddress.value();
+    if (camera == "dvx") {
+      handle = new libcaer::devices::dvXplorer(deviceId, deviceId,
+                                               deviceHardwareAddress, "");
+    } else if (camera == "davis") {
+      handle =
+          new libcaer::devices::davis(deviceId, deviceId, deviceHardwareAddress, "");
+    } else {
+      throw std::invalid_argument("Unsupported camera '" + camera + "'");
+    }
+  } else {
+    std::optional<libcaer::devices::device *> found_device = find_device();
+    if (found_device.has_value()) {
+      handle = found_device.value();
+    } else {
+      throw std::invalid_argument("No inivation device found.");
+    }
   }
 
   // Send the default configuration before using the device.
@@ -41,11 +83,10 @@ CAERUSBConnection::CAERUSBConnection(std::string camera, uint16_t deviceId,
 
 // event generator for Inivation cameras
 Generator<AEDAT::PolarityEvent>
-inivation_event_generator(std::string camera, std::uint16_t deviceId,
-                          std::uint8_t deviceAddress,
+inivation_event_generator(std::optional<InivationDeviceAddress> device_address,
                           const std::atomic<bool> &runFlag) {
 
-  auto connection = CAERUSBConnection(camera, deviceId, deviceAddress);
+  auto connection = CAERUSBConnection(device_address);
 
   std::unique_ptr<libcaer::events::EventPacketContainer> packetContainer;
   try {
