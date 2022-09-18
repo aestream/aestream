@@ -94,6 +94,28 @@ setup(
         "Topic :: Software Development :: Libraries",
         "Topic :: System :: Hardware :: Universal Serial Bus (USB)",
     ],
+<<<<<<< HEAD
     ext_modules=[extension],
+=======
+    ext_modules=[
+        cpp_extension.CUDAExtension(
+            name="aestream",
+            headers=cpp_headers,
+            sources=cpp_sources,
+            extra_compile_args={
+                "cxx": [
+                    "-O3",
+                    "-g",
+                    "-D_GLIBCXX_USE_CXX11_ABI=0",
+                    "-fcoroutines",
+                    "-std=c++20",
+                    "-I/usr/include/opencv4",
+                ],
+                'nvcc': ['-O3']
+            },
+            libraries=["caer"],
+        ),
+    ],
+>>>>>>> 9a2f0b0 (Added CUDA code for tensor buffer)
     cmdclass={"build_ext": cpp_extension.BuildExtension},
 )
