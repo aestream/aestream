@@ -94,9 +94,6 @@ setup(
         "Topic :: Software Development :: Libraries",
         "Topic :: System :: Hardware :: Universal Serial Bus (USB)",
     ],
-<<<<<<< HEAD
-    ext_modules=[extension],
-=======
     ext_modules=[
         cpp_extension.CUDAExtension(
             name="aestream",
@@ -116,6 +113,5 @@ setup(
             libraries=["caer"],
         ),
     ],
->>>>>>> 9a2f0b0 (Added CUDA code for tensor buffer)
     cmdclass={"build_ext": cpp_extension.BuildExtension},
 )
