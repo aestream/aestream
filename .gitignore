@@ -29,3 +29,6 @@ result
 *.dat
 *.mp4
 *generated.h
+*.deb
+release/
+wheelhouse/
