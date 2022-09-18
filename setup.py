@@ -13,6 +13,7 @@ cpp_sources = [
     # Module code
     "src/pybind/module.cpp",
     "src/pybind/tensor_buffer.cpp",
+    "src/pybind/tensor_buffer_kernel.cu",
     # UDP
     "src/pybind/udp.cpp",
     "src/pybind/udp_client.cpp",
@@ -51,18 +52,21 @@ setup(
         "Topic :: System :: Hardware :: Universal Serial Bus (USB)",
     ],
     ext_modules=[
-        cpp_extension.CppExtension(
+        cpp_extension.CUDAExtension(
             name="aestream",
             headers=cpp_headers,
             sources=cpp_sources,
-            extra_compile_args=[
-                "-O3",
-                "-g",
-                "-D_GLIBCXX_USE_CXX11_ABI=0",
-                "-fcoroutines",
-                "-std=c++20",
-                "-I/usr/include/opencv4",
-            ],
+            extra_compile_args={
+                "cxx": [
+                    "-O3",
+                    "-g",
+                    "-D_GLIBCXX_USE_CXX11_ABI=0",
+                    "-fcoroutines",
+                    "-std=c++20",
+                    "-I/usr/include/opencv4",
+                ],
+                'nvcc': ['-O3']
+            },
             libraries=["caer"],
         ),
     ],

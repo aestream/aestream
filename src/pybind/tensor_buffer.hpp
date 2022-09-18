@@ -4,10 +4,13 @@
 #include <thread>
 #include <vector>
 
-#include "../aedat.hpp"
-
 #include <torch/extension.h>
 #include <torch/torch.h>
+
+#include <cuda.h>
+#include <cuda_runtime.h>
+
+#include "../aedat.hpp"
 
 class TensorBuffer {
 private:
@@ -18,9 +21,12 @@ private:
   std::mutex buffer_lock;
   std::shared_ptr<torch::Tensor> buffer1;
   std::shared_ptr<torch::Tensor> buffer2;
+  uint32_t *cuda_device_pointer;
 
 public:
-  TensorBuffer(torch::IntArrayRef size, torch::Device device);
+  TensorBuffer(torch::IntArrayRef size, torch::Device device,
+               size_t buffer_size);
+  ~TensorBuffer();
   void set_buffer(uint16_t data[], int numbytes);
   void set_vector(std::vector<AEDAT::PolarityEvent> events);
   at::Tensor read();

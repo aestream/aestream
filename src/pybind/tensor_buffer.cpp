@@ -1,14 +1,14 @@
-#include <string>
-#include <thread>
-#include <vector>
-
-#include "../aedat.hpp"
 #include "tensor_buffer.hpp"
 
-#include <torch/extension.h>
-#include <torch/torch.h>
+// CUDA functions
+uint32_t *alloc_memory_cuda(size_t buffer_size);
+void free_memory_cuda(uint32_t *cuda_device_pointer);
+void index_increment_cuda(torch::Tensor array, std::vector<uint32_t> events,
+                          uint32_t *event_device_pointer);
 
-TensorBuffer::TensorBuffer(torch::IntArrayRef size, torch::Device device)
+// TensorBuffer constructor
+TensorBuffer::TensorBuffer(torch::IntArrayRef size, torch::Device device,
+                           size_t buffer_size)
     : shape(size.vec()) {
   options_buffer = torch::TensorOptions()
                        .dtype(torch::kUInt8)
@@ -17,12 +17,21 @@ TensorBuffer::TensorBuffer(torch::IntArrayRef size, torch::Device device)
   options_copy = torch::TensorOptions().dtype(torch::kFloat32).device(device);
   buffer1 = std::make_shared<torch::Tensor>(torch::zeros(size, options_buffer));
   buffer2 = std::make_shared<torch::Tensor>(torch::zeros(size, options_buffer));
+  if (device == torch::DeviceType::CUDA) {
+    cuda_device_pointer = alloc_memory_cuda(buffer_size);
+  }
+}
+
+TensorBuffer::~TensorBuffer() {
+  if (options_buffer.device() == torch::DeviceType::CUDA) {
+    free_memory_cuda(cuda_device_pointer);
+  }
 }
 
 void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
   const auto length = numbytes >> 1;
   const std::lock_guard lock{buffer_lock};
-  char *array = (char *)buffer1->data_ptr();
+  uint8_t *array = buffer1->data_ptr<uint8_t>();
   for (int i = 0; i < length; i = i + 2) {
     // Decode x, y
     const uint16_t y_coord = data[i] & 0x7FFF;
@@ -33,9 +42,17 @@ void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
 
 void TensorBuffer::set_vector(std::vector<AEDAT::PolarityEvent> events) {
   const std::lock_guard lock{buffer_lock};
-  char *array = (char *)buffer1->data_ptr();
-  for (auto event : events) {
-    (*(array + shape[1] * event.x + event.y))++;
+  if (options_buffer.device() == torch::DeviceType::CUDA) {
+    std::vector<uint32_t> offsets;
+    for (auto event : events) {
+      offsets.push_back(shape[1] * event.x + event.y);
+    }
+    index_increment_cuda(*buffer1, offsets, cuda_device_pointer);
+  } else {
+    auto *array = buffer1->data_ptr<uint8_t>();
+    for (auto event : events) {
+      (*(array + shape[1] * event.x + event.y))++;
+    }
   }
 }
 
@@ -47,6 +64,6 @@ at::Tensor TensorBuffer::read() {
   }
   // Copy and clean
   auto copy = buffer2->to(options_copy, true, true);
-  buffer2->index_put_({torch::indexing::Slice()}, false);
+  buffer2->index_put_({torch::indexing::Slice()}, 0);
   return copy;
 }

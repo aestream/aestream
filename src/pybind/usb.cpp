@@ -12,7 +12,7 @@ class DVSInput {
 private:
   Generator<AEDAT::PolarityEvent> generator;
   std::thread socket_thread;
-  static const uint32_t EVENT_BUFFER_SIZE = 100;
+  static const uint32_t EVENT_BUFFER_SIZE = 128;
   TensorBuffer buffer;
   std::atomic<bool> is_streaming = {true};
 
@@ -35,7 +35,7 @@ private:
 public:
   DVSInput(torch::IntArrayRef shape, torch::Device device, uint16_t deviceId,
            uint16_t deviceAddress)
-      : buffer(shape, device) {
+      : buffer(shape, device, EVENT_BUFFER_SIZE) {
     if (deviceId > 0) {
       try {
         auto address = InivationDeviceAddress{"dvx", deviceId, deviceAddress};
@@ -57,5 +57,8 @@ public:
     return this;
   }
 
-  void stop_stream() { is_streaming.store(false); }
+  void stop_stream() {
+    is_streaming.store(false);
+    socket_thread.join();
+  }
 };
