@@ -137,7 +137,7 @@ Please cite `aestream` if you use it in your work:
   month        = {August},
   year         = 2022,
   publisher    = {Zenodo},
-  version      = {0.2.0},
+  version      = {0.3.0},
   doi          = {10.5281/zenodo.6322829},
   url          = {https://doi.org/10.5281/zenodo.6322829}
 }

@@ -76,7 +76,7 @@ else:
 
 setup(
     name="aestream",
-    version="0.2.0",
+    version="0.3.0",
     author="Jens E. Pedersen, Christian Pehle",
     author_email="jens@jepedersen.dk, christian.pehle@gmail.com",
     url="https://github.com/norse/aestream",
