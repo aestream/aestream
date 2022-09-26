@@ -7,9 +7,6 @@
 #include <torch/extension.h>
 #include <torch/torch.h>
 
-#include <cuda.h>
-#include <cuda_runtime.h>
-
 #include "../aedat.hpp"
 
 class TensorBuffer {
@@ -21,6 +18,7 @@ private:
   std::mutex buffer_lock;
   std::shared_ptr<torch::Tensor> buffer1;
   std::shared_ptr<torch::Tensor> buffer2;
+  std::vector<uint32_t> offset_buffer;
   uint32_t *cuda_device_pointer;
 
 public:
