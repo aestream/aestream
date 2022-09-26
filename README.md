@@ -28,8 +28,8 @@ First, install [PyTorch](https://pytorch.org/) and [libcaer](https://gitlab.com/
 Then install `aestream` via pip: `pip install aestream`
 
 ```python
-# Stream events from a DVS camera over USB at address 2:4
-with DVSInput(2, 4, (640, 480)) as stream:
+# Stream events from a DVS camera over USB
+with DVSInput((640, 480)) as stream:
     while True:
         frame = stream.read() # Provides a (640, 480) tensor
         ...
@@ -44,6 +44,7 @@ with UDPInput((640, 480), port=3333) as stream:
 ```
 
 More examples can be found in [our example folder](https://github.com/norse/aestream/tree/master/example).
+Please note the examples may require additional dependencies (such as [Norse](https://github.com/norse/norse) for spiking networks or [PySDL](https://github.com/py-sdl/py-sdl2) for rendering). To install all the requirements, simply stand in the `aestream` root directory and run `pip install -r example/requirements.txt`
 
 ## Usage (CLI)
 
@@ -136,7 +137,7 @@ Please cite `aestream` if you use it in your work:
   month        = {August},
   year         = 2022,
   publisher    = {Zenodo},
-  version      = {0.2.0},
+  version      = {0.3.0},
   doi          = {10.5281/zenodo.6322829},
   url          = {https://doi.org/10.5281/zenodo.6322829}
 }

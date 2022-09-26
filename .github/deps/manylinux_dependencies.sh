@@ -12,7 +12,7 @@ echo `pwd`
 cd /root
 
 # Install libtorch
-curl -L -s -m 100 https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip > libtorch.zip
+curl -L -s -m 100 https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.12.1%2Bcpu.zip > libtorch.zip
 # We use Python to Unzip because
 #  - Modern linux systems uses PIDs above 65k
 #  - Old versions of unzip do not cope well with high PIDs

@@ -5,11 +5,21 @@
 #include <iostream>
 #include <string>
 
+#include <libcaer/devices/device.h>
+#include <libcaer/devices/device_discover.h>
 #include <libcaercpp/devices/davis.hpp>
 #include <libcaercpp/devices/dvxplorer.hpp>
 
 #include "../aedat.hpp"
 #include "../generator.hpp"
+
+struct InivationDeviceAddress {
+  const std::string camera;
+  const std::uint16_t deviceId;
+  const std::uint16_t deviceAddress;
+};
+
+std::optional<libcaer::devices::device *> find_device();
 
 class CAERUSBConnection {
   uint32_t containerInterval = 128;
@@ -22,8 +32,7 @@ class CAERUSBConnection {
   }
 
 public:
-  CAERUSBConnection(std::string camera, std::uint16_t deviceId,
-                    std::uint8_t deviceAddress);
+  CAERUSBConnection(std::optional<InivationDeviceAddress> deviceAddress);
   ~CAERUSBConnection() { close(); }
 
   std::unique_ptr<libcaer::events::EventPacketContainer> getPacket() {
@@ -33,6 +42,5 @@ public:
 };
 
 Generator<AEDAT::PolarityEvent>
-inivation_event_generator(std::string camera, std::uint16_t deviceId,
-                          std::uint8_t deviceAddress,
+inivation_event_generator(std::optional<InivationDeviceAddress> device_address,
                           const std::atomic<bool> &runFlag);

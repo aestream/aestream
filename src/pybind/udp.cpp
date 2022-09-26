@@ -14,7 +14,7 @@ class UDPInput {
 private:
   TensorBuffer buffer;
   const int port;
-  const int max_events_per_packet = 1024;
+  static const int max_events_per_packet = 1024;
 
   std::thread socket_thread;
   std::atomic<bool> is_serving = {true};
@@ -22,7 +22,7 @@ private:
 public:
   uint64_t count = 0;
   UDPInput(torch::IntArrayRef shape, torch::Device device, int port)
-      : buffer(shape, device), port(port) {}
+      : buffer(shape, device, max_events_per_packet), port(port) {}
 
   UDPInput *start_server() {
     std::thread socket_thread(&UDPInput::serve_synchronous, this);

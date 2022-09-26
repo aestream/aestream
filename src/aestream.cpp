@@ -48,12 +48,10 @@ int main(int argc, char *argv[]) {
   // Inivation cameras
   auto app_input_inivation = app_input->add_subcommand(
       "inivation", "DVS input source for inivation cameras");
-  app_input_inivation->add_option("id", deviceId, "Hardware ID")->required();
-  app_input_inivation->add_option("address", deviceAddress, "Hardware address")
-      ->required();
-  app_input_inivation
-      ->add_option("camera", camera, "Type of camera; davis or dvx")
-      ->required();
+  app_input_inivation->add_option("id", deviceId, "Hardware ID");
+  app_input_inivation->add_option("address", deviceAddress, "Hardware address");
+  app_input_inivation->add_option("camera", camera,
+                                  "Type of camera; davis or dvx");
   uint64_t timeLimitMs;
   app_input_inivation
       ->add_option("timeout", timeLimitMs,
@@ -62,7 +60,9 @@ int main(int argc, char *argv[]) {
   // Prophesee cameras
   auto app_input_prophesee = app_input->add_subcommand(
       "prophesee", "DVS input source for prophesee cameras");
-  app_input_prophesee->add_option("serial", serial_number, "Serial number (optional). Defaults to first available camera.");
+  app_input_prophesee->add_option(
+      "serial", serial_number,
+      "Serial number (optional). Defaults to first available camera.");
   // - File
   std::string input_filename = "None";
   bool input_ignore_time = false;
@@ -122,8 +122,11 @@ int main(int argc, char *argv[]) {
   Generator<AEDAT::PolarityEvent> input_generator;
   if (app_input_inivation->parsed()) {
 #ifdef WITH_CAER
-    input_generator =
-        inivation_event_generator(camera, deviceId, deviceAddress, runFlag);
+    input_generator = inivation_event_generator(
+        deviceId > 0 ? std::make_optional(InivationDeviceAddress{
+                           camera, deviceId, deviceAddress})
+                     : std::nullopt,
+        runFlag);
 #else
     throw std::invalid_argument(
         "Inivation cameras unavailable: please recompile with libcaer");

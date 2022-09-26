@@ -12,7 +12,7 @@ class DVSInput {
 private:
   Generator<AEDAT::PolarityEvent> generator;
   std::thread socket_thread;
-  static const uint32_t EVENT_BUFFER_SIZE = 100;
+  static const uint32_t EVENT_BUFFER_SIZE = 128;
   TensorBuffer buffer;
   std::atomic<bool> is_streaming = {true};
 
@@ -33,15 +33,19 @@ private:
   };
 
 public:
-  DVSInput(uint16_t deviceId, uint8_t deviceAddress, torch::IntArrayRef shape,
-           torch::Device device)
-      : buffer(shape, device) {
-    try {
-      generator = inivation_event_generator("dvx", deviceId, deviceAddress,
-                                            is_streaming);
-    } catch (std::exception &e) {
-      generator = inivation_event_generator("davis", deviceId, deviceAddress,
-                                            is_streaming);
+  DVSInput(torch::IntArrayRef shape, torch::Device device, uint16_t deviceId,
+           uint16_t deviceAddress)
+      : buffer(shape, device, EVENT_BUFFER_SIZE) {
+    if (deviceId > 0) {
+      try {
+        auto address = InivationDeviceAddress{"dvx", deviceId, deviceAddress};
+        generator = inivation_event_generator(address, is_streaming);
+      } catch (std::exception &e) {
+        auto address = InivationDeviceAddress{"davis", deviceId, deviceAddress};
+        generator = inivation_event_generator(address, is_streaming);
+      }
+    } else {
+      generator = inivation_event_generator({}, is_streaming);
     }
   }
 
@@ -53,5 +57,8 @@ public:
     return this;
   }
 
-  void stop_stream() { is_streaming.store(false); }
+  void stop_stream() {
+    is_streaming.store(false);
+    socket_thread.join();
+  }
 };

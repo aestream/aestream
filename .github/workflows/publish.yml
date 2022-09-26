@@ -1,6 +1,6 @@
 name: Publish to PyPi
 
-on: [push, pull_request]
+on: [pull_request, release]
 
 # Thanks to https://github.com/pypa/cibuildwheel/blob/main/examples/github-deploy.yml
 jobs:
