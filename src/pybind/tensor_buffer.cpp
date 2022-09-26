@@ -11,16 +11,9 @@ TensorBuffer::TensorBuffer(torch::IntArrayRef size, torch::Device device,
   options_copy = torch::TensorOptions().dtype(torch::kFloat32).device(device);
   buffer1 = std::make_shared<torch::Tensor>(torch::zeros(size, options_buffer));
   buffer2 = std::make_shared<torch::Tensor>(torch::zeros(size, options_buffer));
-  if (device == torch::DeviceType::CUDA) {
-    cuda_device_pointer = alloc_memory_cuda(buffer_size);
-  }
 }
 
-TensorBuffer::~TensorBuffer() {
-  if (options_buffer.device() == torch::DeviceType::CUDA) {
-    free_memory_cuda(cuda_device_pointer);
-  }
-}
+TensorBuffer::~TensorBuffer() {}
 
 TensorBuffer::~TensorBuffer() {}
 
