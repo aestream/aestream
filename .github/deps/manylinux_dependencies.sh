@@ -1,36 +1,11 @@
 #!/usr/bin/env bash
 
 # System dependencies
-yum install -y zlib-devel ninja-build libgusb-devel
-
-# Ensure we're in the root directory to align paths with publish.yml
-cd /root
-
-echo `pwd`
-
-# Ensure we're in the root directory to align paths with publish.yml
-cd /root
-
-# Install libtorch
-curl -L -s -m 100 https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.12.1%2Bcpu.zip > libtorch.zip
-# We use Python to Unzip because
-#  - Modern linux systems uses PIDs above 65k
-#  - Old versions of unzip do not cope well with high PIDs
-echo "Extracting"
-/usr/local/bin/python3.9 -c '
-import zipfile
-with zipfile.ZipFile("libtorch.zip", "r") as zip_ref:
-  zip_ref.extractall(".")
-'
-
-echo "Libtorch extracted"
-ls -alh /root/libtorch
-  
-#unzip -q libtorch.zip
+yum install -y lz4-devel ninja-build libgusb-devel || ( apt update && apt install -y liblz4-dev libusb-1.0-0-dev )
 
 # Install libcaer
 curl -L -s -m 100 https://gitlab.com/inivation/dv/libcaer/-/archive/3.3.14/libcaer-3.3.14.tar.gz | tar zxf -
 cd libcaer-3.3.14
-cmake -DCMAKE_INSTALL_PREFIX=/usr .
+cmake -DCMAKE_INSTALL_PREFIX=/usr . # Use specific cmake to avoid confusing versions
 make -j 4 && make install
 cd ..

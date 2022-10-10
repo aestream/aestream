@@ -1,6 +1,7 @@
 import sdl2.ext
 
-WHITE = (256 << 16 | 256 << 8 | 256)
+WHITE = 256 << 16 | 256 << 8 | 256
+
 
 def create_sdl_surface(*shape):
     sdl2.ext.init()
@@ -13,6 +14,7 @@ def create_sdl_surface(*shape):
     pixels = sdl2.ext.pixelaccess.pixels2d(renderer)
 
     return window, pixels
+
 
 def events_to_bw(events):
     return events.int() * (255 << 16)

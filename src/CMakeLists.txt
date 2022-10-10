@@ -1,6 +1,7 @@
 # Include flatbuffers and generate headers
 find_package(flatbuffers NAMES flatbuffers Flatbuffers FlatBuffers)
 
+option(FLATBUFFERS_BUILD_TESTS OFF)
 if (${flatbuffers_FOUND}) # Add flatbuffers from source dir (set in flake.nix)
   add_subdirectory(${FLATBUFFERS_SOURCE_DIR} 
                   ${CMAKE_CURRENT_BINARY_DIR}/flatbuffers-build
@@ -23,12 +24,11 @@ flatbuffers_generate_headers(
 )
 
 # LZ4 for AEDAT encoding
-find_path(LZ4_INCLUDE_DIR NAMES lz4.h)
-find_library(LZ4_LIBRARY NAMES lz4 REQUIRED)
+# find_path(LZ4_INCLUDE_DIR NAMES lz4.h)
+# find_library(LZ4_LIBRARY NAMES lz4 LZ4 REQUIRED)
 
 # AEDAT4 processing
 add_library(aedat4 SHARED aedat.hpp aedat4.hpp generator.hpp)
-include_directories(aedat4 PRIVATE ${LZ4_INCLUDE_DIR})
 target_include_directories(aedat4 INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(aedat4 PUBLIC fb_headers flatbuffers)
 
@@ -37,11 +37,35 @@ add_subdirectory(input)
 add_subdirectory(output)
 
 # AEStream library
-add_library(aestream_lib SHARED aestream.cpp)
+add_library(aestream_lib STATIC aestream.cpp)
 target_include_directories(aestream_lib PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(aestream_lib PUBLIC aedat4 aestream_input aestream_output)
+install(TARGETS aestream_lib LIBRARY)
 
-# AEStream executable
-add_executable(aestream aestream.cpp)
-target_link_libraries(aestream PRIVATE aestream_lib)
-install(IMPORTED_RUNTIME_ARTIFACTS aestream DESTINATION bin)
+
+# AEStream Python
+if (${WITH_PYTHON})
+  if (CMAKE_CUDA_COMPILER)
+    set(LANGUAGE_CUDA CUDA)
+    set(module_source_files pybind/tensor_buffer_cuda.cpp pybind/tensor_buffer_kernel.cu)
+  else()
+    set(module_source_files pybind/tensor_buffer.cpp)
+  endif()
+
+  find_package(PythonExtensions REQUIRED)
+  find_package(Torch REQUIRED)
+  
+  add_library(aestream MODULE 
+        pybind/module.cpp pybind/udp.cpp pybind/usb.cpp pybind/udp_client.cpp pybind/udp_client.hpp pybind/convert.cpp pybind/convert.hpp pybind/tensor_buffer.hpp 
+        ${module_source_files})
+  python_extension_module(aestream)
+  target_link_libraries(aestream ${TORCH_LIBRARIES} aestream_lib)
+  target_include_directories(aestream PRIVATE ${TORCH_INCLUDE_DIRS})
+
+  install(IMPORTED_RUNTIME_ARTIFACTS aestream LIBRARY DESTINATION .)
+else()
+  # AEStream executable
+  add_executable(aestream aestream.cpp)
+  target_link_libraries(aestream PRIVATE aestream_lib)
+  install(IMPORTED_RUNTIME_ARTIFACTS aestream DESTINATION bin)
+endif()

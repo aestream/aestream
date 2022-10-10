@@ -7,7 +7,7 @@
 
 #include "tensor_buffer.hpp"
 
-class DVSInput {
+class USBInput {
 
 private:
   Generator<AEDAT::PolarityEvent> generator;
@@ -33,7 +33,7 @@ private:
   };
 
 public:
-  DVSInput(torch::IntArrayRef shape, torch::Device device, uint16_t deviceId,
+  USBInput(torch::IntArrayRef shape, torch::Device device, uint16_t deviceId,
            uint16_t deviceAddress)
       : buffer(shape, device, EVENT_BUFFER_SIZE) {
     if (deviceId > 0) {
@@ -51,8 +51,8 @@ public:
 
   at::Tensor read() { return buffer.read(); }
 
-  DVSInput *start_stream() {
-    std::thread socket_thread(&DVSInput::stream_synchronous, this);
+  USBInput *start_stream() {
+    std::thread socket_thread(&USBInput::stream_synchronous, this);
     socket_thread.detach();
     return this;
   }

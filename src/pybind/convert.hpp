@@ -1,13 +1,10 @@
 #pragma once
-#include "aedat.hpp"
-#include "aedat4.hpp"
 
 #include <iostream>
-#include <sys/types.h>
-#include <torch/script.h>
+#include <torch/extension.h>
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "aedat.hpp"
+#include "aedat4.hpp"
 
 torch::Tensor convert_polarity_events(
     std::vector<AEDAT::PolarityEvent> &polarity_events,
@@ -18,4 +15,4 @@ convert_polarity(std::vector<AEDAT::PolarityEvent> &polarity_events,
                  const int64_t window_size,
                  const int64_t window_step,
                  const std::vector<double> &scale,
-                 const std::vector<int64_t> &image_dimensions) {
+                 const std::vector<int64_t> &image_dimensions);
