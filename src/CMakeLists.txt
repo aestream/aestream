@@ -1,8 +1,7 @@
 # Include flatbuffers and generate headers
-find_package(flatbuffers NAMES flatbuffers Flatbuffers FlatBuffers)
-
+find_package(flatbuffers MODULE QUIET)
 option(FLATBUFFERS_BUILD_TESTS OFF)
-if (${flatbuffers_FOUND}) # Add flatbuffers from source dir (set in flake.nix)
+if (flatbuffers_FOUND) # Add flatbuffers from source dir (set in flake.nix)
   add_subdirectory(${FLATBUFFERS_SOURCE_DIR} 
                   ${CMAKE_CURRENT_BINARY_DIR}/flatbuffers-build
                   EXCLUDE_FROM_ALL)
@@ -24,13 +23,13 @@ flatbuffers_generate_headers(
 )
 
 # LZ4 for AEDAT encoding
-# find_path(LZ4_INCLUDE_DIR NAMES lz4.h)
-# find_library(LZ4_LIBRARY NAMES lz4 LZ4 REQUIRED)
+find_path(LZ4_INCLUDE_DIR NAMES lz4.h)
+find_library(LZ4_LIBRARY NAMES lz4 LZ4 REQUIRED)
 
 # AEDAT4 processing
 add_library(aedat4 SHARED aedat.hpp aedat4.hpp generator.hpp)
 target_include_directories(aedat4 INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(aedat4 PUBLIC fb_headers flatbuffers)
+target_link_libraries(aedat4 PUBLIC fb_headers flatbuffers lz4)
 
 # Add subdirectories
 add_subdirectory(input)
@@ -44,7 +43,7 @@ install(TARGETS aestream_lib LIBRARY)
 
 
 # AEStream Python
-if (${WITH_PYTHON})
+if (WITH_PYTHON)
   if (CMAKE_CUDA_COMPILER)
     set(LANGUAGE_CUDA CUDA)
     set(module_source_files pybind/tensor_buffer_cuda.cpp pybind/tensor_buffer_kernel.cu)
