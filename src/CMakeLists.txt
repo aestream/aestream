@@ -1,5 +1,5 @@
 # Include flatbuffers and generate headers
-find_package(flatbuffers MODULE QUIET)
+find_package(flatbuffers NAMES flatbuffers Flatbuffers FlatBuffers)
 option(FLATBUFFERS_BUILD_TESTS OFF)
 if (flatbuffers_FOUND) # Add flatbuffers from source dir (set in flake.nix)
   add_subdirectory(${FLATBUFFERS_SOURCE_DIR} 

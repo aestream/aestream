@@ -2,7 +2,7 @@
   description = "Address Event Streaming library";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-21.11";
+    nixpkgs.url = "nixpkgs/nixos-22.05";
     flake-utils.url = "github:numtide/flake-utils";
     mach-nix.url = "mach-nix/3.5.0";
   };
@@ -62,6 +62,7 @@
           cmakeFlags = [
             "-GNinja"
             "-DCMAKE_PREFIX_PATH=${libtorch}"
+	    "-DCMAKE_MODULE_PATH=${pkgs.flatbuffers}"
             "-DFLATBUFFERS_SOURCE_DIR=${pkgs.flatbuffers.src}"
           ];
           preBuild = ''
