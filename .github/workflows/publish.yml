@@ -23,7 +23,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.10.2
         env:
           CIBW_BUILD_VERBOSITY: 2
-          CIBW_BUILD: "cp37*x86-64 cp38*x86-64 cp39*x86-64 cp310*x86-64"
+          CIBW_BUILD: "cp3{7,8,9,10}*"
           CIBW_SKIP: "*musllinux*"
           CIBW_ARCHS: x86_64
           # Note: We need 2_28 because libcaer requires recent linux headers
