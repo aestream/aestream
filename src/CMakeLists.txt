@@ -50,7 +50,7 @@ if (WITH_PYTHON)
 
   # Require input libraries
   find_library(libcaer NAMES caer libcaer REQUIRED)
-  find_library(MetavisionSDK NAMES metavision_sdk_core REQUIRED)
+  # find_library(MetavisionSDK NAMES metavision_sdk_core REQUIRED)
 
   find_package(PythonExtensions REQUIRED)
   find_package(Torch REQUIRED)
