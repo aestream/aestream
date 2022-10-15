@@ -32,3 +32,5 @@ result
 *.deb
 release/
 wheelhouse/
+_skbuild
+

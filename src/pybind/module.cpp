@@ -1,15 +1,15 @@
 #include <string>
 #include <torch/extension.h>
-#include <torch/torch.h>
-#include <pybind11/pybind11.h>
 
 #include "udp.cpp"
 #include "usb.cpp"
 
-PYBIND11_MODULE(aestream_ext, m) {
+
+PYBIND11_MODULE(aestream, m) {
+
   py::class_<USBInput>(m, "USBInput")
       .def(py::init<torch::IntArrayRef, torch::Device, int, int>(),
-           py::arg("shape"), py::arg("device") = torch::DeviceType::CPU,
+           py::arg("shape"), py::arg("device") = "cpu",
            py::arg("device_id") = 0, py::arg("device_address") = 0)
       .def(py::init<torch::IntArrayRef, std::string, int, int>(),
            py::arg("shape"), py::arg("device") = "cpu",
@@ -26,8 +26,6 @@ PYBIND11_MODULE(aestream_ext, m) {
 
   py::class_<UDPInput>(m, "UDPInput")
       .def(py::init<torch::IntArrayRef, torch::Device, int>(), py::arg("shape"),
-           py::arg("device") = torch::DeviceType::CPU, py::arg("port") = 3333)
-      .def(py::init<torch::IntArrayRef, std::string, int>(), py::arg("shape"),
            py::arg("device") = "cpu", py::arg("port") = 3333)
       .def("__enter__", &UDPInput::start_server)
       .def("__exit__",

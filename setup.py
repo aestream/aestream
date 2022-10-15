@@ -13,15 +13,22 @@ with open(os.path.join(pwd, "requirements.txt"), encoding="utf-8") as fp:
 
 # C++ config
 cmake_args = [
-    f"-DCMAKE_PREFIX_PATH={os.path.dirname(torch.__file__)};{torch.utils.cmake_prefix_path}",
+    f"-DCMAKE_PREFIX_PATH='{os.path.dirname(torch.__file__)};{torch.utils.cmake_prefix_path}'",
     "-DWITH_PYTHON=1",
-    "-D_GLIBCXX_USE_CXX11_ABI=0"
+    f"-D_GLIBCXX_USE_CXX11_ABI={1 if torch._C._GLIBCXX_USE_CXX11_ABI else 0}",
+    "-DCMAKE_BUILD_TYPE=Debug"
 ]
 
 # Define extension based on CUDA availability
 cuda_home = cpp_extension._find_cuda_home()
 if cuda_home is not None:
-    cmake_args += [f"-DCMAKE_CUDA_HOME={cuda_home}"]
+    archs = ";".join([x[3:] for x in torch.cuda.get_arch_list()])
+    flags = " ".join(cpp_extension._get_cuda_arch_flags())
+    cmake_args += [
+        f"-DCMAKE_CUDA_ARCHITECTURES='{archs}'",
+        f'-DCMAKE_CUDA_FLAGS={flags}',
+        f"-DCMAKE_CUDA_COMPILER={cuda_home}/bin/nvcc",
+    ]
 
 # Setuptools entrypoint
 setup(
@@ -35,7 +42,6 @@ setup(
     long_description=readme_text,
     long_description_content_type="text/markdown",
     python_requires=">=3.7",
-    # package=["src"],
     include_package_data=True,
     install_requires=install_requires,
     classifiers=[

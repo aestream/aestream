@@ -39,13 +39,14 @@ set(input_include_directories ${CMAKE_CURRENT_SOURCE_DIR} )
 #   set(input_libraries ${input_libraries} libcaer)
 
 # Include libcaer
-find_library(CAER_LIBRARY NAMES caer)
-if (CAER_LIBRARY_FOUND)
+find_library(libcaer NAMES caer libcaer)
+if (libcaer-NOTFOUND)
+    message(STATUS "Inivation dependencies (libcaer) not found, ignoring")
+else()
     set(input_definitions ${input_definitions} WITH_CAER )
     set(input_sources ${input_sources} inivation.hpp inivation.cpp )
-    set(input_libraries ${input_libraries} ${CAER_LIBRARY})
-else()
-    message(STATUS "Inivation dependencies (libcaer) not found, ignoring")
+    set(input_libraries ${input_libraries} ${libcaer})
+    message(STATUS "Inivation dependencies (libcaer) found at ${libcaer}")
 endif()
     
 # Include MetavisionSDK
@@ -62,6 +63,7 @@ endif()
 
 # Create the input library
 add_library(aestream_input SHARED ${input_sources})
-target_link_libraries(aestream_input PUBLIC ${input_libraries})
+target_link_libraries(aestream_input ${input_libraries})
 target_compile_definitions(aestream_input PUBLIC ${input_definitions})
 target_include_directories(aestream_input PUBLIC ${input_include_directories})
+# set_target_properties(aestream_input PROPERTIES POSITION_INDEPENDENT_CODE ON)
