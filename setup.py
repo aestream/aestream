@@ -16,7 +16,6 @@ cmake_args = [
     f"-DCMAKE_PREFIX_PATH='{os.path.dirname(torch.__file__)};{torch.utils.cmake_prefix_path}'",
     "-DWITH_PYTHON=1",
     f"-D_GLIBCXX_USE_CXX11_ABI={1 if torch._C._GLIBCXX_USE_CXX11_ABI else 0}",
-    "-DCMAKE_BUILD_TYPE=Debug"
 ]
 
 # Define extension based on CUDA availability
@@ -29,6 +28,7 @@ if cuda_home is not None:
         f'-DCMAKE_CUDA_FLAGS={flags}',
         f"-DCMAKE_CUDA_COMPILER={cuda_home}/bin/nvcc",
     ]
+print(cmake_args)
 
 # Setuptools entrypoint
 setup(

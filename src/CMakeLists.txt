@@ -72,19 +72,20 @@ if (WITH_PYTHON)
         pybind/tensor_buffer.hpp 
         ${module_source_files})
   target_link_libraries(${python_module} ${TORCH_LIBRARIES} ${TORCH_PYTHON_LIBRARY} aedat4 aestream_input aestream_output)
-  target_include_directories(${python_module} PUBLIC ${TORCH_INCLUDE_DIRS} $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>)
+  target_include_directories(${python_module} PUBLIC ${TORCH_INCLUDE_DIRS} ${CMAKE_INSTALL_LIBDIR} ${PYTHON_INCLUDE_DIR})
   target_compile_features(${python_module} PUBLIC cxx_std_20)
   set_target_properties(${python_module} 
      PROPERTIES CXX_STANDARD 20
      INSTALL_RPATH "$ORIGIN/${CMAKE_INSTALL_LIBDIR}"
     )
-  
+
+  #python_extension_module(aedat4)
   python_extension_module(aestream_input)
   python_extension_module(aestream_output)
   python_extension_module(libcaer)
   python_extension_module(${python_module})
 
-  install(TARGETS aestream_input aestream_output DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  install(TARGETS aedat4 aestream_input aestream_output DESTINATION ${CMAKE_INSTALL_LIBDIR})
   install(TARGETS ${python_module} DESTINATION .)
 else()
 

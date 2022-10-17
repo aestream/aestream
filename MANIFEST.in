@@ -1,5 +1,3 @@
 include requirements.txt
 
 graft src/
-include *aestream*.a
-include *aestream*.so
