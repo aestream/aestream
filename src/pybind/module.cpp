@@ -1,11 +1,12 @@
 #include <string>
 #include <torch/extension.h>
+#include <torch/torch.h>
 
 #include "udp.cpp"
 #include "usb.cpp"
 
 
-PYBIND11_MODULE(aestream, m) {
+PYBIND11_MODULE(aestream_ext, m) {
 
   py::class_<USBInput>(m, "USBInput")
       .def(py::init<torch::IntArrayRef, torch::Device, int, int>(),

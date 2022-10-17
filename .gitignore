@@ -6,7 +6,6 @@ build_python/
 dist/
 .vscode/
 *.a
-*.cmake
 *.ninja
 *.so
 _deps/
@@ -18,7 +17,6 @@ CMakeCache.txt
 CMakeFiles/
 thirdparty/
 *.ipynb
-*.cmake
 .venv/
 *.egg-info
 __pycache__/

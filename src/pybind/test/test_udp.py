@@ -20,7 +20,7 @@ def start_stream():
 
 
 def test_udp():
-    with UDPInput(torch.Size((640, 480))) as stream:
+    with UDPInput((640, 480)) as stream:
         start_stream()  # Start streaming from file
 
         interval = 0.5

@@ -5,5 +5,4 @@ TORCH_PATH=$(python3 -c "import os,torch; print(os.path.dirname(torch.__file__) 
 echo $TORCH_PATH
 #AESTREAM_PATH=$(find . -name "libaestream_lib.a" | head -n 1)
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${TORCH_PATH}
-#:${AESTREAM_PATH}
 echo $LD_LIBRARY_PATH

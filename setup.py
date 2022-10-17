@@ -28,7 +28,6 @@ if cuda_home is not None:
         f'-DCMAKE_CUDA_FLAGS={flags}',
         f"-DCMAKE_CUDA_COMPILER={cuda_home}/bin/nvcc",
     ]
-print(cmake_args)
 
 # Setuptools entrypoint
 setup(
@@ -42,6 +41,7 @@ setup(
     long_description=readme_text,
     long_description_content_type="text/markdown",
     python_requires=">=3.7",
+    packages=["aestream"],
     include_package_data=True,
     install_requires=install_requires,
     classifiers=[

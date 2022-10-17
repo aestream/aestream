@@ -60,8 +60,8 @@ if (WITH_PYTHON)
   find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
   message(STATUS "TORCH_PYTHON_LIBRARY: ${TORCH_PYTHON_LIBRARY}")
 
-  set(python_module aestream)
-  add_library(${python_module} MODULE
+  set(PYTHON_MODULE_NAME aestream_ext)
+  add_library(${PYTHON_MODULE_NAME} MODULE
         pybind/module.cpp 
         pybind/udp.cpp 
         pybind/usb.cpp 
@@ -71,22 +71,21 @@ if (WITH_PYTHON)
         pybind/convert.hpp 
         pybind/tensor_buffer.hpp 
         ${module_source_files})
-  target_link_libraries(${python_module} ${TORCH_LIBRARIES} ${TORCH_PYTHON_LIBRARY} aedat4 aestream_input aestream_output)
-  target_include_directories(${python_module} PUBLIC ${TORCH_INCLUDE_DIRS} ${CMAKE_INSTALL_LIBDIR} ${PYTHON_INCLUDE_DIR})
-  target_compile_features(${python_module} PUBLIC cxx_std_20)
-  set_target_properties(${python_module} 
-     PROPERTIES CXX_STANDARD 20
-     INSTALL_RPATH "$ORIGIN/${CMAKE_INSTALL_LIBDIR}"
-    )
 
-  #python_extension_module(aedat4)
   python_extension_module(aestream_input)
   python_extension_module(aestream_output)
   python_extension_module(libcaer)
-  python_extension_module(${python_module})
+  python_extension_module(${PYTHON_MODULE_NAME})
 
-  install(TARGETS aedat4 aestream_input aestream_output DESTINATION ${CMAKE_INSTALL_LIBDIR})
-  install(TARGETS ${python_module} DESTINATION .)
+  target_link_libraries(${PYTHON_MODULE_NAME} ${TORCH_LIBRARIES} ${TORCH_PYTHON_LIBRARY} aedat4 aestream_input aestream_output)
+  target_include_directories(${PYTHON_MODULE_NAME} PUBLIC ${TORCH_INCLUDE_DIRS} ${CMAKE_INSTALL_LIBDIR})
+  target_compile_features(${PYTHON_MODULE_NAME} PUBLIC cxx_std_20)
+  set_target_properties(${PYTHON_MODULE_NAME} 
+    PROPERTIES CXX_STANDARD 20
+  )
+
+  #install(TARGETS aedat4 aestream_input aestream_output aestream DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+  install(TARGETS ${PYTHON_MODULE_NAME} LIBRARY DESTINATION aestream)
 else()
 
   # AEStream library

@@ -28,7 +28,7 @@ jobs:
           sudo add-apt-repository ppa:inivation-ppa/inivation -y
           sudo apt update && sudo apt install libcaer-dev libflatbuffers-dev liblz4-dev libopencv-core-dev ninja-build -y
           pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
-          CC=gcc-10 CXX=g++-10 pip install -e .
+          pip install .
           pip install pytest
       - name: Test
         run: pytest .
