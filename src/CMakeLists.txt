@@ -87,11 +87,13 @@ if (WITH_PYTHON)
   #install(TARGETS aedat4 aestream_input aestream_output aestream DESTINATION "${CMAKE_INSTALL_LIBDIR}")
   install(TARGETS ${PYTHON_MODULE_NAME} LIBRARY DESTINATION aestream)
 else()
+  # Link in Torch, if found
+  find_package(Torch)
 
   # AEStream library
   add_library(aestream_lib SHARED aestream.cpp)
-  target_include_directories(aestream_lib PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-  target_link_libraries(aestream_lib PUBLIC aedat4 aestream_input aestream_output)
+  target_include_directories(aestream_lib PRIVATE "${TORCH_INCLUDE_DIRS}")
+  target_link_libraries(aestream_lib "${TORCH_LIBRARIES}" aedat4 aestream_input aestream_output)
 
   # AEStream executable
   add_executable(aestream aestream.cpp)

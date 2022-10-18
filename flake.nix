@@ -27,21 +27,6 @@
             pkg-config libusb1 cmake gcc flatbuffers ninja lz4
           ];
         };
-        libtorch = pkgs.stdenv.mkDerivation {
-          pname = "libtorch";
-          version = "1.12.0";
-          src = pkgs.fetchzip {
-            name = "libtorch";
-            url = "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.12.0%2Bcpu.zip";
-            hash = "sha256-coeCeX8OYQyMhLjDurZjXs1uII25xaOC51XmOK3uMTk=";
-          };
-          nativeBuildInputs = [ pkgs.unzip ];
-          buildPhase = ''
-            mkdir $out
-            mv * $out/
-          '';
-          phases = [ "unpackPhase" "buildPhase" ];
-        };
         aestream = pkgs.stdenv.mkDerivation {
           name = "aestream";
           version = "0.3.0";
@@ -56,13 +41,13 @@
             pkgs.python39
             pkgs.ninja
             pkgs.lz4
+            py.pytorch
             libcaer
-            libtorch
           ];
           cmakeFlags = [
             "-GNinja"
-            "-DCMAKE_PREFIX_PATH=${libtorch}"
-	    "-DCMAKE_MODULE_PATH=${pkgs.flatbuffers}"
+            "-DCMAKE_PREFIX_PATH=${py.pytorch}"
+	    #"-DCMAKE_MODULE_PATH=${pkgs.flatbuffers}"
             "-DFLATBUFFERS_SOURCE_DIR=${pkgs.flatbuffers.src}"
           ];
           preBuild = ''
@@ -85,7 +70,7 @@
           ];
           cmakeFlags = parent.cmakeFlags ++ [
             "-DCMAKE_BUILD_TYPE=Debug"
-            "-DCMAKE_PREFIX_PATH=${libtorch};${pkgs.gtest}"
+            "-DCMAKE_PREFIX_PATH=${py.pytorch};${pkgs.gtest}"
           ];
           installPhase = parent.installPhase + ''
             install -m555 -D $src/example/davis.aedat4 $out/example/davis.aedat4
