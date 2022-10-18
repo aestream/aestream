@@ -59,6 +59,7 @@ if (WITH_PYTHON)
   # Thanks to https://github.com/pytorch/pytorch/issues/38122
   find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
   message(STATUS "TORCH_PYTHON_LIBRARY: ${TORCH_PYTHON_LIBRARY}")
+  message(STATUS "TORCH_LIBRARIES: ${TORCH_LIBRARIES}")
 
   set(PYTHON_MODULE_NAME aestream_ext)
   add_library(${PYTHON_MODULE_NAME} MODULE
@@ -77,17 +78,17 @@ if (WITH_PYTHON)
   python_extension_module(libcaer)
   python_extension_module(${PYTHON_MODULE_NAME})
 
-  target_link_libraries(${PYTHON_MODULE_NAME} ${TORCH_LIBRARIES} ${TORCH_PYTHON_LIBRARY} aedat4 aestream_input aestream_output)
+  target_link_libraries(${PYTHON_MODULE_NAME} "${TORCH_LIBRARIES}" "${TORCH_PYTHON_LIBRARY}" aedat4 aestream_input aestream_output)
   target_include_directories(${PYTHON_MODULE_NAME} PUBLIC ${TORCH_INCLUDE_DIRS} ${CMAKE_INSTALL_LIBDIR})
   target_compile_features(${PYTHON_MODULE_NAME} PUBLIC cxx_std_20)
   set_target_properties(${PYTHON_MODULE_NAME} 
     PROPERTIES CXX_STANDARD 20
   )
 
-  #install(TARGETS aedat4 aestream_input aestream_output aestream DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+  install(TARGETS aedat4 aestream_input aestream_output ${PYTHON_MODULE_NAME} DESTINATION aestream)
   install(TARGETS ${PYTHON_MODULE_NAME} LIBRARY DESTINATION aestream)
 else()
-  # Link in Torch, if found
+  # Link Torch, if found
   find_package(Torch)
 
   # AEStream library
