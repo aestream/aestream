@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
   //
   try {
     if (app_output_udp->parsed()) {
-      std::cout << "Send events to: " << ipAddress << " on port: " << port
+      std::cout << "Sending events to: " << ipAddress << " on port: " << port
                 << std::endl;
       DVSToUDP<AEDAT::PolarityEvent> client(bufferSize, port, ipAddress);
       client.stream(input_generator, include_timestamp);

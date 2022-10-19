@@ -25,11 +25,14 @@ def test_udp():
 
         interval = 0.5
         t_0 = time.time()
+        time.sleep(0.5)
         while True:
             if t_0 + interval <= time.time():
                 frame = stream.read()
                 break
 
+    torch.save(frame, "frame.dat")
+    print(frame.sum())
     assert torch.eq(frame[218, 15], 1)
 
 

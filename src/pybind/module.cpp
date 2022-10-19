@@ -26,8 +26,10 @@ PYBIND11_MODULE(aestream_ext, m) {
       .def("read", &USBInput::read);
 
   py::class_<UDPInput>(m, "UDPInput")
-      .def(py::init<torch::IntArrayRef, torch::Device, int>(), py::arg("shape"),
-           py::arg("device") = "cpu", py::arg("port") = 3333)
+      .def(py::init<torch::IntArrayRef, torch::Device, int>(), 
+           py::arg("shape"), py::arg("device") = "cpu", py::arg("port") = 3333)
+      .def(py::init<torch::IntArrayRef, std::string, int>(), 
+           py::arg("shape"), py::arg("device") = "cpu", py::arg("port") = 3333)
       .def("__enter__", &UDPInput::start_server)
       .def("__exit__",
            [&](UDPInput &i, py::object t, py::object v, py::object trace) {

@@ -14,7 +14,7 @@ class UDPInput {
 private:
   TensorBuffer buffer;
   const int port;
-  static const int max_events_per_packet = 1024;
+  static const int max_events_per_packet = 256;
 
   std::thread socket_thread;
   std::atomic<bool> is_serving = {true};
