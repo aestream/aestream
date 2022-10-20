@@ -28,7 +28,7 @@ jobs:
           sudo apt update && sudo apt install cmake ninja-build g++-10 -y && sudo .github/deps/manylinux_dependencies.sh
           pip3 install torch --extra-index-url https://download.pytorch.org/whl/cpu
           pip install cmake scikit-build ninja
-          CXX=g++-10 pip install . -v
+          CXX=g++-10 pip install --no-build-isolation . -v
           pip install pytest
       - name: Test
         run: pytest src
