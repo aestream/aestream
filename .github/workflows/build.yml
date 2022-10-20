@@ -25,9 +25,10 @@ jobs:
           python-version: '3.x'
       - name: Install prerequisites
         run: |
-          sudo apt update && sudo apt install cmake ninja-build g++-10 -y && .github/deps/manylinux_dependencies.sh
-          #pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
-          CXX=g++-10 pip install --extra-index-url https://download.pytorch.org/whl/cpu .
+          sudo apt update && sudo apt install cmake ninja-build g++-10 -y && sudo .github/deps/manylinux_dependencies.sh
+          pip3 install torch --extra-index-url https://download.pytorch.org/whl/cpu
+          pip install cmake scikit-build ninja
+          CXX=g++-10 pip install . -v
           pip install pytest
       - name: Test
         run: pytest src
