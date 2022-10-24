@@ -15,7 +15,7 @@ with open(os.path.join(pwd, "requirements.txt"), encoding="utf-8") as fp:
 cmake_args = [
     f"-DCMAKE_PREFIX_PATH='{os.path.dirname(torch.__file__)};{torch.utils.cmake_prefix_path}'",
     "-DWITH_PYTHON=1",
-    f"-D_GLIBCXX_USE_CXX11_ABI={1 if torch._C._GLIBCXX_USE_CXX11_ABI else 0}",
+    f"-DCMAKE_CXX_FLAGS='-D_GLIBCXX_USE_CXX11_ABI={1 if torch._C._GLIBCXX_USE_CXX11_ABI else 0} -fPIC'",
 ]
 
 # Define extension based on CUDA availability
@@ -42,7 +42,6 @@ setup(
     long_description_content_type="text/markdown",
     python_requires=">=3.7",
     packages=["aestream"],
-    include_package_data=True,
     install_requires=install_requires,
     classifiers=[
         "License :: OSI Approved :: MIT License",

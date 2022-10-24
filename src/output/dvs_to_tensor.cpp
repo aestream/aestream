@@ -15,7 +15,7 @@ convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events,
       {4, size}, torch::TensorOptions().dtype(torch::kInt64).device(device));
   int64_t *indices = (int64_t *)ind.data_ptr();
   auto val = torch::ones(
-      {size}, torch::TensorOptions().dtype(torch::kInt8).device(device));
+      {size}, torch::TensorOptions().dtype(torch::kInt16).device(device));
 
   for (size_t idx = 0; idx < size; idx++) {
     auto event = polarity_events[idx];
@@ -28,12 +28,14 @@ convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events,
   }
 
   auto sparse_options =
-      torch::TensorOptions().dtype(torch::kInt8).device(device);
+      torch::TensorOptions().dtype(torch::kInt16).device(device);
 
   if (shape.empty()) {
     return torch::sparse_coo_tensor(ind, val, sparse_options);
   } else {
-    return torch::sparse_coo_tensor(ind, val, {indices[size - 1] + 1, 2, shape[0], shape[1]}, sparse_options);
+    return torch::sparse_coo_tensor(
+        ind, val, {indices[size - 1] + 1, 2, shape[0], shape[1]},
+        sparse_options);
   }
 }
 

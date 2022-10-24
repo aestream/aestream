@@ -27,13 +27,11 @@ jobs:
           CIBW_SKIP: "*musllinux*"
           CIBW_ARCHS: x86_64
           # Note: We need 2_28 because libcaer requires recent linux headers
-          CIBW_BUILD_FRONTEND: "build"
-          CIBW_CONFIG_SETTINGS: "--no-isolation"
+          CIBW_BUILD_FRONTEND: "pip"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
           CIBW_BEFORE_ALL_LINUX: '.github/deps/manylinux_dependencies.sh'
           CIBW_ENVIRONMENT: PIP_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu
-          CIBW_REPAIR_WHEEL_COMMAND_LINUX: 'source .github/deps/fix_path.sh && auditwheel repair -w {dest_dir} {wheel}'
-          #CIBW_REPAIR_WHEEL_COMMAND_LINUX: 'auditwheel repair -w {dest_dir} {wheel}'
+          CIBW_REPAIR_WHEEL_COMMAND: 'source .github/deps/fix_path.sh && auditwheel repair -w {dest_dir} {wheel}'
 
       - uses: actions/upload-artifact@v3
         with:

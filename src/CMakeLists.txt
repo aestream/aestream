@@ -1,5 +1,3 @@
-include(GNUInstallDirs)
-
 # Include flatbuffers and generate headers
 find_package(flatbuffers CONFIG NAMES flatbuffers Flatbuffers FlatBuffers QUIET)
 option(FLATBUFFERS_BUILD_TESTS OFF)
