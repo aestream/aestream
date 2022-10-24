@@ -19,8 +19,8 @@ private:
   std::shared_ptr<torch::Tensor> buffer1;
   std::shared_ptr<torch::Tensor> buffer2;
 #ifdef WITH_CUDA
-  std::vector<uint16_t> offset_buffer;
-  uint16_t *cuda_device_pointer;
+  std::vector<int> offset_buffer;
+  int *cuda_device_pointer;
 #endif
 public:
   TensorBuffer(torch::IntArrayRef size, torch::Device device,

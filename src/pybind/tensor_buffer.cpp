@@ -4,10 +4,10 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 // CUDA functions
-uint16_t *alloc_memory_cuda(size_t buffer_size);
-void free_memory_cuda(uint16_t *cuda_device_pointer);
-void index_increment_cuda(torch::Tensor array, std::vector<uint16_t> events,
-                          uint16_t *event_device_pointer);
+int *alloc_memory_cuda(size_t buffer_size);
+void free_memory_cuda(int *cuda_device_pointer);
+void index_increment_cuda(torch::Tensor array, std::vector<int> events,
+                          int *event_device_pointer);
 #endif
 // TensorBuffer constructor
 TensorBuffer::TensorBuffer(torch::IntArrayRef size, torch::Device device,
@@ -22,7 +22,7 @@ TensorBuffer::TensorBuffer(torch::IntArrayRef size, torch::Device device,
   buffer2 = std::make_shared<torch::Tensor>(torch::zeros(size, options_buffer));
 #ifdef WITH_CUDA
   cuda_device_pointer = alloc_memory_cuda(buffer_size);
-  offset_buffer = std::vector<uint16_t>(buffer_size);
+  offset_buffer = std::vector<int>(buffer_size);
 #endif
 }
 
@@ -44,11 +44,11 @@ void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
     return;
   }
 #endif
-  uint16_t *array = buffer1->data_ptr<uint16_t>();
+  int16_t *array = buffer1->data_ptr<int16_t>();
   for (int i = 0; i < length; i = i + 2) {
     // Decode x, y
-    const uint16_t y_coord = data[i] & 0x7FFF;
-    const uint16_t x_coord = data[i + 1] & 0x7FFF;
+    const int16_t y_coord = data[i] & 0x7FFF;
+    const int16_t x_coord = data[i + 1] & 0x7FFF;
     (*(array + shape[1] * x_coord + y_coord))++;
   }
 }
@@ -64,7 +64,7 @@ void TensorBuffer::set_vector(std::vector<AEDAT::PolarityEvent> events) {
     return;
   }
 #endif
-  auto *array = buffer1->data_ptr<uint16_t>();
+  int16_t *array = buffer1->data_ptr<int16_t>();
   for (auto event : events) {
     (*(array + shape[1] * event.x + event.y))++;
   }

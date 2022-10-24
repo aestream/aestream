@@ -7,35 +7,33 @@
 #include <vector>
 
 template <typename scalar_t>
-__global__ void cuda_increment_kernel(scalar_t *__restrict__ array, uint16_t *__restrict__ offsets, const size_t size) {
+__global__ void cuda_increment_kernel(scalar_t *__restrict__ array, int *__restrict__ offsets, const size_t size) {
     int index = threadIdx.x; // Pixel offset
     if (index < size) {
-      printf("(%d;%d:%d=%d);", size, index, offsets[index], array[offsets[index]]);
       array[offsets[index]]++;
     }
 }
 
-void index_increment_cuda(torch::Tensor array, std::vector<uint16_t> offsets, uint16_t* event_device_pointer) {
+void index_increment_cuda(torch::Tensor array, std::vector<int> offsets, int* event_device_pointer) {
   const size_t indices = offsets.size();
-  const size_t buffer_size = indices * sizeof(uint16_t);
+  const size_t buffer_size = indices * sizeof(int);
 
-  printf("Indices %d, size %d\n", indices, buffer_size);
-  uint16_t* event_vector_pointer = &offsets[0];
+  int* event_vector_pointer = &offsets[0];
   cudaMemcpy(event_device_pointer, event_vector_pointer, buffer_size, cudaMemcpyHostToDevice);
 
   AT_DISPATCH_INTEGRAL_TYPES(array.scalar_type(), "cuda_increment", ([&] {
     cuda_increment_kernel<scalar_t><<<1, indices>>>(
-      array.data<scalar_t>(), event_device_pointer, indices);
+      array.data_ptr<scalar_t>(), event_device_pointer, indices);
   }));
 }
 
 
-uint16_t* alloc_memory_cuda(size_t buffer_size) {
-  uint16_t *cuda_device_pointer;
-  const size_t size = buffer_size * sizeof(uint16_t);
+int* alloc_memory_cuda(size_t buffer_size) {
+  int *cuda_device_pointer;
+  const size_t size = buffer_size * sizeof(int);
   cudaMalloc(&cuda_device_pointer, size);
   return cuda_device_pointer;
 }
-void free_memory_cuda(uint16_t* cuda_device_pointer) {
+void free_memory_cuda(int* cuda_device_pointer) {
   cudaFree(cuda_device_pointer);
 }
