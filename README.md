@@ -22,7 +22,7 @@ AEDAT parses event-based dynamic-vision system (DVS) data from an input source a
 ## Installation
 
 AEStream can be installed with the Python package manage `pip`.
-However, **AEStream depends on [PyTorch](https://pytorch.org/) and [libcaer](https://gitlab.com/inivation/dv/libcaer/)**, so please install that manually **before** you install AEStream.
+However, **AEStream depends on [PyTorch](https://pytorch.org/), [LZ4](https://lz4.github.io/lz4/), and [libcaer](https://gitlab.com/inivation/dv/libcaer/)**, so please install these dependencies manually **before** you install AEStream.
 For PyTorch, recall whether you are using the CPU or CUDA version and use the corresponding command below to install AEStream:
 
 | **PyTorch version** | **Command** |

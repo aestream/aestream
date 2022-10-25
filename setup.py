@@ -51,4 +51,5 @@ setup(
         "Topic :: System :: Hardware :: Universal Serial Bus (USB)",
     ],
     cmake_args=cmake_args,
+    cmake_source_dir="src"
 )
