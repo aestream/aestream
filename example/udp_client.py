@@ -29,5 +29,3 @@ with UDPInput((640, 480), "cpu", 4301) as stream:
             # Sum the incoming events and print along the timestamp
             time_string = datetime.datetime.fromtimestamp(t_0).time()
             print(f"Frame at {time_string} with {frame.sum()} events")
-    fs = torch.stack(out)
-    torch.save(fs, "f.dat")

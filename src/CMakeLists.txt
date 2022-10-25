@@ -1,7 +1,9 @@
-# Include flatbuffers and generate headers
-find_package(flatbuffers NAMES flatbuffers Flatbuffers FlatBuffers)
+include(GNUInstallDirs)
 
-if (${flatbuffers_FOUND}) # Add flatbuffers from source dir (set in flake.nix)
+# Include flatbuffers and generate headers
+find_package(flatbuffers CONFIG NAMES flatbuffers Flatbuffers FlatBuffers QUIET)
+option(FLATBUFFERS_BUILD_TESTS OFF)
+if (flatbuffers_FOUND AND FLATBUFFERS_SOURCE_DIR) # Add flatbuffers from source dir (set in flake.nix)
   add_subdirectory(${FLATBUFFERS_SOURCE_DIR} 
                   ${CMAKE_CURRENT_BINARY_DIR}/flatbuffers-build
                   EXCLUDE_FROM_ALL)
@@ -24,24 +26,36 @@ flatbuffers_generate_headers(
 
 # LZ4 for AEDAT encoding
 find_path(LZ4_INCLUDE_DIR NAMES lz4.h)
-find_library(LZ4_LIBRARY NAMES lz4 REQUIRED)
+find_library(LZ4_LIBRARY NAMES lz4 LZ4 REQUIRED)
+
+# Link in Torch outside of Python
+if (NOT WITH_PYTHON)
+  find_package(Torch)
+endif()
 
 # AEDAT4 processing
 add_library(aedat4 SHARED aedat.hpp aedat4.hpp generator.hpp)
-include_directories(aedat4 PRIVATE ${LZ4_INCLUDE_DIR})
 target_include_directories(aedat4 INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(aedat4 PUBLIC fb_headers flatbuffers)
+target_link_libraries(aedat4 PUBLIC fb_headers flatbuffers lz4)
 
 # Add subdirectories
-add_subdirectory(input)
 add_subdirectory(output)
+add_subdirectory(input)
+
+# AEStream Python
+if (WITH_PYTHON)
+  add_subdirectory(pybind)
+endif()
 
 # AEStream library
 add_library(aestream_lib SHARED aestream.cpp)
-target_include_directories(aestream_lib PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-target_link_libraries(aestream_lib PUBLIC aedat4 aestream_input aestream_output)
+target_include_directories(aestream_lib PRIVATE "${TORCH_INCLUDE_DIRS}")
+target_link_libraries(aestream_lib "${TORCH_LIBRARIES}" aedat4 aestream_input aestream_output)
 
 # AEStream executable
 add_executable(aestream aestream.cpp)
 target_link_libraries(aestream PRIVATE aestream_lib)
-install(IMPORTED_RUNTIME_ARTIFACTS aestream DESTINATION bin)
+
+# Install targets
+install(TARGETS aestream_lib LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(IMPORTED_RUNTIME_ARTIFACTS aestream DESTINATION ${CMAKE_INSTALL_BINDIR})

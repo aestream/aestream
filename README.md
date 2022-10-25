@@ -17,19 +17,30 @@
 </p>
 
 
-AEDAT parses event-based dynamic-vision system (DVS) data
-from an input source and streams it to a sink.
+AEDAT parses event-based dynamic-vision system (DVS) data from an input source and streams it to a sink (see table below).
 
-AEStream is built in C++, but can be interfaced via CLI or Python (work in progress).
+## Installation
+
+AEStream can be installed with the Python package manage `pip`.
+However, **AEStream depends on [PyTorch](https://pytorch.org/) and [libcaer](https://gitlab.com/inivation/dv/libcaer/)**, so please install that manually **before** you install AEStream.
+For PyTorch, recall whether you are using the CPU or CUDA version and use the corresponding command below to install AEStream:
+
+| **PyTorch version** | **Command** |
+| -------------------- | --- |
+| With CPU | `pip install aestream --extra-index-url https://download.pytorch.org/whl/cpu ` |
+| With CUDA | `pip install aestream --extra-index-url https://download.pytorch.org/whl/cu116` |
+
+Note that this uses CUDA 11.6. Other versions can be found and used by copying links from [the website of PyTorch](https://pytorch.org/).
+
+We do not currently support other platforms than Linux, but contributions are most welcome.
 
 ## Usage (Python)
 
-First, install [PyTorch](https://pytorch.org/) and [libcaer](https://gitlab.com/inivation/dv/libcaer/). 
-Then install `aestream` via pip: `pip install aestream`
+The Python API exposes two classes for reading DVS data sources into PyTorch tensors: `USBInput` and `UDPInput`.
 
 ```python
 # Stream events from a DVS camera over USB
-with DVSInput((640, 480)) as stream:
+with USBInput((640, 480)) as stream:
     while True:
         frame = stream.read() # Provides a (640, 480) tensor
         ...
@@ -48,25 +59,19 @@ Please note the examples may require additional dependencies (such as [Norse](ht
 
 ## Usage (CLI)
 
-AEStream produces a binary `stream` that requires you to specify an `input` source and an optional `output` source (defaulting to STDOUT).
-The general syntax is as follows (input is required, output is optional):
+Installing AEStream also gives access to the command-line interface (CLI) `aestream`.
+To use `aestraem`, simply provide an `input` source and an optional `output` sink (defaulting to STDOUT):
 
 ```bash
 aestream input <input source> [output <output sink>]
 ```
 ## Supported Inputs and Outputs
 
-We currently support the following inputs:
-
 | Input | Description | Usage |
 | --------- | :----------- | ----- |
-| DAVIS           | 346x260 DVS camera with USB address `X:Y`, Inivation  | `input inivation X Y davis` |
-| DVXplorer       | 640x480 DVS camera with USB address `X:Y`, Inivation  | `input inivation X Y dvx` |
-| Prophesee       | 640x480 DVS camera with USB address `X`, Prophesee  | `input prophesee X` |
-| Prophesee       | 1280x720 DVS camera with USB address `X`, Prophesee  | `input prophesee X` |
-| File            | `.aedat` or `.aedat4` | `input file x.aedat4` |
-
-We currently support the following outputs:
+| DAVIS, DVXPlorer | [Inivation](https://inivation.com/) DVS Camera over USB | `input inivation` |
+| EVK Cameras      | [Prophesee](https://www.prophesee.ai/) DVS camera over USB  | `input prophesee` |
+| File             | [AEDAT file format](https://gitlab.com/inivation/inivation-docs/blob/master/Software%20user%20guides/AEDAT_file_formats.md) as `.aedat` or `.aedat4` | `input file x.aedat4` |
 
 | Output | Description | Usage |
 | --------- | ----------- | ----- |
@@ -80,13 +85,13 @@ We currently support the following outputs:
 | Example | Syntax |
 | ------------- | ------------------------------|
 | Read file to STDOUT | `aestream input file example/davis.aedat4` |
-| Stream DVS Davis346 (USB 0:2) by iniVation AG to STDOUT (Note, requires Inivation libraries) | `aestream input inivation 0 2 davis output stdout` |
-| Stream Prophesee 640x480 (serial Prophesee:hal_plugin_gen31_fx3:00001464) to STDOUT (Note, requires Metavision SDK) | `aestream input prophesee Prophesee:hal_plugin_gen31_fx3:00001464 output stdout` |
-| Read file to remote machine X.X.X.X | `aestream input file example/davis.aedat4 output udp X.X.X.X` |
+| Stream DVS Davis346 (USB 0:2) by iniVation AG to STDOUT (Note, requires Inivation libraries) | `aestream input inivation output stdout` |
+| Stream Prophesee 640x480 (serial Prophesee:hal_plugin_gen31_fx3:00001464) to STDOUT (Note, requires Metavision SDK) | `aestream input output stdout` |
+| Read file to remote IP X.X.X.X | `aestream input file example/davis.aedat4 output udp X.X.X.X` |
 
-## Setup (C++)
+## Custom installation (C++)
 
-AEStream requires [libtorch](https://pytorch.org/cppdocs/installing.html). [Metavision SDK](https://docs.prophesee.ai/stable/metavision_sdk/index.html), [libcaer](https://github.com/inivation/libcaer) and [OpenCV](https://github.com/opencv/opencv) are optional dependencies, but are needed for some functionality.
+AEStream requires [libtorch](https://pytorch.org/cppdocs/installing.html). [Metavision SDK](https://docs.prophesee.ai/stable/metavision_sdk/index.html) and [libcaer](https://github.com/inivation/libcaer) are optional dependencies, but are needed for connecting to Prophesee and Inivation cameras respectively.
 
 AEStream is based on [C++20](https://en.cppreference.com/w/cpp/20). Since C++20 is not yet fully supported by all compilers, we recommend using `GCC >= 10.2`. 
 
@@ -137,7 +142,7 @@ Please cite `aestream` if you use it in your work:
   month        = {August},
   year         = 2022,
   publisher    = {Zenodo},
-  version      = {0.3.0},
+  version      = {0.4.0},
   doi          = {10.5281/zenodo.6322829},
   url          = {https://doi.org/10.5281/zenodo.6322829}
 }

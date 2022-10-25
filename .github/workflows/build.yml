@@ -22,12 +22,13 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.9'
+          python-version: '3.x'
       - name: Install prerequisites
         run: |
-          sudo add-apt-repository ppa:inivation-ppa/inivation -y
-          sudo apt update && sudo apt install libcaer-dev libflatbuffers-dev liblz4-dev libopencv-core-dev ninja-build -y
-          CC=gcc-10 CXX=g++-10 pip install -e .
+          sudo apt update && sudo apt install cmake ninja-build g++-10 -y && sudo .github/deps/manylinux_dependencies.sh
+          pip3 install torch --extra-index-url https://download.pytorch.org/whl/cpu
+          pip install cmake scikit-build ninja
+          CXX=g++-10 pip install --no-build-isolation . -v
           pip install pytest
       - name: Test
-        run: pytest .
+        run: pytest src

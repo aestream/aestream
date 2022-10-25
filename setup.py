@@ -1,82 +1,38 @@
-from os import path
-from setuptools import setup
+import os
+
+from skbuild import setup  # Use scikit-build
 import torch
 from torch.utils import cpp_extension
 
-pwd = path.abspath(path.dirname(__file__))
-with open(path.join(pwd, "README.md"), encoding="utf-8") as fp:
+pwd = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(pwd, "README.md"), encoding="utf-8") as fp:
     readme_text = fp.read()
 
-with open(path.join(pwd, "requirements.txt"), encoding="utf-8") as fp:
+with open(os.path.join(pwd, "requirements.txt"), encoding="utf-8") as fp:
     install_requires = fp.read()
 
-# Setup C++ sources
-cpp_sources = [
-    # Module code
-    "src/pybind/module.cpp",
-    # UDP
-    "src/pybind/udp.cpp",
-    "src/pybind/udp_client.cpp",
-    # USB
-    "src/input/inivation.cpp",
-    "src/pybind/usb.cpp",
-]
-
-cpp_headers = [
-    "src/aedat.hpp",
-    # Inputs
-    "src/input/inivation.hpp",
-    # Python class headers
-    "src/pybind/tensor_buffer.hpp",
-    "src/pybind/udp_client.hpp",
+# C++ config
+cmake_args = [
+    f"-DCMAKE_PREFIX_PATH='{os.path.dirname(torch.__file__)};{torch.utils.cmake_prefix_path}'",
+    "-DWITH_PYTHON=1",
+    f"-DCMAKE_CXX_FLAGS='-D_GLIBCXX_USE_CXX11_ABI={1 if torch._C._GLIBCXX_USE_CXX11_ABI else 0} -fPIC'",
 ]
 
 # Define extension based on CUDA availability
 cuda_home = cpp_extension._find_cuda_home()
 if cuda_home is not None:
-    cpp_sources += [
-        "src/pybind/tensor_buffer_cuda.cpp",
-        "src/pybind/tensor_buffer_kernel.cu",
+    archs = ";".join([x[3:] for x in torch.cuda.get_arch_list()])
+    flags = " ".join(cpp_extension._get_cuda_arch_flags())
+    cmake_args += [
+        f"-DCMAKE_CUDA_ARCHITECTURES='{archs}'",
+        f'-DCMAKE_CUDA_FLAGS={flags}',
+        f"-DCMAKE_CUDA_COMPILER={cuda_home}/bin/nvcc",
     ]
-    extension = cpp_extension.CUDAExtension(
-        name="aestream",
-        headers=cpp_headers,
-        sources=cpp_sources,
-        extra_compile_args={
-            "cxx": [
-                "-O3",
-                "-g",
-                "-D_GLIBCXX_USE_CXX11_ABI=0",
-                "-fcoroutines",
-                "-std=c++20",
-                "-I/usr/include/opencv4",
-            ],
-            "nvcc": ["-O3"],
-        },
-        libraries=["caer"],
-    )
-else:
-    cpp_sources += [
-        "src/pybind/tensor_buffer.cpp",
-    ]
-    extension = cpp_extension.CppExtension(
-        name="aestream",
-        headers=cpp_headers,
-        sources=cpp_sources,
-        extra_compile_args=[
-            "-O3",
-            "-g",
-            "-D_GLIBCXX_USE_CXX11_ABI=0",
-            "-fcoroutines",
-            "-std=c++20",
-            "-I/usr/include/opencv4",
-        ],
-        libraries=["caer"],
-    )
 
+# Setuptools entrypoint
 setup(
     name="aestream",
-    version="0.3.0",
+    version="0.4.0",
     author="Jens E. Pedersen, Christian Pehle",
     author_email="jens@jepedersen.dk, christian.pehle@gmail.com",
     url="https://github.com/norse/aestream",
@@ -85,8 +41,8 @@ setup(
     long_description=readme_text,
     long_description_content_type="text/markdown",
     python_requires=">=3.7",
+    packages=["aestream"],
     install_requires=install_requires,
-    setup_requires=["setuptools", "wheel", "torch", "numpy", "ninja"],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
@@ -94,6 +50,5 @@ setup(
         "Topic :: Software Development :: Libraries",
         "Topic :: System :: Hardware :: Universal Serial Bus (USB)",
     ],
-    ext_modules=[extension],
-    cmdclass={"build_ext": cpp_extension.BuildExtension},
+    cmake_args=cmake_args,
 )

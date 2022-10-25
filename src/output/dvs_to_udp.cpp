@@ -112,7 +112,7 @@ void DVSToUDP<T>::stream(Generator<T> &input_generator,
     }
   }
 
-  printf("Sent a total of %lu events", count);
+  printf("Sent a total of %lu events\n", count);
 
   if (sent == false) {
     if ((numbytes = sendto(sockfd, &message, current_event * event_size, 0,

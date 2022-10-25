@@ -14,7 +14,7 @@ with DVSInput(resolution, device="cuda") as stream:
     while True:
         # Read a tensor (640, 480) tensor from the camera
         tensor = stream.read().cpu()
-        #1tensor = torch.randn(640, 480).float() + 2
+        # 1tensor = torch.randn(640, 480).float() + 2
 
         # Render pixels
         pixels[:] = sdl.events_to_bw(tensor)

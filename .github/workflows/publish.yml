@@ -13,21 +13,26 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - if: ${{ env.ACT }}
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.x
-      - run: pip install pipx
-
+          python-version: '3.x'
+      - if: ${{ env.ACT }}
+        run: pip install pipx 
       - name: Build wheels
-        run: pipx run cibuildwheel==2.7.0
+        uses: pypa/cibuildwheel@v2.10.2
         env:
+          CIBW_BUILD_VERBOSITY: 2
           CIBW_BUILD: "cp3{7,8,9,10}*"
           CIBW_SKIP: "*musllinux*"
           CIBW_ARCHS: x86_64
           # Note: We need 2_28 because libcaer requires recent linux headers
+          CIBW_BUILD_FRONTEND: "pip"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
-          CIBW_BEFORE_BUILD: .github/deps/manylinux_dependencies.sh
-          CIBW_REPAIR_WHEEL_COMMAND_LINUX: 'LD_LIBRARY_PATH=/root/libtorch/lib:${LD_LIBRARY_PATH} auditwheel repair -w {dest_dir} {wheel}'
+          CIBW_BEFORE_BUILD: "rm -rf {project}/_skbuild"
+          CIBW_BEFORE_ALL_LINUX: '.github/deps/manylinux_dependencies.sh'
+          CIBW_ENVIRONMENT: PIP_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu
+          CIBW_REPAIR_WHEEL_COMMAND: 'source .github/deps/fix_path.sh && auditwheel repair -w {dest_dir} {wheel}'
 
       - uses: actions/upload-artifact@v3
         with:
@@ -101,8 +106,8 @@ jobs:
           name: artifact
           path: dist
 
-      - uses: pypa/gh-action-pypi-publish@v1.5.0
+      - uses: pypa/gh-action-pypi-publish@v1
         with:
           user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
-          repository_url: https://test.pypi.org/legacy/
+          verbose: true
