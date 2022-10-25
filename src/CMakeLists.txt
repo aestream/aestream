@@ -26,6 +26,11 @@ flatbuffers_generate_headers(
 find_path(LZ4_INCLUDE_DIR NAMES lz4.h)
 find_library(LZ4_LIBRARY NAMES lz4 LZ4 REQUIRED)
 
+# Link in Torch outside of Python
+if (NOT WITH_PYTHON)
+  find_package(Torch)
+endif()
+
 # AEDAT4 processing
 add_library(aedat4 SHARED aedat.hpp aedat4.hpp generator.hpp)
 target_include_directories(aedat4 INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
@@ -39,9 +44,6 @@ add_subdirectory(input)
 if (WITH_PYTHON)
   add_subdirectory(pybind)
 else()
-  # Link Torch, if found
-  find_package(Torch)
-
   # AEStream library
   add_library(aestream_lib SHARED aestream.cpp)
   target_include_directories(aestream_lib PRIVATE "${TORCH_INCLUDE_DIRS}")
