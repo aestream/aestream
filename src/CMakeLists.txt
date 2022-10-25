@@ -1,3 +1,5 @@
+include(GNUInstallDirs)
+
 # Include flatbuffers and generate headers
 find_package(flatbuffers CONFIG NAMES flatbuffers Flatbuffers FlatBuffers QUIET)
 option(FLATBUFFERS_BUILD_TESTS OFF)
@@ -43,17 +45,17 @@ add_subdirectory(input)
 # AEStream Python
 if (WITH_PYTHON)
   add_subdirectory(pybind)
-else()
-  # AEStream library
-  add_library(aestream_lib SHARED aestream.cpp)
-  target_include_directories(aestream_lib PRIVATE "${TORCH_INCLUDE_DIRS}")
-  target_link_libraries(aestream_lib "${TORCH_LIBRARIES}" aedat4 aestream_input aestream_output)
-
-  # AEStream executable
-  add_executable(aestream aestream.cpp)
-  target_link_libraries(aestream PRIVATE aestream_lib)
-
-  # Install targets
-  install(TARGETS aestream_lib LIBRARY)
-  install(IMPORTED_RUNTIME_ARTIFACTS aestream DESTINATION bin)
 endif()
+
+# AEStream library
+add_library(aestream_lib SHARED aestream.cpp)
+target_include_directories(aestream_lib PRIVATE "${TORCH_INCLUDE_DIRS}")
+target_link_libraries(aestream_lib "${TORCH_LIBRARIES}" aedat4 aestream_input aestream_output)
+
+# AEStream executable
+add_executable(aestream aestream.cpp)
+target_link_libraries(aestream PRIVATE aestream_lib)
+
+# Install targets
+install(TARGETS aestream_lib LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(IMPORTED_RUNTIME_ARTIFACTS aestream DESTINATION ${CMAKE_INSTALL_BINDIR})
