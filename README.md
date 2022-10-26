@@ -30,8 +30,7 @@ For PyTorch, recall whether you are using the CPU or CUDA version and use the co
 | With CPU | `pip install aestream --extra-index-url https://download.pytorch.org/whl/cpu ` |
 | With CUDA | `pip install aestream --extra-index-url https://download.pytorch.org/whl/cu116` |
 
-Note that this uses CUDA 11.6. Other versions can be found and used by copying links from [the website of PyTorch](https://pytorch.org/).
-
+Note that this uses CUDA 11.6. Other versions can be found at [the website of PyTorch](https://pytorch.org/).
 We do not currently support other platforms than Linux, but contributions are most welcome.
 
 ## Usage (Python)
