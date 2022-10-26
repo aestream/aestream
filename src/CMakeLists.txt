@@ -57,5 +57,5 @@ add_executable(aestream aestream.cpp)
 target_link_libraries(aestream PRIVATE aestream_lib)
 
 # Install targets
-install(TARGETS libcaer aedat4 aestream_input aestream_output aestream_lib LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS aedat4 aestream_input aestream_output aestream_lib LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(IMPORTED_RUNTIME_ARTIFACTS aestream DESTINATION ${CMAKE_INSTALL_BINDIR})
