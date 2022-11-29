@@ -2,7 +2,8 @@
 
 // event generator for Prophesee cameras
 Generator<AEDAT::PolarityEvent> prophesee_event_generator(
-    const std::optional<std::string> serial_number = std::nullopt) {
+    const std::optional<std::string> serial_number,
+                          const std::atomic<bool> &runFlag) {
 
   Metavision::Camera cam;
 
@@ -54,7 +55,8 @@ Generator<AEDAT::PolarityEvent> prophesee_event_generator(
   cam.start();
 
   // keep running while camera is on or video is finished
-  while (cam.is_running()) {
+  try {
+  while (cam.is_running() && runFlag.load()) {
     if ((ev_start != NULL) && (ev_final != NULL)) {
       // iterate over events in buffer and convert to AEDAT Polarity Event
       for (const Metavision::EventCD *ev = ev_start; ev < ev_final; ++ev) {
@@ -67,7 +69,9 @@ Generator<AEDAT::PolarityEvent> prophesee_event_generator(
       ev_final = NULL;
     }
   }
-
+  } catch (const std::exception &e) {
+    std::cerr << "Unexpected exception occurred: " << e.what();
+  }
   // if video is finished, stop camera - will never get here with live camera
   cam.stop();
 }

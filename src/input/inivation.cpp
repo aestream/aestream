@@ -1,5 +1,3 @@
-#include <atomic>
-
 #include "./inivation.hpp"
 
 std::optional<libcaer::devices::device *> find_device() {
