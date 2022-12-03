@@ -1,7 +1,6 @@
 import datetime
 import time
 
-import torch  # Torch is needed to import c10 (Core TENsor) context
 from aestream import USBInput
 
 # Connect to a USB camera, receiving tensors of shape (640, 480)
