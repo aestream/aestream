@@ -5,7 +5,7 @@ import torch
 import norse
 
 # Import the DVS camera streaming library, AEstream
-from aestream import DVSInput
+from aestream import USBInput
 
 # Initialize our canvas
 from sdl import create_sdl_surface, events_to_bw
@@ -31,7 +31,7 @@ state = None  # Start with empty state
 
 try:
     # Start streaming from a DVS camera on USB 2:2 and put them on the CPU
-    with DVSInput((640, 480)) as stream:
+    with USBInput((640, 480)) as stream:
         while True:  # Loop forever
             # Read a tensor (640, 480) tensor from the camera
             tensor = stream.read()

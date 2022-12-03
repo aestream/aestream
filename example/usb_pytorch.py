@@ -7,7 +7,7 @@ matplotlib.use("Qt5Agg")
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 
-from aestream import DVSInput
+from aestream import USBInput
 
 ## Example modified from: https://matplotlib.org/stable/tutorials/advanced/blitting.html
 
@@ -31,7 +31,7 @@ net.weight = torch.nn.Parameter(
 )
 
 # Start streaming from a DVS camera and put them on the GPU
-with DVSInput((640, 480), device="gpu") as stream:
+with USBInput((640, 480), device="gpu") as stream:
     try:
         while True:
             # Read a tensor (346, 260) tensor from the camera
