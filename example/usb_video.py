@@ -1,5 +1,4 @@
 import time
-import torch  # Torch is needed to import c10 (Core TENsor) context
 from aestream import USBInput
 import sdl
 
