@@ -41,6 +41,7 @@ target_link_libraries(aedat4 PUBLIC fb_headers flatbuffers lz4)
 # Add subdirectories
 add_subdirectory(output)
 add_subdirectory(input)
+add_subdirectory(process)
 
 # AEStream Python
 if (WITH_PYTHON)
@@ -50,12 +51,12 @@ endif()
 # AEStream library
 add_library(aestream_lib SHARED aestream.cpp)
 target_include_directories(aestream_lib PRIVATE "${TORCH_INCLUDE_DIRS}")
-target_link_libraries(aestream_lib "${TORCH_LIBRARIES}" aedat4 aestream_input aestream_output)
+target_link_libraries(aestream_lib "${TORCH_LIBRARIES}" aedat4 aestream_input aestream_output aestream_process)
 
 # AEStream executable
 add_executable(aestream aestream.cpp)
 target_link_libraries(aestream PRIVATE aestream_lib)
 
 # Install targets
-install(TARGETS libcaer aedat4 aestream_input aestream_output aestream_lib LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS aedat4 aestream_input aestream_output aestream_process aestream_lib LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(IMPORTED_RUNTIME_ARTIFACTS aestream DESTINATION ${CMAKE_INSTALL_BINDIR})
