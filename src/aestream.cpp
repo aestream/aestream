@@ -18,6 +18,9 @@
 #include "input/prophesee.hpp"
 #endif
 
+// Processing
+#include "process/undistortion.hpp"
+
 // Output
 #include "output/dvs_to_file.hpp"
 #include "output/dvs_to_udp.hpp"
@@ -26,8 +29,10 @@
 auto runFlag = std::atomic<bool>(true);
 void signalHandler(int signum) { runFlag.store(false); }
 
+
 // Main
 int main(int argc, char *argv[]) {
+
   signal(SIGINT, signalHandler); // Register interrupt
 
   CLI::App app{"Streams DVS data from a USB camera or AEDAT file to a file or "
@@ -73,6 +78,22 @@ int main(int argc, char *argv[]) {
   //     "--ignore-time", input_ignore_time,
   //     "Playback in real-time (false, default) or ignore timestamps (true).");
 
+
+
+  //
+  // Processing
+  //
+  // Undistortion
+  //
+  auto app_undistortion = app.add_subcommand("undistortion", "Performs Undistortion");
+  std::string undistortion_filename;
+  std::uint16_t width;
+  std::uint16_t height;
+  app_undistortion->add_option("undistortion-filename", undistortion_filename,
+                              "Undistortion Filename. Supports .csv");
+  app_undistortion->add_option("w", width, "Camera width (in pixels)");
+  app_undistortion->add_option("h", height, "Camera height (in pixels)");
+ 
   //
   // Output
   //
@@ -144,6 +165,12 @@ int main(int argc, char *argv[]) {
   }
 
   //
+  // Processing - Undistortion
+  //
+  Generator<AEDAT::PolarityEvent> processed_generator;
+  processed_generator = undistortion_event_generator(input_generator, undistortion_filename, width, height);
+
+  //
   // Handle output
   //
   try {
@@ -151,13 +178,13 @@ int main(int argc, char *argv[]) {
       std::cout << "Sending events to: " << ipAddress << " on port: " << port
                 << std::endl;
       DVSToUDP<AER::Event> client(bufferSize, port, ipAddress);
-      client.stream(input_generator, include_timestamp);
+      client.stream(processed_generator, include_timestamp);
     } else if (app_output_file->parsed()) {
       std::cout << "Sending events to file " << output_filename << std::endl;
       if (output_filename.ends_with(".txt")) {
-        dvs_to_file_txt(input_generator, output_filename);
+        dvs_to_file_txt(processed_generator, output_filename);
       } else if (output_filename.ends_with(".aedat4")) {
-        dvs_to_file_aedat(input_generator, output_filename);
+        dvs_to_file_aedat(processed_generator, output_filename);
       } else {
         std::stringstream error;
         error << "Unsupported file ending" << output_filename;
