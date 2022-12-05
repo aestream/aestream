@@ -1,6 +1,7 @@
 #pragma once
 
 #include <any>
+#include <atomic>
 #include <csignal>
 #include <iostream>
 #include <string>

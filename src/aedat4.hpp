@@ -305,7 +305,6 @@ struct AEDAT4 {
         CreateIOHeaderDirect(fbb, CompressionType_LZ4, -1L, infoNode);
     fbb.FinishSizePrefixed(headerOffset);
     stream.write((char *)fbb.GetBufferPointer(), fbb.GetSize());
-    std::cout << "Data " << stream.tellp() << std::endl;
     return fbb.GetSize();
   }
 
@@ -343,7 +342,7 @@ struct AEDAT4 {
     auto [compressed, size] =
         compress_lz4((char *)fbb.GetBufferPointer(), fbb.GetSize());
     stream.write(compressed, size);
-    std::cout << "Table " << tableOffset << std::endl;
+    std::cout << "Wrote " << eventCount << " events" << std::endl;
   }
 
   static void save_events(std::fstream &stream,

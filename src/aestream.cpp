@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
 #endif
   } else if (app_input_prophesee->parsed()) {
 #ifdef WITH_METAVISION
-    input_generator = prophesee_event_generator(serial_number);
+    input_generator = prophesee_event_generator(serial_number, runFlag);
 #else
     throw std::invalid_argument(
         "Prophesee cameras unavailable: please recompile with MetavisionSDK");
