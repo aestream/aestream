@@ -24,6 +24,7 @@ endif()
 add_subdirectory(file)
 add_subdirectory(output)
 add_subdirectory(input)
+add_subdirectory(process)
 
 if (WITH_PYTHON)
   # AEStream Python
@@ -32,9 +33,9 @@ else()
   # AEStream executable
   add_executable(aestream aestream.cpp)
   target_include_directories(aestream PRIVATE "${TORCH_INCLUDE_DIRS}" ${CMAKE_INSTALL_LIBDIR})
-  target_link_libraries(aestream PRIVATE aer aestream_file aestream_input aestream_output)
+  target_link_libraries(aestream PRIVATE aer aestream_file aestream_input aestream_output aestream_process)
 
   # Install targets
-  # install(TARGETS aer aestream_input aestream_output aestream_lib LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  # install(TARGETS aer aestream_input aestream_output aestream_process aestream_lib LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
   install(IMPORTED_RUNTIME_ARTIFACTS aestream DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
