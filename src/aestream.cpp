@@ -117,6 +117,22 @@ int main(int argc, char *argv[]) {
 
 
 
+
+
+  //
+  // Processing
+  //
+  // Undistortion
+  //
+  auto app_undistortion = app.add_subcommand("undistortion", "Performs Undistortion");
+  std::string undistortion_filename;
+  std::uint16_t width;
+  std::uint16_t height;
+  app_undistortion->add_option("undistortion-filename", undistortion_filename,
+                              "Undistortion Filename. Supports .csv");
+  app_undistortion->add_option("w", width, "Camera width (in pixels)");
+  app_undistortion->add_option("h", height, "Camera height (in pixels)");
+ 
   //
   // Output
   //
@@ -207,6 +223,12 @@ int main(int argc, char *argv[]) {
     std::cout << "NO Processing" << std::endl;
     ptr_processed_generator = &input_generator;
   }
+
+  //
+  // Processing - Undistortion
+  //
+  Generator<AEDAT::PolarityEvent> processed_generator;
+  processed_generator = undistortion_event_generator(input_generator, undistortion_filename, width, height);
 
   //
   // Handle output

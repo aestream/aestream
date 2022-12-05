@@ -39,6 +39,16 @@ if (${USE_CAMERA})
   endif()
 
   # Include MetavisionSDK
+  # find_package(MetavisionSDK COMPONENTS core driver)
+  # if (MetavisionSDK_FOUND)
+  #     set(input_definitions ${input_definitions} WITH_METAVISION )
+  #     set(input_sources ${input_sources} prophesee.hpp prophesee.cpp)
+  #     set(input_libraries ${input_libraries} MetavisionSDK::core MetavisionSDK::driver)
+  #     set(input_include_directories ${input_include_directories})
+  # else()
+  #     message(STATUS "Prophesee dependencies (MetavisionSDK) not found, ignoring")
+  # endif()
+
   # find_package(MetavisionSDK COMPONENTS core driver QUIET)
   # if (NOT ${MetavisionSDK_FOUND})
   #   message(DEBUG "MetavisionSDK not found, fetching...")
