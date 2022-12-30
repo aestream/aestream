@@ -2,12 +2,12 @@ import datetime
 import time
 
 import torch  # Torch is needed to import c10 (Core TENsor) context
-from aestream import DVSInput
+from aestream import USBInput
 
 # Connect to a USB camera, receiving tensors of shape (640, 480)
 # By default, we send the tensors to the CPU
 #   - if you have a GPU, try changing this to "cuda"
-with DVSInput((640, 480), device="cpu") as stream:
+with USBInput((640, 480), device="cpu") as stream:
 
     # In this case, we read() every 100ms
     interval = 0.1

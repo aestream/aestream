@@ -1,6 +1,6 @@
 import time
 import torch  # Torch is needed to import c10 (Core TENsor) context
-from aestream import DVSInput
+from aestream import USBInput
 import sdl
 
 # Define our camera resolution
@@ -10,7 +10,7 @@ resolution = (640, 480)
 window, pixels = sdl.create_sdl_surface(*resolution)
 
 # Start streaming from a DVS camera on USB 2:2
-with DVSInput(resolution, device="cuda") as stream:
+with USBInput(resolution, device="cuda") as stream:
     while True:
         # Read a tensor (640, 480) tensor from the camera
         tensor = stream.read().cpu()
