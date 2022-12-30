@@ -16,8 +16,11 @@
     <a href="https://doi.org/10.5281/zenodo.6322829"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6322829.svg" alt="DOI"></a>
 </p>
 
+AEStream efficiently reads sparse events from an input source and streams it to an output sink.
+AEStream supports reading from files, USB cameras, as well as network via UDP and can stream events to files, network over UDP, and peripherals such as [GPU](https://en.wikipedia.org/wiki/Graphics_processing_unit)s and [neuromorphic hardware](https://en.wikipedia.org/wiki/Neuromorphic_engineering).
 
-AEDAT parses event-based dynamic-vision system (DVS) data from an input source and streams it to a sink (see table below).
+<img src="https://jegp.github.io/aestream-paper/2212_aestream.svg" />
+
 
 ## Installation
 
@@ -55,6 +58,17 @@ with UDPInput((640, 480), port=3333) as stream:
 
 More examples can be found in [our example folder](https://github.com/norse/aestream/tree/master/example).
 Please note the examples may require additional dependencies (such as [Norse](https://github.com/norse/norse) for spiking networks or [PySDL](https://github.com/py-sdl/py-sdl2) for rendering). To install all the requirements, simply stand in the `aestream` root directory and run `pip install -r example/requirements.txt`
+
+### Example: real-time edge detection with spiking neural networks
+
+<video controls="" autoplay="" loop="" muted="">
+    <source src="https://jegp.github.io/aestream-paper/edge.mp4" type="video/mp4">
+    <source src="https://jegp.github.io/aestream-paper/edge.webm" type="video/webm">
+</video>
+
+We stream events from a camera connected via USB and process them on a GPU in real-time using the [spiking neural network library, Norse](https://github.com/norse/norse) using fewer than 50 lines of Python.
+The left panel in the video shows the raw signal, while the middle and right panels show horizontal and vertical edge detection respectively.
+The full example can be found in [`examples/usb_edgedetection.py`](https://github.com/norse/aestream/blob/main/example/usb_edgedetection.py)
 
 ## Usage (CLI)
 
@@ -134,15 +148,13 @@ Thanks to [Philipp Mondorf](https://github.com/PMMon) for interfacing with Metav
 Please cite `aestream` if you use it in your work:
 
 ```bibtex
-@software{aestream2022,
-  author       = {Pedersen, Jens Egholm and
-                  Pehle, Christian-Gernot},
-  title        = {AEStream - Address Event Streaming library},
-  month        = {August},
-  year         = 2022,
-  publisher    = {Zenodo},
-  version      = {0.4.0},
-  doi          = {10.5281/zenodo.6322829},
-  url          = {https://doi.org/10.5281/zenodo.6322829}
+@misc{aestream,
+  doi = {10.48550/ARXIV.2212.10719},
+  url = {https://arxiv.org/abs/2212.10719},
+  author = {Pedersen, Jens Egholm and Conradt, Jörg},
+  title = {AEStream: Accelerated event-based processing with coroutines},
+  publisher = {arXiv},
+  year = {2022},
 }
+
 ```
