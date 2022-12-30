@@ -61,14 +61,11 @@ Please note the examples may require additional dependencies (such as [Norse](ht
 
 ### Example: real-time edge detection with spiking neural networks
 
-<video controls="" autoplay="" loop="" muted="">
-    <source src="https://jegp.github.io/aestream-paper/edge.mp4" type="video/mp4">
-    <source src="https://jegp.github.io/aestream-paper/edge.webm" type="video/webm">
-</video>
+![](example/usb_edgedetection.gif)
 
 We stream events from a camera connected via USB and process them on a GPU in real-time using the [spiking neural network library, Norse](https://github.com/norse/norse) using fewer than 50 lines of Python.
 The left panel in the video shows the raw signal, while the middle and right panels show horizontal and vertical edge detection respectively.
-The full example can be found in [`examples/usb_edgedetection.py`](https://github.com/norse/aestream/blob/main/example/usb_edgedetection.py)
+The full example can be found in [`example/usb_edgedetection.py`](https://github.com/norse/aestream/blob/main/example/usb_edgedetection.py)
 
 ## Usage (CLI)
 
