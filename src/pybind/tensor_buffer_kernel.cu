@@ -19,7 +19,7 @@ void index_increment_cuda(torch::Tensor array, std::vector<int> offsets, int* ev
   const size_t buffer_size = indices * sizeof(int);
 
   int* event_vector_pointer = &offsets[0];
-  cudaMemcpy(event_device_pointer, event_vector_pointer, buffer_size, cudaMemcpyHostToDevice);
+  cudaMemcpyAsync(event_device_pointer, event_vector_pointer, buffer_size, cudaMemcpyHostToDevice, 0);
 
   AT_DISPATCH_INTEGRAL_TYPES(array.scalar_type(), "cuda_increment", ([&] {
     cuda_increment_kernel<scalar_t><<<1, indices>>>(
@@ -31,7 +31,7 @@ void index_increment_cuda(torch::Tensor array, std::vector<int> offsets, int* ev
 int* alloc_memory_cuda(size_t buffer_size) {
   int *cuda_device_pointer;
   const size_t size = buffer_size * sizeof(int);
-  cudaMalloc(&cuda_device_pointer, size);
+  cudaHostMalloc(&cuda_device_pointer, size);
   return cuda_device_pointer;
 }
 void free_memory_cuda(int* cuda_device_pointer) {

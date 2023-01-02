@@ -16,7 +16,8 @@ TensorBuffer::TensorBuffer(torch::IntArrayRef size, torch::Device device,
   options_buffer = torch::TensorOptions()
                        .dtype(torch::kInt16)
                        .device(device)
-                       .memory_format(c10::MemoryFormat::Contiguous);
+                       .memory_format(c10::MemoryFormat::Contiguous)
+                       .pinned_memory(true);
   options_copy = torch::TensorOptions().dtype(torch::kFloat32).device(device);
   buffer1 = std::make_shared<torch::Tensor>(torch::zeros(size, options_buffer));
   buffer2 = std::make_shared<torch::Tensor>(torch::zeros(size, options_buffer));
