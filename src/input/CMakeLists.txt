@@ -40,13 +40,13 @@ set(input_include_directories "")
 
 # Include libcaer
 find_library(libcaer NAMES caer libcaer)
-if (libcaer-NOTFOUND)
-    message(STATUS "Inivation dependencies (libcaer) not found, ignoring")
+if (libcaer_FOUND)
+  set(input_definitions ${input_definitions} WITH_CAER )
+  set(input_sources ${input_sources} inivation.hpp inivation.cpp )
+  set(input_libraries ${input_libraries} ${libcaer})
+  message(STATUS "Inivation dependencies (libcaer) found at ${libcaer}")
 else()
-    set(input_definitions ${input_definitions} WITH_CAER )
-    set(input_sources ${input_sources} inivation.hpp inivation.cpp )
-    set(input_libraries ${input_libraries} ${libcaer})
-    message(STATUS "Inivation dependencies (libcaer) found at ${libcaer}")
+  message(STATUS "Inivation dependencies (libcaer) not found, ignoring")
 endif()
 
 # Include MetavisionSDK

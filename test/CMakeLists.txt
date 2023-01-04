@@ -22,12 +22,14 @@ enable_testing()
 add_executable(
   aestream_test
   main_test.cpp
-  aedat_test.cpp
+  file_test.cpp
   torch_test.cpp
 )
 target_link_libraries(
   aestream_test
-  aestream_lib
+  aedat4
+  aestream_input
+  aestream_output
   gtest
   ${LZ4_LIBRARY}
   ${TORCH_LIBRARIES}

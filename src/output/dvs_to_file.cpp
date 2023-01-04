@@ -21,7 +21,7 @@ void dvs_to_file_aedat(Generator<AEDAT::PolarityEvent> &input_generator,
   size_t sum = 0;
   uint64_t timeStart = 0;
   uint64_t timeEnd = 0;
-  for (const auto event : input_generator) {
+  for (auto event : input_generator) {
     events.push_back(event);
 
     if (events.size() >= bufferSize) {
