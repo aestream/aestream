@@ -26,6 +26,7 @@ file_event_generator(const std::string filename,
       fseek(fp.get(), 2, SEEK_CUR); // Skip header bytes
     }
 
+    const auto time_start = std::chrono::high_resolution_clock::now();
     std::vector<uint64_t> buffer(BUFFER_SIZE);
     size_t count = 0;
     uint64_t timestep = 0;
@@ -52,35 +53,47 @@ file_event_generator(const std::string filename,
         } else {
           timestep = newTimestep;
         }
+
+        // Check for time discrepancies
+        if (!ignore_time) {
+          const int64_t time_diff =
+              std::chrono::duration_cast<std::chrono::microseconds>(
+                  std::chrono::high_resolution_clock::now() - time_start)
+                  .count();
+          const int64_t time_offset = timestep - time_diff;
+          if (time_offset > 5) {
+            std::this_thread::sleep_for(std::chrono::microseconds(time_offset));
+          }
+        }
         co_yield AEDAT::PolarityEvent{timestep, le16toh(event.x),
                                       le16toh(event.y), true, event.p > 0};
       }
     };
 
-  } else if (ends_with(filename, "aedat4")) {
-    AEDAT4 aedat_file = AEDAT4(filename);
-    const auto polarity_events = aedat_file.polarity_events;
-    const auto time_start = std::chrono::high_resolution_clock::now();
-    const int64_t time_start_us = polarity_events[0].timestamp;
+    // } else if (ends_with(filename, "aedat4")) {
+    //   AEDAT4 aedat_file = AEDAT4(filename);
+    //   const auto polarity_events = aedat_file.polarity_events;
+    //   const auto time_start = std::chrono::high_resolution_clock::now();
+    //   const int64_t time_start_us = polarity_events[0].timestamp;
 
-    for (auto event : polarity_events) {
-      if (!runFlag.load()) { // Stop if requested
-        break;
-      }
-      // Sleep to align with real-time, unless ignore_time is set
-      if (!ignore_time) {
-        const int64_t time_diff =
-            std::chrono::duration_cast<std::chrono::microseconds>(
-                std::chrono::high_resolution_clock::now() - time_start)
-                .count();
-        const int64_t file_diff = event.timestamp - time_start_us;
-        const int64_t time_offset = file_diff - time_diff;
-        if (time_offset > 1000) {
-          std::this_thread::sleep_for(std::chrono::microseconds(time_offset));
-        }
-      }
-      co_yield event;
-    }
+    //   for (auto event : polarity_events) {
+    //     if (!runFlag.load()) { // Stop if requested
+    //       break;
+    //     }
+    //     // Sleep to align with real-time, unless ignore_time is set
+    //     if (!ignore_time) {
+    //       const int64_t time_diff =
+    //           std::chrono::duration_cast<std::chrono::microseconds>(
+    //               std::chrono::high_resolution_clock::now() - time_start)
+    //               .count();
+    //       const int64_t file_diff = event.timestamp - time_start_us;
+    //       const int64_t time_offset = file_diff - time_diff;
+    //       if (time_offset > 1000) {
+    //         std::this_thread::sleep_for(std::chrono::microseconds(time_offset));
+    //       }
+    //     }
+    //     co_yield event;
+    //   }
   } else {
     throw std::invalid_argument("Unknown file ending for file " + filename);
   }

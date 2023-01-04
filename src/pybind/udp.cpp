@@ -4,8 +4,7 @@
 #include <thread>
 #include <unistd.h>
 
-#include <torch/extension.h>
-#include <torch/torch.h>
+#include "types.hpp"
 
 #include "tensor_buffer.hpp"
 #include "udp_client.hpp"
@@ -21,7 +20,7 @@ private:
 
 public:
   uint64_t count = 0;
-  UDPInput(torch::IntArrayRef shape, torch::Device device, int port)
+  UDPInput(py_size_t shape, device_t device, int port)
       : buffer(shape, device, max_events_per_packet), port(port) {}
 
   UDPInput *start_server() {
@@ -30,7 +29,7 @@ public:
     return this;
   }
 
-  at::Tensor read() { return buffer.read(); }
+  tensor_t read() { return buffer.read(); }
 
   void serve_synchronous() {
     int sockfd;

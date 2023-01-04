@@ -2,7 +2,7 @@ import multiprocessing
 import socket
 import time
 
-import torch
+import numpy
 from aestream import UDPInput
 
 
@@ -14,7 +14,7 @@ def stream_fake_data(port):
 
 
 def start_stream(port):
-    p = multiprocessing.Process(target=stream_fake_data, args=(port, ))
+    p = multiprocessing.Process(target=stream_fake_data, args=(port,))
     p.start()
     return p
 
@@ -30,25 +30,29 @@ def test_udp():
             if t_0 + interval <= time.time():
                 frame = stream.read()
                 break
-
-    assert torch.eq(frame[218, 15], 1)
+    assert numpy.equal(frame[218, 15], 1)
 
 
 def test_udp_gpu():
-    if (torch.has_cuda):
-        with UDPInput((640, 480), device="cuda", port=3334) as stream:
-            start_stream(3334)  # Start streaming from file
+    try:
+        import torch
 
-            interval = 0.5
-            t_0 = time.time()
-            time.sleep(0.5)
-            while True:
-                if t_0 + interval <= time.time():
-                    frame = stream.read()
-                    break
+        if torch.has_cuda:
+            with UDPInput((640, 480), device="cuda", port=3334) as stream:
+                start_stream(3334)  # Start streaming from file
 
-        print(frame[218, 15])
-        assert torch.eq(frame[218, 15], 1)
+                interval = 0.5
+                t_0 = time.time()
+                time.sleep(0.5)
+                while True:
+                    if t_0 + interval <= time.time():
+                        frame = stream.read()
+                        break
+
+            assert torch.eq(frame[218, 15], 1)
+    except ImportError:
+        pass
+
 
 if __name__ == "__main__":
     test_udp()

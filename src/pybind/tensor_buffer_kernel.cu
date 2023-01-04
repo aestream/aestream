@@ -31,7 +31,7 @@ void index_increment_cuda(torch::Tensor array, std::vector<int> offsets, int* ev
 int* alloc_memory_cuda(size_t buffer_size) {
   int *cuda_device_pointer;
   const size_t size = buffer_size * sizeof(int);
-  cudaHostMalloc(&cuda_device_pointer, size);
+  cudaMalloc(&cuda_device_pointer, size);
   return cuda_device_pointer;
 }
 void free_memory_cuda(int* cuda_device_pointer) {

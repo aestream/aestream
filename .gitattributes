@@ -3,3 +3,5 @@
 *.gif filter=lfs diff=lfs merge=lfs -text
 *.mov filter=lfs diff=lfs merge=lfs -text
 example/usb_edgedetection.gif filter=lfs diff=lfs merge=lfs -text
+example/sample.dat filter=lfs diff=lfs merge=lfs -text
+example/sample.aedat4 filter=lfs diff=lfs merge=lfs -text

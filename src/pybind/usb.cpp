@@ -2,8 +2,7 @@
 #include "../generator.hpp"
 #include "../input/inivation.hpp"
 
-#include <torch/extension.h>
-#include <torch/torch.h>
+#include "types.hpp"
 
 #include "tensor_buffer.hpp"
 
@@ -33,7 +32,7 @@ private:
   };
 
 public:
-  USBInput(torch::IntArrayRef shape, torch::Device device, uint16_t deviceId,
+  USBInput(py_size_t shape, device_t device, uint16_t deviceId,
            uint16_t deviceAddress)
       : buffer(shape, device, EVENT_BUFFER_SIZE) {
     if (deviceId > 0) {
@@ -49,7 +48,7 @@ public:
     }
   }
 
-  at::Tensor read() { return buffer.read(); }
+  tensor_t read() { return buffer.read(); }
 
   USBInput *start_stream() {
     std::thread socket_thread(&USBInput::stream_synchronous, this);

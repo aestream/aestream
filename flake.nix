@@ -73,7 +73,8 @@
             "-DCMAKE_PREFIX_PATH=${py.pytorch};${pkgs.gtest}"
           ];
           installPhase = parent.installPhase + ''
-            install -m555 -D $src/example/davis.aedat4 $out/example/davis.aedat4
+            install -m555 -D $src/example/sample.aedat4 $out/example/sample.aedat4
+            install -m555 -D $src/example/sample.dat $out/example/sample.dat
             install -m755 -D test/aestream_test $out/bin/aestream_test
           '';
         });

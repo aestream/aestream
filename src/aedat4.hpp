@@ -11,8 +11,8 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 
-#include <lz4.h>
-#include <lz4frame.h>
+// #include <lz4.h>
+// #include <lz4frame.h>
 
 #include <flatbuffers/flatbuffers.h>
 
@@ -224,10 +224,6 @@ struct AEDAT4 {
               1,
               static_cast<bool>(event->on()),
           };
-          if (e.x > 640 || e.y > 480) {
-            printf("Wrong coords (%lu) %lu: %ux%u\n", count, e.timestamp, e.x,
-                   e.y);
-          }
           polarity_events.push_back(e);
         }
         break;
@@ -269,31 +265,33 @@ struct AEDAT4 {
       }
       }
     }
+
+    fclose(fd);
   }
 
-  static std::tuple<char *, size_t> compress_lz4(char *buffer, size_t size) {
-    auto lz4FrameBound = LZ4F_compressBound(size, nullptr);
-    auto new_buffer = new char[lz4FrameBound];
+  // static std::tuple<char *, size_t> compress_lz4(char *buffer, size_t size) {
+  //   auto lz4FrameBound = LZ4F_compressBound(size, nullptr);
+  //   auto new_buffer = new char[lz4FrameBound];
 
-    auto compression =
-        LZ4F_compressFrame(new_buffer, lz4FrameBound, buffer, size, nullptr);
-    return {new_buffer, compression};
-    // LZ4F_compressionContext_t ctx;
-    // auto contextCreation = LZ4F_createCompressionContext(&ctx, LZ4F_VERSION);
-    // auto headerSize =
-    //     LZ4F_compressBegin(ctx, new_buffer, lz4FrameBound, nullptr);
-    // if (LZ4F_isError(headerSize)) {
-    //   std::stringstream err;
-    //   err << "Compression error: " << LZ4F_getErrorName(headerSize);
-    //   throw std::runtime_error(err.str());
-    // }
+  //   auto compression =
+  //       LZ4F_compressFrame(new_buffer, lz4FrameBound, buffer, size, nullptr);
+  //   return {new_buffer, compression};
+  //   // LZ4F_compressionContext_t ctx;
+  //   // auto contextCreation = LZ4F_createCompressionContext(&ctx, LZ4F_VERSION);
+  //   // auto headerSize =
+  //   //     LZ4F_compressBegin(ctx, new_buffer, lz4FrameBound, nullptr);
+  //   // if (LZ4F_isError(headerSize)) {
+  //   //   std::stringstream err;
+  //   //   err << "Compression error: " << LZ4F_getErrorName(headerSize);
+  //   //   throw std::runtime_error(err.str());
+  //   // }
 
-    // auto packetSize = LZ4F_compressUpdate(ctx, new_buffer, lz4FrameBound,
-    //                                       buffer, size, nullptr);
-    // auto footerSize = LZ4F_compressEnd(ctx, new_buffer, lz4FrameBound,
-    // nullptr);
-    // return {new_buffer, headerSize + packetSize + footerSize};
-  }
+  //   // auto packetSize = LZ4F_compressUpdate(ctx, new_buffer, lz4FrameBound,
+  //   //                                       buffer, size, nullptr);
+  //   // auto footerSize = LZ4F_compressEnd(ctx, new_buffer, lz4FrameBound,
+  //   // nullptr);
+  //   // return {new_buffer, headerSize + packetSize + footerSize};
+  // }
 
   static size_t save_header(std::fstream &stream) {
     stream << "#!AER-DAT4.0\r\n";
@@ -305,6 +303,7 @@ struct AEDAT4 {
         CreateIOHeaderDirect(fbb, CompressionType_LZ4, -1L, infoNode);
     fbb.FinishSizePrefixed(headerOffset);
     stream.write((char *)fbb.GetBufferPointer(), fbb.GetSize());
+    std::cout << "Data " << stream.tellp() << std::endl;
     return fbb.GetSize();
   }
 
@@ -342,7 +341,7 @@ struct AEDAT4 {
     auto [compressed, size] =
         compress_lz4((char *)fbb.GetBufferPointer(), fbb.GetSize());
     stream.write(compressed, size);
-    std::cout << "Wrote " << eventCount << " events" << std::endl;
+    std::cout << "Table " << tableOffset << std::endl;
   }
 
   static void save_events(std::fstream &stream,

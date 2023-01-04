@@ -1,26 +1,29 @@
 include(GNUInstallDirs)
 
-if (CMAKE_CUDA_COMPILER) # Ensure we have proper compile definitions for torch import
-  set(CMAKE_CXX_STANDARD 17)
-  set(CMAKE_CUDA_STANDARD 17)
-  set(CMAKE_CUDA_STANDARD_REQUIRED TRUE)
-  set(module_compile_definitions WITH_CUDA)
-  set(module_source_files tensor_buffer_kernel.cu)
+if (USE_TORCH)
+  if (CMAKE_CUDA_COMPILER) # Include cuda buffers
+    set(module_source_files tensor_buffer_kernel.cu)
+  endif()
+  # Import PyTorch's Python library to ensure correct linking
+  # Thanks to https://github.com/pytorch/pytorch/issues/38122
+  find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
+  message(STATUS "TORCH_PYTHON_LIBRARY: ${TORCH_PYTHON_LIBRARY} - ${PYTHON_INCLUDE_DIRS}")
+  message(STATUS "TORCH_LIBRARIES: ${TORCH_LIBRARIES} - ${TORCH_INCLUDE_DIRS}")
+  
+endif()
+
+if (libcaer_FOUND) 
+  set(module_compile_definitions USE_INIVATION)
+  set(module_source_files "${module_source_files}" usb.cpp)
 endif()
 
 # Require input libraries
-find_library(libcaer NAMES caer libcaer REQUIRED)
+# find_library(libcaer NAMES caer libcaer REQUIRED)
 # find_library(MetavisionSDK NAMES metavision_sdk_core REQUIRED)
 
 find_package(PythonExtensions REQUIRED)
-find_package(Torch REQUIRED)
 
-# Import PyTorch's Python library to ensure correct linking
-# Thanks to https://github.com/pytorch/pytorch/issues/38122
-find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
-message(STATUS "TORCH_PYTHON_LIBRARY: ${TORCH_PYTHON_LIBRARY} - ${PYTHON_INCLUDE_DIRS}")
-message(STATUS "TORCH_LIBRARIES: ${TORCH_LIBRARIES} - ${TORCH_INCLUDE_DIRS}")
-
+set(PY_MODULE_SOURCES module.cpp udp.cpp udp_client.cpp udp_client.hpp tensor_buffer.hpp tensor_buffer.cpp) # convert.hpp convert.cpp )
 set(PYTHON_MODULE_NAME aestream_ext)
 add_library(${PYTHON_MODULE_NAME} MODULE
       module.cpp 
@@ -28,8 +31,8 @@ add_library(${PYTHON_MODULE_NAME} MODULE
       usb.cpp 
       udp_client.cpp 
       udp_client.hpp 
-      convert.cpp 
-      convert.hpp 
+      # convert.cpp 
+      # convert.hpp 
       tensor_buffer.hpp 
       tensor_buffer.cpp
       ${module_source_files})

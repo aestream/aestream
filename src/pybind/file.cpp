@@ -1,10 +1,12 @@
 #include "../input/file.hpp"
 #include "../aedat.hpp"
-#include "../aedat4.hpp"
+// #include "../aedat4.hpp"
 #include "../generator.hpp"
 
+#ifdef USE_TORCH
 #include <torch/extension.h>
 #include <torch/torch.h>
+#endif
 
 #include "tensor_buffer.hpp"
 
@@ -20,6 +22,7 @@ private:
   std::vector<AEDAT::PolarityEvent> event_vector;
   TensorBuffer buffer;
   std::atomic<bool> is_streaming = {true};
+  std::atomic<bool> is_nonempty = {true};
   const bool use_coroutines;
 
   void stream_file_to_buffer() {
@@ -29,6 +32,9 @@ private:
 
       std::vector<AEDAT::PolarityEvent> local_buffer = {};
       for (auto event : event_vector) {
+        if (!is_streaming) {
+          break;
+        }
         local_buffer.push_back(event);
 
         // Sleep to align with real-time, unless ignore_time is set
@@ -46,48 +52,64 @@ private:
 
         if (local_buffer.size() >= EVENT_BUFFER_SIZE) {
           buffer.set_vector(local_buffer);
+          is_nonempty.store(true);
           local_buffer.clear();
         }
       }
+      std::cout << "Done streaming events" << std::endl;
       is_streaming.store(false);
     }
   }
 
   void stream_generator_to_buffer() {
-    while (is_streaming.load()) {
-      // We add a local buffer to avoid overusing the atomic lock in the actual
-      // buffer
+    // We add a local buffer to avoid overusing the atomic
+    // lock in the actual buffer
+    try {
       std::vector<AEDAT::PolarityEvent> local_buffer = {};
       for (auto event : generator) {
+        if (!is_streaming.load()) {
+          break;
+        }
         local_buffer.push_back(event);
 
         if (local_buffer.size() >= EVENT_BUFFER_SIZE) {
           buffer.set_vector(local_buffer);
+          is_nonempty.store(true);
           local_buffer.clear();
         }
       }
       is_streaming.store(false);
-      return;
+    } catch (std::exception e) {
+      std::cout << "caught " << e.what() << std::endl;
     }
   }
 
 public:
-  FileInput(std::string filename, torch::IntArrayRef shape,
-            torch::Device device, bool ignore_time = false,
-            bool use_coroutines = true)
+  FileInput(std::string filename, py_size_t shape, device_t device,
+            bool ignore_time = false, bool use_coroutines = true)
       : buffer(shape, device, EVENT_BUFFER_SIZE), ignore_time(ignore_time),
         use_coroutines(use_coroutines) {
     if (use_coroutines) {
-      generator = file_event_generator(filename, ignore_time);
+      generator = file_event_generator(filename, is_streaming, ignore_time);
     } else {
-      const AEDAT4 aedat_file = AEDAT4(filename);
-      event_vector = aedat_file.polarity_events;
+      throw std::invalid_argument("AEDAT4 temporarily unsupported");
+      // try {
+      //   const AEDAT4 aedat_file = AEDAT4(filename);
+      //   event_vector = aedat_file.polarity_events;
+      // } catch (std::exception e) {
+      //   throw std::invalid_argument(
+      //       "Files without coroutines must be of .aedat4 format");
+      // }
     }
   }
 
-  at::Tensor read() { return buffer.read(); }
+  tensor_t read() {
+    const auto &tmp = buffer.read();
+    is_nonempty.store(false);
+    return tmp;
+  }
 
-  bool get_is_streaming() { return is_streaming.load(); }
+  bool get_is_streaming() { return is_streaming.load() || is_nonempty.load(); }
 
   FileInput *start_stream() {
     if (use_coroutines) {
@@ -97,12 +119,13 @@ public:
       file_thread = std::unique_ptr<std::thread>(
           new std::thread(&FileInput::stream_file_to_buffer, this));
     }
-    file_thread->detach();
     return this;
   }
 
   void stop_stream() {
     is_streaming.store(false);
-    file_thread->join();
+    if (file_thread->joinable()) {
+      file_thread->join();
+    }
   }
 };
