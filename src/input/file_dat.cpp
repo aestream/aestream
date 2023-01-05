@@ -116,16 +116,16 @@ Generator<AER::Event> dat_stream_all_events(const unique_file_t &fp,
       }
 
       // Check for time discrepancies
-      // if (!ignore_time) {
-      //   const int64_t time_diff =
-      //       std::chrono::duration_cast<std::chrono::microseconds>(
-      //           std::chrono::high_resolution_clock::now() - time_start)
-      //           .count();
-      //   const int64_t time_offset = timestep - time_diff;
-      //   if (time_offset > 5) {
-      //     std::this_thread::sleep_for(std::chrono::microseconds(time_offset));
-      //   }
-      // }
+      if (!ignore_time) {
+        const int64_t time_diff =
+            std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::high_resolution_clock::now() - time_start)
+                .count();
+        const int64_t time_offset = timestep - time_diff;
+        if (time_offset > 5) {
+          std::this_thread::sleep_for(std::chrono::microseconds(time_offset));
+        }
+      }
       co_yield event;
     }
   };
@@ -135,6 +135,8 @@ inline AER::Event decode_event(uint64_t data, size_t overflows) {
   auto event = *(DATEvent *)(&data);
   return AER::Event{event.ts, event.x, event.y, event.p};
 
+  // static const uint64_t mask_4b = 0xFU, mask_14b = 0x3FFFU,
+  //                       mask_32b = 0xFFFFFFFFU;
   // const uint64_t lower = data & mask_32b;
   // const uint64_t upper = data >> 32;
   // const uint64_t timestep = (overflows << 32) | lower;
