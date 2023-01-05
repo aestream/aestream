@@ -4,7 +4,7 @@
 #include <thread>
 #include <vector>
 
-#include "../aedat.hpp"
+#include "../aer.hpp"
 #include "types.hpp"
 
 #ifdef USE_TORCH
@@ -18,6 +18,7 @@
 class TensorBuffer {
 private:
   const std::vector<int64_t> shape;
+  uint64_t current_timestamp = 0;
 #ifdef USE_TORCH
   torch::TensorOptions options_buffer;
   torch::TensorOptions options_copy;
@@ -33,7 +34,8 @@ private:
 public:
   TensorBuffer(py_size_t size, device_t device, size_t buffer_size);
   ~TensorBuffer();
+  template <typename T> void assign_event(T *array, int16_t x, int16_t y);
   void set_buffer(uint16_t data[], int numbytes);
-  void set_vector(std::vector<AEDAT::PolarityEvent> events);
+  void set_vector(std::vector<AER::Event> events);
   tensor_t read();
 };

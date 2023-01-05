@@ -63,11 +63,11 @@ void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
     // Decode x, y
     const int16_t y_coord = data[i] & 0x7FFF;
     const int16_t x_coord = data[i + 1] & 0x7FFF;
-    (*(array + shape[1] * x_coord + y_coord))++;
+    assign_event(array, x_coord, y_coord);
   }
 }
 
-void TensorBuffer::set_vector(std::vector<AEDAT::PolarityEvent> events) {
+void TensorBuffer::set_vector(std::vector<AER::Event> events) {
   const std::lock_guard lock{buffer_lock};
 #ifdef USE_CUDA
   if (buffer1->device().is_cuda()) {
@@ -84,8 +84,13 @@ void TensorBuffer::set_vector(std::vector<AEDAT::PolarityEvent> events) {
   float *array = buffer1->data();
 #endif
   for (auto event : events) {
-    (*(array + shape[1] * event.x + event.y))++;
+    assign_event(array, event.x, event.y);
   }
+}
+
+template <typename T>
+inline void TensorBuffer::assign_event(T *array, int16_t x, int16_t y) {
+  (*(array + shape[1] * x + y))++;
 }
 
 tensor_t TensorBuffer::read() {

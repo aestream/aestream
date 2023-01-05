@@ -7,12 +7,13 @@ from aestream import FileInput
 # By default, we send the tensors to the CPU with Numpy
 #   - if you have a PyTorch installation with a GPU, try changing this to "cuda"
 s = 0
-with FileInput("sample.dat", (600, 500), device="cpu") as stream:
+st = time.time()
+with FileInput("sample.dat", (640, 480), device="cpu", ignore_time=True) as stream:
 
     # In this case, we read() every 100ms
-    interval = 0.0001
-    t_0 = time.time()
+    interval = 0.01
     c = 0
+    t_0 = time.time()
 
     # Loop forever
     while stream.is_streaming():
@@ -24,12 +25,12 @@ with FileInput("sample.dat", (600, 500), device="cpu") as stream:
 
             # Reset the time so we're again counting to 100ms
             t_0 = time.time()
-            s += frame.sum()
+            # s += frame.sum()
             # Sum the incoming events and print along the timestamp
             #time_string = datetime.datetime.fromtimestamp(t_0).time()
             #print(f"Frame at {time_string} with {frame.sum()} events")
             c +=1
     
-    s += stream.read().sum()
-    print(s, time.time() - t_0)
+    # s += stream.read().sum()
+    print(s, time.time() - st)
     print(c)

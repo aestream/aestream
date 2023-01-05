@@ -30,18 +30,18 @@ std::optional<libcaer::devices::device *> find_device() {
   }
 }
 
-
 CAERUSBConnection::CAERUSBConnection(
     std::optional<InivationDeviceAddress> deviceAddress) {
 
   if (deviceAddress.has_value()) {
-    const auto &[camera, deviceId, deviceHardwareAddress] = deviceAddress.value();
+    const auto &[camera, deviceId, deviceHardwareAddress] =
+        deviceAddress.value();
     if (camera == "dvx") {
       handle = new libcaer::devices::dvXplorer(deviceId, deviceId,
                                                deviceHardwareAddress, "");
     } else if (camera == "davis") {
-      handle =
-          new libcaer::devices::davis(deviceId, deviceId, deviceHardwareAddress, "");
+      handle = new libcaer::devices::davis(deviceId, deviceId,
+                                           deviceHardwareAddress, "");
     } else {
       throw std::invalid_argument("Unsupported camera '" + camera + "'");
     }
@@ -80,7 +80,7 @@ CAERUSBConnection::CAERUSBConnection(
 }
 
 // event generator for Inivation cameras
-Generator<AEDAT::PolarityEvent>
+Generator<AER::Event>
 inivation_event_generator(std::optional<InivationDeviceAddress> device_address,
                           const std::atomic<bool> &runFlag) {
 
@@ -108,11 +108,10 @@ inivation_event_generator(std::optional<InivationDeviceAddress> device_address,
               continue;
             }
 
-            const AEDAT::PolarityEvent polarityEvent = {
+            const AER::Event polarityEvent = {
                 (uint64_t)evt.getTimestamp64(*polarity),
                 evt.getX(),
                 evt.getY(),
-                evt.isValid(),
                 evt.getPolarity(),
             };
 
