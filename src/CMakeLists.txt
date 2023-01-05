@@ -29,7 +29,7 @@ include(GNUInstallDirs)
 # find_library(LZ4_LIBRARY NAMES lz4 LZ4 REQUIRED)
 
 # AEDAT4 processing
-add_library(aedat4 SHARED aedat.hpp generator.hpp) #aedat4.hpp )
+add_library(aedat4 SHARED aer.hpp aedat.hpp generator.hpp) #aedat4.hpp )
 target_include_directories(aedat4 INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 set_target_properties(aedat4 PROPERTIES LINKER_LANGUAGE CXX)
 # target_link_libraries(aedat4 PUBLIC fb_headers flatbuffers lz4)

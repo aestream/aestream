@@ -11,7 +11,7 @@
 #include <libcaercpp/devices/davis.hpp>
 #include <libcaercpp/devices/dvxplorer.hpp>
 
-#include "../aedat.hpp"
+#include "../aer.hpp"
 #include "../generator.hpp"
 
 struct InivationDeviceAddress {
@@ -42,6 +42,6 @@ public:
   void close() { handle->dataStop(); }
 };
 
-Generator<AEDAT::PolarityEvent>
+Generator<AER::Event>
 inivation_event_generator(std::optional<InivationDeviceAddress> device_address,
                           const std::atomic<bool> &runFlag);

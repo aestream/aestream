@@ -1,7 +1,7 @@
 #include "prophesee.hpp"
 
 // event generator for Prophesee cameras
-Generator<AEDAT::PolarityEvent> prophesee_event_generator(
+Generator<AER::Event> prophesee_event_generator(
     const std::atomic<bool> &runFlag,
     const std::optional<std::string> serial_number = std::nullopt) {
 
@@ -56,8 +56,11 @@ Generator<AEDAT::PolarityEvent> prophesee_event_generator(
     if ((ev_start != NULL) && (ev_final != NULL)) {
       // iterate over events in buffer and convert to AEDAT Polarity Event
       for (const Metavision::EventCD *ev = ev_start; ev < ev_final; ++ev) {
-        const AEDAT::PolarityEvent polarityEvent = {
-            (uint64_t)ev->t, ev->x, ev->y, true, (bool)ev->p,
+        const AER::Event polarityEvent = {
+            (uint64_t)ev->t,
+            ev->x,
+            ev->y,
+            (bool)ev->p,
         };
         co_yield polarityEvent;
       }

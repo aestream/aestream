@@ -9,7 +9,7 @@
 class USBInput {
 
 private:
-  Generator<AEDAT::PolarityEvent> generator;
+  Generator<AER::Event> generator;
   std::thread socket_thread;
   static const uint32_t EVENT_BUFFER_SIZE = 128;
   TensorBuffer buffer;
@@ -19,7 +19,7 @@ private:
     while (is_streaming.load()) {
       // We add a local buffer to avoid overusing the atomic lock in the actual
       // buffer
-      std::vector<AEDAT::PolarityEvent> local_buffer = {};
+      std::vector<AER::Event> local_buffer = {};
       for (auto event : generator) {
         local_buffer.push_back(event);
 

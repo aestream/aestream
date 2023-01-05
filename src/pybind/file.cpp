@@ -9,32 +9,42 @@
 #endif
 
 #include "tensor_buffer.hpp"
+#include "tensor_iterator.hpp"
 
+inline py::array_t<AER::Event> buffer_to_py_array(AER::Event *events,
+                                                  size_t n_events) {
+  py::capsule free_when_done(events, [](void *f) {
+    AER::Event *events = reinterpret_cast<AER::Event *>(f);
+    delete[] events;
+  });
+
+  // return py::array(n_events, events);
+  return py::array_t<AER::Event>({n_events}, {sizeof(AER::Event)}, events,
+                                 free_when_done);
+}
 class FileInput {
 
 private:
   static const uint32_t EVENT_BUFFER_SIZE = 512;
 
+  const std::string filename;
   const bool ignore_time;
+  py_size_t shape;
 
   std::unique_ptr<std::thread> file_thread;
-  Generator<AEDAT::PolarityEvent> generator;
-  std::vector<AEDAT::PolarityEvent> event_vector;
+  std::vector<AER::Event> event_vector;
   TensorBuffer buffer;
+  // TensorIterator iterator;
   std::atomic<bool> is_streaming = {true};
   std::atomic<bool> is_nonempty = {true};
-  const bool use_coroutines;
 
   void stream_file_to_buffer() {
     while (is_streaming.load()) {
       const auto time_start = std::chrono::high_resolution_clock::now();
       const int64_t time_start_us = event_vector[0].timestamp;
 
-      std::vector<AEDAT::PolarityEvent> local_buffer = {};
+      std::vector<AER::Event> local_buffer = {};
       for (auto event : event_vector) {
-        if (!is_streaming) {
-          break;
-        }
         local_buffer.push_back(event);
 
         // Sleep to align with real-time, unless ignore_time is set
@@ -54,9 +64,17 @@ private:
           buffer.set_vector(local_buffer);
           is_nonempty.store(true);
           local_buffer.clear();
+
+          if (!is_streaming) {
+            break;
+          }
         }
       }
-      std::cout << "Done streaming events" << std::endl;
+      // Stream remaining events
+      if (local_buffer.size() > 0) {
+        buffer.set_vector(local_buffer);
+        is_nonempty.store(true);
+      }
       is_streaming.store(false);
     }
   }
@@ -64,44 +82,29 @@ private:
   void stream_generator_to_buffer() {
     // We add a local buffer to avoid overusing the atomic
     // lock in the actual buffer
-    try {
-      std::vector<AEDAT::PolarityEvent> local_buffer = {};
-      for (auto event : generator) {
-        if (!is_streaming.load()) {
-          break;
-        }
-        local_buffer.push_back(event);
-
-        if (local_buffer.size() >= EVENT_BUFFER_SIZE) {
-          buffer.set_vector(local_buffer);
-          is_nonempty.store(true);
-          local_buffer.clear();
-        }
+    std::vector<AER::Event> local_buffer = {};
+    for (const auto &event : generator) {
+      if (!is_streaming.load()) {
+        break;
       }
-      is_streaming.store(false);
-    } catch (std::exception e) {
-      std::cout << "caught " << e.what() << std::endl;
+      local_buffer.push_back(event);
+
+      if (local_buffer.size() >= EVENT_BUFFER_SIZE) {
+        buffer.set_vector(local_buffer);
+        is_nonempty.store(true);
+        local_buffer.clear();
+      }
     }
+    is_streaming.store(false);
   }
 
 public:
-  FileInput(std::string filename, py_size_t shape, device_t device,
-            bool ignore_time = false, bool use_coroutines = true)
+  Generator<AER::Event> generator;
+
+  FileInput(const std::string filename, py_size_t shape, device_t device,
+            bool ignore_time = false)
       : buffer(shape, device, EVENT_BUFFER_SIZE), ignore_time(ignore_time),
-        use_coroutines(use_coroutines) {
-    if (use_coroutines) {
-      generator = file_event_generator(filename, is_streaming, ignore_time);
-    } else {
-      throw std::invalid_argument("AEDAT4 temporarily unsupported");
-      // try {
-      //   const AEDAT4 aedat_file = AEDAT4(filename);
-      //   event_vector = aedat_file.polarity_events;
-      // } catch (std::exception e) {
-      //   throw std::invalid_argument(
-      //       "Files without coroutines must be of .aedat4 format");
-      // }
-    }
-  }
+        shape(shape), filename(filename){};
 
   tensor_t read() {
     const auto &tmp = buffer.read();
@@ -109,16 +112,39 @@ public:
     return tmp;
   }
 
+  Generator<AER::Event>::Iter begin() { return generator.begin(); }
+  std::default_sentinel_t end() { return generator.end(); }
+
   bool get_is_streaming() { return is_streaming.load() || is_nonempty.load(); }
 
-  FileInput *start_stream() {
-    if (use_coroutines) {
-      file_thread = std::unique_ptr<std::thread>(
-          new std::thread(&FileInput::stream_generator_to_buffer, this));
-    } else {
-      file_thread = std::unique_ptr<std::thread>(
-          new std::thread(&FileInput::stream_file_to_buffer, this));
+  // std::vector<AEDAT::PolarityEvent> events() {
+  py::array_t<AER::Event> events() {
+    const unique_file_t &fp = open_file(filename);
+
+    auto n_events = dat_read_header(fp);
+    auto events = dat_read_all_events(fp, n_events);
+
+    return buffer_to_py_array(events, n_events);
+  }
+
+  py::array_t<AER::Event> events_co() {
+    const unique_file_t &fp = open_file(filename);
+    auto n_events = dat_read_header(fp);
+    generator = dat_read_stream_all_events(fp);
+
+    AER::Event *events = (AER::Event *)malloc(n_events * sizeof(AER::Event));
+    size_t index = 0;
+    for (auto event : generator) {
+      events[index] = event;
+      index++;
     }
+    return buffer_to_py_array(events, n_events);
+  }
+
+  FileInput *start_stream() {
+    generator = file_event_generator(filename, is_streaming, ignore_time);
+    file_thread = std::unique_ptr<std::thread>(
+        new std::thread(&FileInput::stream_generator_to_buffer, this));
     return this;
   }
 

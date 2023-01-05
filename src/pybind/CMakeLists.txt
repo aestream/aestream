@@ -23,7 +23,6 @@ endif()
 
 find_package(PythonExtensions REQUIRED)
 
-set(PY_MODULE_SOURCES module.cpp udp.cpp udp_client.cpp udp_client.hpp tensor_buffer.hpp tensor_buffer.cpp) # convert.hpp convert.cpp )
 set(PYTHON_MODULE_NAME aestream_ext)
 add_library(${PYTHON_MODULE_NAME} MODULE
       module.cpp 
@@ -35,6 +34,8 @@ add_library(${PYTHON_MODULE_NAME} MODULE
       # convert.hpp 
       tensor_buffer.hpp 
       tensor_buffer.cpp
+      tensor_iterator.hpp
+      tensor_iterator.cpp
       ${module_source_files})
 
 python_extension_module(${PYTHON_MODULE_NAME})

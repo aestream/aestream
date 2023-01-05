@@ -1,5 +1,5 @@
 set(input_definitions "")
-set(input_sources file.hpp file.cpp)
+set(input_sources file_utils.hpp file_utils.cpp file_dat.hpp file_dat.cpp file.hpp file.cpp )
 set(input_libraries aedat4 ${LZ4_LIBRARY})
 set(input_include_directories "")
 
