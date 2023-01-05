@@ -17,9 +17,6 @@ struct DATEvent {
   unsigned int p : 4;
 } __attribute__((packed));
 
-static const uint64_t mask_4b = 0xFU, mask_14b = 0x3FFFU,
-                      mask_32b = 0xFFFFFFFFU;
-
 size_t dat_read_header(const unique_file_t &fp);
 
 AER::Event *dat_read_all_events(const unique_file_t &fp,
