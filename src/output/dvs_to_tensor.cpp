@@ -2,12 +2,12 @@
 
 #include <torch/torch.h>
 
-#include "../aedat.hpp"
+#include "../aer.hpp"
 #include "../generator.hpp"
 #include "dvs_to_tensor.hpp"
 
 torch::Tensor
-convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events,
+convert_polarity_events(std::vector<AER::Event> &polarity_events,
                         const torch::IntArrayRef &shape,
                         const torch::Device device) {
   const int64_t size = polarity_events.size();
@@ -40,15 +40,15 @@ convert_polarity_events(std::vector<AEDAT::PolarityEvent> &polarity_events,
 }
 
 Generator<torch::Tensor>
-sparse_tensor_generator(Generator<AEDAT::PolarityEvent> &event_generator,
+sparse_tensor_generator(Generator<AER::Event> &event_generator,
                         std::chrono::duration<double, std::micro> event_window,
                         const torch::IntArrayRef shape,
                         const torch::Device device) {
 
-  std::vector<AEDAT::PolarityEvent> polarity_events;
+  std::vector<AER::Event> polarity_events;
   auto start = std::chrono::high_resolution_clock::now();
 
-  for (AEDAT::PolarityEvent event : event_generator) {
+  for (AER::Event event : event_generator) {
     polarity_events.push_back(event);
 
     auto end = std::chrono::high_resolution_clock::now();

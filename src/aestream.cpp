@@ -8,7 +8,7 @@
 
 // AEDAT imports
 #include "aedat.hpp"
-#include "aedat4.hpp"
+// #include "aedat4.hpp"
 
 // Input
 #include "input/file.hpp"
@@ -20,7 +20,7 @@
 #endif
 
 // Output
-#include "output/dvs_to_file.hpp"
+// #include "output/dvs_to_file.hpp"
 #include "output/dvs_to_udp.hpp"
 
 // Interrupt
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
   //
   // Handle input
   //
-  Generator<AEDAT::PolarityEvent> input_generator;
+  Generator<AER::Event> input_generator;
   if (app_input_inivation->parsed()) {
 #ifdef WITH_CAER
     input_generator = inivation_event_generator(
@@ -150,22 +150,22 @@ int main(int argc, char *argv[]) {
     if (app_output_udp->parsed()) {
       std::cout << "Sending events to: " << ipAddress << " on port: " << port
                 << std::endl;
-      DVSToUDP<AEDAT::PolarityEvent> client(bufferSize, port, ipAddress);
+      DVSToUDP<AER::Event> client(bufferSize, port, ipAddress);
       client.stream(input_generator, include_timestamp);
     } else if (app_output_file->parsed()) {
       std::cout << "Sending events to file " << output_filename << std::endl;
-      if (output_filename.ends_with(".txt")) {
-        dvs_to_file_txt(input_generator, output_filename);
-      } else if (output_filename.ends_with(".aedat4")) {
-        dvs_to_file_aedat(input_generator, output_filename);
-      } else {
-        std::stringstream error;
-        error << "Unsupported file ending" << output_filename;
-        throw std::invalid_argument(error.str());
-      }
+      // if (output_filename.ends_with(".txt")) {
+      //   dvs_to_file_txt(input_generator, output_filename);
+      // } else if (output_filename.ends_with(".aedat4")) {
+      //   // dvs_to_file_aedat(input_generator, output_filename);
+      // } else {
+      std::stringstream error;
+      error << "Unsupported file ending" << output_filename;
+      throw std::invalid_argument(error.str());
+      // }
     } else { // Default to STDOUT
       uint64_t count = 0;
-      for (AEDAT::PolarityEvent event : input_generator) {
+      for (AER::Event event : input_generator) {
         count += 1;
         std::cout << event.x << "," << event.y << ","
                   << std::to_string(event.timestamp) << std::endl;
