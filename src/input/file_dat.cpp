@@ -133,7 +133,9 @@ Generator<AER::Event> dat_stream_all_events(const unique_file_t &fp,
 
 inline AER::Event decode_event(uint64_t data, size_t overflows) {
   auto event = *(DATEvent *)(&data);
-  return AER::Event{event.ts, event.x, event.y, event.p};
+  return AER::Event{static_cast<uint64_t>(event.ts),
+                    static_cast<uint16_t>(event.x),
+                    static_cast<uint16_t>(event.y), static_cast<bool>(event.p)};
 
   // static const uint64_t mask_4b = 0xFU, mask_14b = 0x3FFFU,
   //                       mask_32b = 0xFFFFFFFFU;
