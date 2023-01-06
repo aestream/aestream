@@ -4,7 +4,14 @@ project(aestream)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
-set(GCC_COVERAGE_COMPILE_FLAGS "-fcoroutines" "-O3")
+
+# set coroutine flags for clang appropriately
+# thanks to https://stackoverflow.com/questions/64703866/is-clang-11s-invocation-of-coroutine-headers-via-fcoroutines-flag
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(GCC_COVERAGE_COMPILE_FLAGS "-fcoroutines-ts" "-O3")
+else()
+    set(GCC_COVERAGE_COMPILE_FLAGS "-fcoroutines" "-O3")
+endif()
 
 set(default_build_type Release)
 add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
