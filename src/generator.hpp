@@ -13,6 +13,7 @@ public:
     }
     static std::suspend_always initial_suspend() noexcept { return {}; }
     static std::suspend_always final_suspend() noexcept { return {}; }
+    void return_void() {}
     std::suspend_always yield_value(T value) noexcept {
       current_value = std::move(value);
       return {};
