@@ -1,6 +1,10 @@
 #pragma once
 
-#include <coroutine>
+#if !defined USE_CLANG
+  #include <experimental/coroutine>
+#else
+  #include <coroutine>
+#endif
 #include <iostream>
 #include <optional>
 
@@ -11,13 +15,23 @@ public:
     Generator<T> get_return_object() {
       return Generator{Handle::from_promise(*this)};
     }
+    void return_void() {}
+    // hack to resolve std / std::experimental
+#if !defined USE_CLANG
+    static std::experimental::suspend_always initial_suspend() noexcept { return {}; }
+    static std::experimental::suspend_always final_suspend() noexcept { return {}; }
+    std::experimental::suspend_always yield_value(T value) noexcept {
+      current_value = std::move(value);
+      return {};
+    }
+#else
     static std::suspend_always initial_suspend() noexcept { return {}; }
     static std::suspend_always final_suspend() noexcept { return {}; }
-    void return_void() {}
     std::suspend_always yield_value(T value) noexcept {
       current_value = std::move(value);
       return {};
     }
+#endif
     // Disallow co_await in generator coroutines.
     void await_transform() = delete;
     [[noreturn]] static void unhandled_exception() { throw; }
@@ -25,7 +39,12 @@ public:
     std::optional<T> current_value;
   };
 
+  // hack to resolve std / std::experimental
+#if !defined USE_CLANG
+  using Handle = std::experimental::coroutine_handle<promise_type>;
+#else
   using Handle = std::coroutine_handle<promise_type>;
+#endif
 
   explicit Generator(const Handle coroutine) : m_coroutine{coroutine} {}
 
