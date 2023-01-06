@@ -29,3 +29,5 @@ Generator<AER::Event> dat_stream_all_events(const unique_file_t &fp,
                                             bool ignore_time = false);
 
 inline AER::Event decode_event(uint64_t data, size_t overflows);
+
+// Generator<AER::Event> dat_stream = file_reader<Generator<AER::Event>, size_t, dat_stream_all_events>;

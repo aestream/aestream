@@ -63,40 +63,38 @@ void DVSToUDP<T>::stream(Generator<T> &input_generator,
   uint32_t message[max_events];
   uint64_t count = 0;
 
-  for (AEDAT::PolarityEvent event : input_generator) {
+  for (AER::Event event : input_generator) {
     count += 1;
-    if (event.valid == true) {
-      sent = false;
+    sent = false;
 
-      // Encoding according to protocol
-      if (include_timestamp) {
-        message[current_event] =
-            (event.x & 0x7FFF)
-            << 16; // Be aware that for machine-independance it should be:
-                   // htons(polarity_event.x & 0x7FFF);
-        message[current_event + 1] = event.timestamp;
-      } else {
-        message[current_event] =
-            (event.x | 0x8000)
-            << 16; // Be aware that for machine-independance it should be:
-                   // htons(polarity_event.x | 0x8000);
-      }
+    // Encoding according to protocol
+    if (include_timestamp) {
+      message[current_event] =
+          (event.x & 0x7FFF)
+          << 16; // Be aware that for machine-independance it should be:
+                 // htons(polarity_event.x & 0x7FFF);
+      message[current_event + 1] = event.timestamp;
+    } else {
+      message[current_event] =
+          (event.x | 0x8000)
+          << 16; // Be aware that for machine-independance it should be:
+                 // htons(polarity_event.x | 0x8000);
+    }
 
-      if (event.polarity) {
-        message[current_event] |=
-            event.y | 0x8000; // Be aware that for machine-independance it
-                              // should be: htons(polarity_event.y | 0x8000);
-      } else {
-        message[current_event] |=
-            event.y & 0x7FFF; // Be aware that for machine-independance it
-                              // should be: htons(polarity_event.y & 0x7FFF);
-      }
+    if (event.polarity) {
+      message[current_event] |=
+          event.y | 0x8000; // Be aware that for machine-independance it
+                            // should be: htons(polarity_event.y | 0x8000);
+    } else {
+      message[current_event] |=
+          event.y & 0x7FFF; // Be aware that for machine-independance it
+                            // should be: htons(polarity_event.y & 0x7FFF);
+    }
 
-      if (include_timestamp) {
-        current_event += 2;
-      } else {
-        current_event += 1;
-      }
+    if (include_timestamp) {
+      current_event += 2;
+    } else {
+      current_event += 1;
     }
 
     if (current_event == max_events) {
@@ -127,4 +125,4 @@ void DVSToUDP<T>::stream(Generator<T> &input_generator,
 // Close the socket
 template <typename T> void DVSToUDP<T>::closesocket() { close(sockfd); }
 
-template class DVSToUDP<AEDAT::PolarityEvent>;
+template class DVSToUDP<AER::Event>;
