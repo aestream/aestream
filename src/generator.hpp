@@ -1,6 +1,6 @@
 #pragma once
 
-#if !defined USE_CLANG
+#if USE_CLANG
   #include <experimental/coroutine>
 #else
   #include <coroutine>
@@ -17,7 +17,7 @@ public:
     }
     void return_void() {}
     // hack to resolve std / std::experimental
-#if !defined USE_CLANG
+#if USE_CLANG
     static std::experimental::suspend_always initial_suspend() noexcept { return {}; }
     static std::experimental::suspend_always final_suspend() noexcept { return {}; }
     std::experimental::suspend_always yield_value(T value) noexcept {
@@ -40,7 +40,7 @@ public:
   };
 
   // hack to resolve std / std::experimental
-#if !defined USE_CLANG
+#if USE_CLANG
   using Handle = std::experimental::coroutine_handle<promise_type>;
 #else
   using Handle = std::coroutine_handle<promise_type>;
