@@ -7,7 +7,7 @@ Generator<AER::Event> file_event_generator(const std::string filename,
   if (ends_with(filename, "dat")) {
     const unique_file_t &fp = open_file(filename);
     const auto n_events = dat_read_header(fp);
-    return dat_stream_all_events(fp, runFlag, ignore_time);
+    return dat_stream_events(fp);
 
     // } else if (ends_with(filename, "aedat4")) {
     //   AEDAT4 aedat_file = AEDAT4(filename);

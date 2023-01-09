@@ -18,14 +18,14 @@ unique_file_t open_file(const std::string &filename) {
   return fp;
 }
 
-// template <typename T, typename R, R h(const unique_file_t &),
-//           T f(const unique_file_t &, const R &, uint64_t *)>
-// T file_reader(const std::string &filename, const std::atomic<bool> &runFlag) {
-//   const auto fp = open_file(filename);
-//   const R header = h(fp);
-//   const uint64_t buffer[BUFFER_SIZE];
+template <typename T, typename H, H h(const unique_file_t &),
+          T f(const unique_file_t &, const H &, uint64_t *)>
+T file_reader(const std::string &filename) {
+  const auto fp = open_file(filename);
+  const H header = h(fp);
+  const uint64_t buffer[BUFFER_SIZE];
 
-//   const auto out = f(fp, header, runFlag);
-//   // delete buffer[];
-//   return out;
-// }
+  const auto out = f(fp, header, buffer);
+  delete[] buffer;
+  return out;
+}
