@@ -4,7 +4,8 @@
 
 #include "../aer.hpp"
 
-#include "file.cpp"
+#include "file.hpp"
+#include "iterator.cpp"
 #include "types.hpp"
 #include "udp.cpp"
 
@@ -24,6 +25,21 @@ PYBIND11_MODULE(aestream_ext, m) {
       .def_property_readonly("polarity",
                              [](const AER::Event &e) { return e.polarity; });
 
+  py::class_<Iterator>(m, "EventIterator")
+      //  .def( // Thanks to https://stackoverflow.com/a/57217995/999865
+      // "__iter__",
+      // [](Iterator &f) { return py::make_iterator(f.begin(), f.end()); },
+      // py::keep_alive<0, 1>() /* Keep object alive while iterator exists
+      //                         */
+      // ,
+      // py::return_value_policy::move)
+      .def("__iter__", [](Iterator &it) -> Iterator & { return it; })
+      .def("__next__", &Iterator::next, py::return_value_policy::reference);
+
+  py::class_<PartIterator>(m, "PartIterator")
+      .def("__iter__", [](PartIterator &it) -> PartIterator & { return it; })
+      .def("__next__", &PartIterator::next);
+
   py::class_<FileInput>(m, "FileInput")
       .def(py::init<std::string, py_size_t, device_t, bool>(),
            py::arg("filename"), py::arg("shape"), py::arg("device") = "cpu",
@@ -40,6 +56,21 @@ PYBIND11_MODULE(aestream_ext, m) {
       .def("start_stream", &FileInput::start_stream)
       .def("stop_stream", &FileInput::stop_stream)
       .def("read", &FileInput::read)
+      .def("parts",
+           [](py::object fobj, size_t n_events_per_part) {
+             //   auto generator = f.parts_co(n_events_per_part);
+             return PartIterator(fobj.cast<FileInput &>(), n_events_per_part,
+                                 fobj);
+             //   return py::make_iterator(generator.begin(), generator.end());
+             //   return Iterator(generator);
+           })
+      .def("parts_co",
+           [](py::object fobj, size_t n_events_per_part) {
+             //   auto generator = f.parts_co(n_events_per_part);
+             return Iterator(fobj.cast<FileInput &>(), n_events_per_part, fobj);
+             //   return py::make_iterator(generator.begin(), generator.end());
+             //   return Iterator(generator);
+           })
       .def( // Thanks to https://stackoverflow.com/a/57217995/999865
           "__iter__",
           [](FileInput &f) { return py::make_iterator(f.begin(), f.end()); },

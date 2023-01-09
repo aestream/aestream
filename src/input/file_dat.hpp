@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <thread>
@@ -17,17 +18,10 @@ struct DATEvent {
   unsigned int p : 4;
 } __attribute__((packed));
 
+inline AER::Event dat_decode_event(uint64_t data, size_t overflows);
+
 size_t dat_read_header(const unique_file_t &fp);
 
-AER::Event *dat_read_all_events(const unique_file_t &fp,
-                                const size_t &n_events);
+std::tuple<AER::Event *, size_t> dat_read_n_events(const unique_file_t &fp, const size_t &n_events);
 
-Generator<AER::Event> dat_read_stream_all_events(const unique_file_t &fp);
-
-Generator<AER::Event> dat_stream_all_events(const unique_file_t &fp,
-                                            const std::atomic<bool> &runFlag,
-                                            bool ignore_time = false);
-
-inline AER::Event decode_event(uint64_t data, size_t overflows);
-
-// Generator<AER::Event> dat_stream = file_reader<Generator<AER::Event>, size_t, dat_stream_all_events>;
+Generator<AER::Event> dat_stream_events(const unique_file_t &fp);

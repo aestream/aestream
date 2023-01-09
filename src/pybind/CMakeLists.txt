@@ -30,6 +30,9 @@ add_library(${PYTHON_MODULE_NAME} MODULE
       usb.cpp 
       udp_client.cpp 
       udp_client.hpp 
+      iterator.cpp
+      file.hpp
+      file.cpp
       # convert.cpp 
       # convert.hpp 
       tensor_buffer.hpp 
