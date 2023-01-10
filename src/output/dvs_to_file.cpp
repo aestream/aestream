@@ -1,13 +1,7 @@
 
-#include <fstream>
-#include <string>
-
-#include "aedat.hpp"
-#include "aedat4.hpp"
-#include "generator.hpp"
 #include "dvs_to_file.hpp"
 
-void dvs_to_file_aedat(Generator<AEDAT::PolarityEvent> &input_generator,
+void dvs_to_file_aedat(Generator<AER::Event> &input_generator,
                        const std::string &filename, size_t bufferSize) {
   std::fstream fileOutput;
   fileOutput.open(filename, std::fstream::in | std::fstream::out |
@@ -22,7 +16,8 @@ void dvs_to_file_aedat(Generator<AEDAT::PolarityEvent> &input_generator,
   uint64_t timeStart = 0;
   uint64_t timeEnd = 0;
   for (auto event : input_generator) {
-    events.push_back(event);
+    auto aedat_event = AEDAT::PolarityEvent{event.timestamp, event.x, event.y, true, event.polarity};
+    events.push_back(aedat_event);
 
     if (events.size() >= bufferSize) {
       AEDAT4::save_events(fileOutput, events);
@@ -46,16 +41,14 @@ void dvs_to_file_aedat(Generator<AEDAT::PolarityEvent> &input_generator,
   fileOutput.close();
 }
 
-void dvs_to_file_txt(Generator<AEDAT::PolarityEvent> &input_generator,
+void dvs_to_file_txt(Generator<AER::Event> &input_generator,
                      const std::string &filename) {
   std::fstream fileOutput;
   fileOutput.open(filename, std::fstream::app);
 
-  for (AEDAT::PolarityEvent event : input_generator) {
-    if (event.valid == true) {
-      fileOutput << "DVS " << event.timestamp << " " << event.x << " "
-                 << event.y << " " << event.polarity << std::endl;
-    }
+  for (AER::Event event : input_generator) {
+    fileOutput << event.timestamp << " " << event.x << " "
+               << event.y << " " << event.polarity << std::endl;
   }
 
   fileOutput.close();

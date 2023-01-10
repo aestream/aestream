@@ -16,6 +16,8 @@
 
 #include <flatbuffers/flatbuffers.h>
 
+#include <aer.hpp>
+
 #include "aedat.hpp"
 #include "events_generated.h"
 #include "file_data_table_generated.h"
@@ -217,11 +219,10 @@ struct AEDAT4 {
         auto event_packet = GetSizePrefixedEventPacket(&dst_buffer[0]);
         for (auto event : *event_packet->elements()) {
           count += 1;
-          const auto e = AEDAT::PolarityEvent{
+          const auto e = AER::Event{
               static_cast<uint64_t>(event->t()),
               static_cast<uint16_t>(event->x()),
               static_cast<uint16_t>(event->y()),
-              1,
               static_cast<bool>(event->on()),
           };
           polarity_events.push_back(e);
@@ -266,33 +267,33 @@ struct AEDAT4 {
       }
     }
 
-    fclose(fd);
+    close(fd);
   }
 
-  // static std::tuple<char *, size_t> compress_lz4(char *buffer, size_t size) {
-  //   auto lz4FrameBound = LZ4F_compressBound(size, nullptr);
-  //   auto new_buffer = new char[lz4FrameBound];
+  static std::tuple<char *, size_t> compress_lz4(char *buffer, size_t size) {
+    auto lz4FrameBound = LZ4F_compressBound(size, nullptr);
+    auto new_buffer = new char[lz4FrameBound];
 
-  //   auto compression =
-  //       LZ4F_compressFrame(new_buffer, lz4FrameBound, buffer, size, nullptr);
-  //   return {new_buffer, compression};
-  //   // LZ4F_compressionContext_t ctx;
-  //   // auto contextCreation = LZ4F_createCompressionContext(&ctx,
-  //   LZ4F_VERSION);
-  //   // auto headerSize =
-  //   //     LZ4F_compressBegin(ctx, new_buffer, lz4FrameBound, nullptr);
-  //   // if (LZ4F_isError(headerSize)) {
-  //   //   std::stringstream err;
-  //   //   err << "Compression error: " << LZ4F_getErrorName(headerSize);
-  //   //   throw std::runtime_error(err.str());
-  //   // }
+    auto compression =
+        LZ4F_compressFrame(new_buffer, lz4FrameBound, buffer, size, nullptr);
+    return {new_buffer, compression};
+    // LZ4F_compressionContext_t ctx;
+    // auto contextCreation = LZ4F_createCompressionContext(&ctx,
+    // LZ4F_VERSION);
+    // auto headerSize =
+    //     LZ4F_compressBegin(ctx, new_buffer, lz4FrameBound, nullptr);
+    // if (LZ4F_isError(headerSize)) {
+    //   std::stringstream err;
+    //   err << "Compression error: " << LZ4F_getErrorName(headerSize);
+    //   throw std::runtime_error(err.str());
+    // }
 
-  //   // auto packetSize = LZ4F_compressUpdate(ctx, new_buffer, lz4FrameBound,
-  //   //                                       buffer, size, nullptr);
-  //   // auto footerSize = LZ4F_compressEnd(ctx, new_buffer, lz4FrameBound,
-  //   // nullptr);
-  //   // return {new_buffer, headerSize + packetSize + footerSize};
-  // }
+    // auto packetSize = LZ4F_compressUpdate(ctx, new_buffer, lz4FrameBound,
+    //                                       buffer, size, nullptr);
+    // auto footerSize = LZ4F_compressEnd(ctx, new_buffer, lz4FrameBound,
+    // nullptr);
+    // return {new_buffer, headerSize + packetSize + footerSize};
+  }
 
   static size_t save_header(std::fstream &stream) {
     stream << "#!AER-DAT4.0\r\n";
@@ -376,5 +377,5 @@ struct AEDAT4 {
 
   std::vector<OutInfo> outinfos;
   std::vector<Frame> frames;
-  std::vector<AEDAT::PolarityEvent> polarity_events;
+  std::vector<AER::Event> polarity_events;
 };

@@ -10,8 +10,9 @@
 #include "../aer.hpp"
 #include "../generator.hpp"
 
-#include "file_dat.hpp"
-#include "file_utils.hpp"
+#include "../file/aedat4.hpp"
+#include "../file/dat.hpp"
+#include "../file/utils.hpp"
 
 /**
  * Reads AEDAT events from a file and replays them either in real-time

@@ -27,7 +27,7 @@ add_executable(
 )
 target_link_libraries(
   aestream_test
-  aedat4
+  aer
   aestream_input
   aestream_output
   gtest

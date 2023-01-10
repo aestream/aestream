@@ -5,7 +5,6 @@
 
 #include <gtest/gtest.h>
 
-#include "aedat4.hpp"
 #include "generator.hpp"
 
 #include "input/file.hpp"
@@ -16,7 +15,7 @@ using namespace std::chrono_literals;
 TEST(TorchTest, ConvertEvents) {
   const std::atomic<bool> flag = {true};
   auto generator = file_event_generator("example/sample.aedat4", flag);
-  auto events = std::vector<AEDAT::PolarityEvent>();
+  auto events = std::vector<AER::Event>();
   int count = 0;
   for (auto event : generator) {
     events.push_back(event);

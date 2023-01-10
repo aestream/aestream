@@ -1,8 +1,11 @@
 #pragma once
 
+#include <fstream>
 #include <string>
 
-#include "../aedat.hpp"
+#include "../aer.hpp"
+#include "../file/aedat.hpp"
+#include "../file/aedat4.hpp"
 #include "../generator.hpp"
 
 void dvs_to_file_aedat(Generator<AER::Event> &input_generator,

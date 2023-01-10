@@ -1,4 +1,4 @@
-#include "file_dat.hpp"
+#include "dat.hpp"
 
 size_t dat_read_header(const unique_file_t &fp) {
   size_t bytes_read = 0;

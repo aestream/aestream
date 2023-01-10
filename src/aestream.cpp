@@ -19,7 +19,7 @@
 #endif
 
 // Output
-// #include "output/dvs_to_file.hpp"
+#include "output/dvs_to_file.hpp"
 #include "output/dvs_to_udp.hpp"
 
 // Interrupt
@@ -153,15 +153,15 @@ int main(int argc, char *argv[]) {
       client.stream(input_generator, include_timestamp);
     } else if (app_output_file->parsed()) {
       std::cout << "Sending events to file " << output_filename << std::endl;
-      // if (output_filename.ends_with(".txt")) {
-      //   dvs_to_file_txt(input_generator, output_filename);
-      // } else if (output_filename.ends_with(".aedat4")) {
-      //   // dvs_to_file_aedat(input_generator, output_filename);
-      // } else {
-      std::stringstream error;
-      error << "Unsupported file ending" << output_filename;
-      throw std::invalid_argument(error.str());
-      // }
+      if (output_filename.ends_with(".txt")) {
+        dvs_to_file_txt(input_generator, output_filename);
+      } else if (output_filename.ends_with(".aedat4")) {
+        dvs_to_file_aedat(input_generator, output_filename);
+      } else {
+        std::stringstream error;
+        error << "Unsupported file ending" << output_filename;
+        throw std::invalid_argument(error.str());
+      }
     } else { // Default to STDOUT
       uint64_t count = 0;
       for (AER::Event event : input_generator) {

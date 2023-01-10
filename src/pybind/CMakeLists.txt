@@ -52,5 +52,5 @@ set_target_properties(${PYTHON_MODULE_NAME} PROPERTIES
   INSTALL_RPATH_USE_LINK_PATH TRUE
 )
 
-install(TARGETS aer aestream_input aestream_output DESTINATION aestream)
+install(TARGETS aer aestream_file aestream_input aestream_output DESTINATION aestream)
 install(TARGETS ${PYTHON_MODULE_NAME} LIBRARY DESTINATION aestream)

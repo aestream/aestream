@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "aedat4.hpp"
 #include "input/file.hpp"
 
 TEST(FileTest, FailEmptyFile) {

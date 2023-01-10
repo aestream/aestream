@@ -1,44 +1,7 @@
 set(input_definitions "")
-set(input_sources file_aedat.hpp file_aedat4.hpp file_utils.hpp file_utils.cpp file_dat.hpp file_dat.cpp file.hpp file.cpp )
-set(input_libraries aer ${LZ4_LIBRARY} flatbuffers)
+set(input_sources file.hpp file.cpp )
+set(input_libraries aer aestream_file)
 set(input_include_directories "")
-
-# Include flatbuffers and generate headers
-find_package(flatbuffers CONFIG NAMES flatbuffers Flatbuffers FlatBuffers QUIET)
-option(FLATBUFFERS_BUILD_TESTS OFF)
-if (flatbuffers_FOUND AND FLATBUFFERS_SOURCE_DIR) # Add flatbuffers from source dir (set in flake.nix)
-  add_subdirectory(${FLATBUFFERS_SOURCE_DIR} 
-                  ${CMAKE_CURRENT_BINARY_DIR}/flatbuffers-build
-                  EXCLUDE_FROM_ALL)
-else()
-  message(STATUS "flatbuffers not found, fetching from source")
-  include(FetchContent)
-  FetchContent_Declare(
-    flatbuffers
-    GIT_REPOSITORY https://github.com/google/flatbuffers.git
-    GIT_TAG v2.0.6
-  )
-  FetchContent_MakeAvailable(flatbuffers)
-endif()
-
-FILE(GLOB SCHEMA_FILES "${CMAKE_CURRENT_SOURCE_DIR}/flatbuffers/*.fbs")
-flatbuffers_generate_headers(
-    TARGET fb_headers
-    SCHEMAS ${SCHEMA_FILES}
-)
-
-# LZ4 for AEDAT encoding
-find_path(LZ4_INCLUDE_DIR NAMES lz4.h)
-find_library(LZ4_LIBRARY NAMES lz4 LZ4)
-if (NOT LZ4_LIBRARY)
-  message(WARNING "LZ4 NOT FOUND")
-  FetchContent_Declare(LZ4
-    GIT_REPOSITORY "https://github.com/lz4/lz4.git"
-    GIT_TAG "v1.9.4"
-    SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../lz4"
-  )
-  FetchContent_MakeAvailable(LZ4)
-endif()
 
 # find_package(PkgConfig REQUIRED)
 #     pkg_check_modules(libusb REQUIRED libusb-1.0)

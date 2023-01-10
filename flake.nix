@@ -12,7 +12,6 @@
       let
         pkgs = import nixpkgs { inherit system; };
         py = pkgs.python39Packages;
-        python-requirements = builtins.readFile ./requirements.txt;
         libcaer = pkgs.stdenv.mkDerivation {
           pname = "libcaer";
           version = "1.0";
@@ -52,11 +51,12 @@
           ];
           preBuild = ''
             addAutoPatchelfSearchPath src/
+            addAutoPatchelfSearchPath src/file
             addAutoPatchelfSearchPath src/input
             addAutoPatchelfSearchPath src/output
           '';
           installPhase = ''
-            install -m555 -D -t $out/lib/ src/*.so src/input/*.so src/output/*.so
+            install -m555 -D -t $out/lib/ src/*.so src/file/*.so src/input/*.so src/output/*.so
             install -m755 -D src/aestream $out/bin/aestream
           '';
         };
@@ -82,7 +82,7 @@
           pname = "aestream";
           version = "0.3.0";
           src = ./.;
-          requirements = python-requirements;
+          requirements = "numpy";
 
           buildInputs = [ libcaer py.pytorch ];
           nativeBuildInputs = [
@@ -92,7 +92,8 @@
       in
       rec {
         devShells = flake-utils.lib.flattenTree {
-          default = aestream-python;
+          default = aestream;
+          python = aestream-python;
         };
         packages = flake-utils.lib.flattenTree {
           default = aestream;
