@@ -2,8 +2,10 @@
 
 #if USE_CLANG
   #include <experimental/coroutine>
+  namespace coroutinestd = std::experimental;
 #else
   #include <coroutine>
+  namespace coroutinestd = std;
 #endif
 #include <iostream>
 #include <optional>
@@ -16,22 +18,13 @@ public:
       return Generator{Handle::from_promise(*this)};
     }
     void return_void() {}
-    // hack to resolve std / std::experimental
-#if USE_CLANG
-    static std::experimental::suspend_always initial_suspend() noexcept { return {}; }
-    static std::experimental::suspend_always final_suspend() noexcept { return {}; }
-    std::experimental::suspend_always yield_value(T value) noexcept {
+    // use coroutinestd instead of {std, std::experimental}
+    static coroutinestd::suspend_always initial_suspend() noexcept { return {}; }
+    static coroutinestd::suspend_always final_suspend() noexcept { return {}; }
+    coroutinestd::suspend_always yield_value(T value) noexcept {
       current_value = std::move(value);
       return {};
     }
-#else
-    static std::suspend_always initial_suspend() noexcept { return {}; }
-    static std::suspend_always final_suspend() noexcept { return {}; }
-    std::suspend_always yield_value(T value) noexcept {
-      current_value = std::move(value);
-      return {};
-    }
-#endif
     // Disallow co_await in generator coroutines.
     void await_transform() = delete;
     [[noreturn]] static void unhandled_exception() { throw; }
@@ -39,12 +32,8 @@ public:
     std::optional<T> current_value;
   };
 
-  // hack to resolve std / std::experimental
-#if USE_CLANG
-  using Handle = std::experimental::coroutine_handle<promise_type>;
-#else
-  using Handle = std::coroutine_handle<promise_type>;
-#endif
+  // use coroutinestd instead of {std, std::experimental}
+  using Handle = coroutinestd::coroutine_handle<promise_type>;
 
   explicit Generator(const Handle coroutine) : m_coroutine{coroutine} {}
 
