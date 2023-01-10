@@ -6,9 +6,8 @@
 
 #include "CLI11.hpp"
 
-// AEDAT imports
-#include "aedat.hpp"
-// #include "aedat4.hpp"
+// AER imports
+#include "aer.hpp"
 
 // Input
 #include "input/file.hpp"

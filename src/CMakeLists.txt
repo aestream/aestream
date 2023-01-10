@@ -1,38 +1,11 @@
 include(GNUInstallDirs)
+include(FetchContent)
 
-# Include flatbuffers and generate headers
-# find_package(flatbuffers CONFIG NAMES flatbuffers Flatbuffers FlatBuffers QUIET)
-# option(FLATBUFFERS_BUILD_TESTS OFF)
-# if (flatbuffers_FOUND AND FLATBUFFERS_SOURCE_DIR) # Add flatbuffers from source dir (set in flake.nix)
-#   add_subdirectory(${FLATBUFFERS_SOURCE_DIR} 
-#                   ${CMAKE_CURRENT_BINARY_DIR}/flatbuffers-build
-#                   EXCLUDE_FROM_ALL)
-# else()
-#   message(STATUS "flatbuffers not found, fetching from source")
-#   include(FetchContent)
-#   FetchContent_Declare(
-#     flatbuffers
-#     GIT_REPOSITORY https://github.com/google/flatbuffers.git
-#     GIT_TAG v2.0.6
-#   )
-#   FetchContent_MakeAvailable(flatbuffers)
-# endif()
-
-# FILE(GLOB SCHEMA_FILES "${CMAKE_CURRENT_SOURCE_DIR}/flatbuffers/*.fbs")
-# flatbuffers_generate_headers(
-#     TARGET fb_headers
-#     SCHEMAS ${SCHEMA_FILES}
-# )
-
-# LZ4 for AEDAT encoding
-# find_path(LZ4_INCLUDE_DIR NAMES lz4.h)
-# find_library(LZ4_LIBRARY NAMES lz4 LZ4 REQUIRED)
-
-# AEDAT4 processing
-add_library(aedat4 SHARED aer.hpp aedat.hpp generator.hpp) #aedat4.hpp )
-target_include_directories(aedat4 INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-set_target_properties(aedat4 PROPERTIES LINKER_LANGUAGE CXX)
-# target_link_libraries(aedat4 PUBLIC fb_headers flatbuffers lz4)
+# AER processing
+add_library(aer SHARED aer.hpp generator.hpp)
+target_include_directories(aer INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+set_target_properties(aer PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(aer PUBLIC fb_headers)
 
 # Ensure we have proper compile definitions when importing torch
 if (CMAKE_CUDA_COMPILER) 
@@ -65,7 +38,7 @@ else()
   # AEStream executable
   add_executable(aestream aestream.cpp)
   target_include_directories(aestream PRIVATE "${TORCH_INCLUDE_DIRS}" ${CMAKE_INSTALL_LIBDIR})
-  target_link_libraries(aestream PRIVATE aedat4 aestream_input aestream_output)
+  target_link_libraries(aestream PRIVATE aer aestream_input aestream_output)
 
   # Install targets
   # install(TARGETS aedat4 aestream_input aestream_output aestream_lib LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})

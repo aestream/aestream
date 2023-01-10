@@ -5,7 +5,6 @@
 #include <chrono>
 #include <thread>
 
-#include "../aedat.hpp"
 #include "../aer.hpp"
 #include "../generator.hpp"
 

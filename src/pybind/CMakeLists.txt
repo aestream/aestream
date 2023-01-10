@@ -45,12 +45,12 @@ python_extension_module(${PYTHON_MODULE_NAME})
 
 target_compile_definitions(${PYTHON_MODULE_NAME} PUBLIC ${module_compile_definitions})
 target_compile_features(${PYTHON_MODULE_NAME} PUBLIC cxx_std_20)
-target_link_libraries(${PYTHON_MODULE_NAME} "${TORCH_LIBRARIES}" "${TORCH_PYTHON_LIBRARY}" aedat4 aestream_input aestream_output)
+target_link_libraries(${PYTHON_MODULE_NAME} "${TORCH_LIBRARIES}" "${TORCH_PYTHON_LIBRARY}" aer aestream_input aestream_output)
 target_include_directories(${PYTHON_MODULE_NAME} PUBLIC "${TORCH_INCLUDE_DIRS}" ${CMAKE_INSTALL_LIBDIR})
 set_target_properties(${PYTHON_MODULE_NAME} PROPERTIES 
   INSTALL_RPATH "${PYTHON_SITE_PACKAGES_DIR}/aestream;${PYTHON_SITE_PACKAGES_DIR}/torch/" # Force searching in Python's packages
   INSTALL_RPATH_USE_LINK_PATH TRUE
 )
 
-install(TARGETS aedat4 aestream_input aestream_output DESTINATION aestream)
+install(TARGETS aer aestream_input aestream_output DESTINATION aestream)
 install(TARGETS ${PYTHON_MODULE_NAME} LIBRARY DESTINATION aestream)

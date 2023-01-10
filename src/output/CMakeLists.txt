@@ -1,6 +1,6 @@
 set(output_definitions "")
 set(output_sources dvs_to_udp.hpp dvs_to_udp.cpp) # dvs_to_file.hpp dvs_to_file.cpp )
-set(output_libraries aedat4)
+set(output_libraries aer)
 
 if (Torch_FOUND)
     set(output_definitions ${output_definitions} WITH_TORCH)

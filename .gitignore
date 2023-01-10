@@ -32,3 +32,5 @@ release/
 wheelhouse/
 _skbuild
 
+# Dependencies
+lz4

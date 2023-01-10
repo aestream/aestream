@@ -11,8 +11,8 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 
-// #include <lz4.h>
-// #include <lz4frame.h>
+#include <lz4.h>
+#include <lz4frame.h>
 
 #include <flatbuffers/flatbuffers.h>
 
@@ -277,7 +277,8 @@ struct AEDAT4 {
   //       LZ4F_compressFrame(new_buffer, lz4FrameBound, buffer, size, nullptr);
   //   return {new_buffer, compression};
   //   // LZ4F_compressionContext_t ctx;
-  //   // auto contextCreation = LZ4F_createCompressionContext(&ctx, LZ4F_VERSION);
+  //   // auto contextCreation = LZ4F_createCompressionContext(&ctx,
+  //   LZ4F_VERSION);
   //   // auto headerSize =
   //   //     LZ4F_compressBegin(ctx, new_buffer, lz4FrameBound, nullptr);
   //   // if (LZ4F_isError(headerSize)) {
