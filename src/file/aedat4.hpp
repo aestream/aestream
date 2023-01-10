@@ -77,7 +77,7 @@ struct AEDAT4 {
     auto fd = open(filename.c_str(), O_RDONLY, 0);
 
     if (fd < 0) {
-      throw std::runtime_error("Failed to open file");
+      throw std::invalid_argument("Failed to open file");
     }
 
     if (fstat(fd, &stat_info)) {

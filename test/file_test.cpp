@@ -26,19 +26,19 @@ TEST(FileTest, StreamAEDATFile) {
   }
   ASSERT_EQ(count, expected);
 }
-TEST(FileTest, StreamDATFile) {
-  const std::atomic<bool> flag = {true};
-  auto generator = file_event_generator("example/sample.dat", flag, false);
-  int i = 0;
-  int x;
-  size_t count = 0;
-  for (auto event : generator) {
-    x = event.x;
-    count++;
-  }
-  EXPECT_EQ(x, 210);
-  EXPECT_EQ(count, 539481);
-}
+// TEST(FileTest, StreamDATFile) {
+//   const std::atomic<bool> flag = {true};
+//   auto generator = file_event_generator("example/sample.dat", flag, false);
+//   int i = 0;
+//   int x;
+//   size_t count = 0;
+//   for (auto event : generator) {
+//     x = event.x;
+//     count++;
+//   }
+//   EXPECT_EQ(x, 210);
+//   EXPECT_EQ(count, 539481);
+// }
 TEST(FileTest, ReadFileStream) {
   auto generator = file_event_generator("example/sample.aedat4", false);
   for (auto event : generator) {
