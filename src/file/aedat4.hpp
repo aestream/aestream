@@ -71,7 +71,7 @@ struct AEDAT4 {
     return attributes;
   }
 
-  void load(const std::string &filename) {
+  void load(const std::string filename) {
     struct stat stat_info;
 
     auto fd = open(filename.c_str(), O_RDONLY, 0);
@@ -369,6 +369,14 @@ struct AEDAT4 {
 
     // Write events
     stream.write(compressed, size);
+  }
+
+  static Generator<AER::Event> aedat_to_stream(const std::string filename) {
+    AEDAT4 aedat = AEDAT4(filename);
+    // TODO: Iterate over raw file pointer to save memory
+    for (auto event : aedat.polarity_events) {
+      co_yield event;
+    }
   }
 
   AEDAT4() {}

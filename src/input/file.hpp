@@ -26,9 +26,4 @@
  * @return A Generator of Events
  */
 Generator<AER::Event> file_event_generator(const std::string filename,
-                                           const std::atomic<bool> &run_flag,
-                                           bool ignore_time = false);
-
-Generator<AER::Event> file_event_generator_aedat(const std::string &filename,
-                                                 const std::atomic<bool> &runFlag,
-                                                 bool ignore_time);
+                                           const std::atomic<bool> &run_flag);

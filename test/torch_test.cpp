@@ -39,13 +39,14 @@ TEST(TorchTest, GenerateTensor) {
   }
   EXPECT_EQ(sum, 117667);
 }
-// TEST(TorchTest, GenerateTensorSmallWindow) {
-//   const std::atomic<bool> flag = {true};
-//   auto generator = file_event_generator("example/sample.aedat4", flag);
-//   auto to_tensor = sparse_tensor_generator(generator, 1ms, {346, 260}, torch::DeviceType::CPU);
-//   uint64_t sum = 0;
-//   for (torch::Tensor tensor : to_tensor) {
-//     sum += torch::_sparse_sum(tensor).item<int>();
-//   }
-//   EXPECT_EQ(sum, 117667);
-// }
+TEST(TorchTest, GenerateTensorSmallWindow) {
+  const std::atomic<bool> flag = {true};
+  auto generator = file_event_generator("example/sample.aedat4", flag);
+  auto to_tensor = sparse_tensor_generator(generator, 1ms, {346, 260},
+                                           torch::DeviceType::CPU);
+  uint64_t sum = 0;
+  for (torch::Tensor tensor : to_tensor) {
+    sum += torch::_sparse_sum(tensor).item<int>();
+  }
+  EXPECT_EQ(sum, 117667);
+}

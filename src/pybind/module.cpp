@@ -74,7 +74,8 @@ PYBIND11_MODULE(aestream_ext, m) {
       .def( // Thanks to https://stackoverflow.com/a/57217995/999865
           "__iter__",
           [](FileInput &f) { return py::make_iterator(f.begin(), f.end()); },
-          py::keep_alive<0, 1>() /* Keep object alive while iterator exists */);
+          py::keep_alive<0, 1>() /* Keep object alive while iterator exists */)
+      .def("__next__", &FileInput::begin);
 
   py::class_<UDPInput>(m, "UDPInput")
       .def(py::init<py_size_t, device_t, int>(), py::arg("shape"),

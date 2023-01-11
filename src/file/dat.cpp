@@ -1,6 +1,6 @@
 #include "dat.hpp"
 
-size_t dat_read_header(const unique_file_t &fp) {
+size_t dat_read_header(const shared_file_t &fp) {
   size_t bytes_read = 0;
   uint8_t c, header_begins;
 
@@ -31,7 +31,7 @@ process_length:
   return (fileLength - bytes_read) / sizeof(int64_t);
 }
 
-std::tuple<AER::Event *, size_t> dat_read_n_events(const unique_file_t &fp,
+std::tuple<AER::Event *, size_t> dat_read_n_events(const shared_file_t &fp,
                                                    const size_t &n_events) {
   const size_t buffer_size = BUFFER_SIZE > n_events ? n_events : BUFFER_SIZE;
 
@@ -65,8 +65,14 @@ std::tuple<AER::Event *, size_t> dat_read_n_events(const unique_file_t &fp,
   return {events, index};
 }
 
-Generator<AER::Event> dat_stream_events(const unique_file_t &fp) {
-  const auto time_start = std::chrono::high_resolution_clock::now();
+Generator<AER::Event> dat_stream_events(const std::string filename) {
+  const shared_file_t &fp = open_file(filename);
+  const auto n_events = dat_read_header(fp);
+  return dat_stream_events(fp, n_events);
+}
+
+Generator<AER::Event> dat_stream_events(shared_file_t fp,
+                                        const size_t n_events) {
   uint64_t buffer[BUFFER_SIZE];
   size_t count = 0;
   uint64_t timestep = 0;

@@ -5,7 +5,9 @@ from aestream import FileInput
 
 
 def test_read_dat():
-    with FileInput(filename="example/sample.aedat4", shape=(600, 300), ignore_time=True) as stream:
+    with FileInput(
+        filename="example/sample.aedat4", shape=(600, 400), ignore_time=True
+    ) as stream:
         interval = 0.5
         t_0 = time.time()
         time.sleep(0.1)

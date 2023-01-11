@@ -2,17 +2,17 @@
 
 #include <memory>
 #include <queue>
-#include <stdio.h>
 #include <string>
 
 void close_file(FILE *fp);
 
-typedef std::unique_ptr<FILE, decltype(&close_file)> unique_file_t;
+// typedef std::unique_ptr<FILE, decltype(&close_file)> unique_file_t;
+typedef std::shared_ptr<FILE> shared_file_t;
 
-unique_file_t open_file(const std::string &filename);
+shared_file_t open_file(const std::string &filename);
 
-template <typename T, typename H, H h(const unique_file_t &),
-          T f(const unique_file_t &, const H &, uint64_t *)>
+template <typename T, typename H, H h(const shared_file_t &),
+          T f(const shared_file_t &, const H &, uint64_t *)>
 T file_reader(const std::string &filename, const H &header);
 
 bool ends_with(std::string const &value, std::string const &ending);

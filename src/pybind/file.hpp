@@ -1,10 +1,9 @@
 #pragma once
 #include <algorithm>
 
-#include "../aedat.hpp"
-#include "../input/file.hpp"
-// #include "../aedat4.hpp"
+#include "../aer.hpp"
 #include "../generator.hpp"
+#include "../input/file.hpp"
 
 #ifdef USE_TORCH
 #include <torch/extension.h>
@@ -45,12 +44,12 @@ private:
   void stream_generator_to_buffer();
 
 public:
-  const unique_file_t fp;
+  const shared_file_t &fp;
   Generator<AER::Event> generator;
   const std::string filename;
   size_t n_events;
 
-  FileInput(const std::string filename, py_size_t shape, device_t device,
+  FileInput(const std::string &filename, py_size_t shape, device_t device,
             bool ignore_time = false);
 
   tensor_t read();

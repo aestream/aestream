@@ -60,12 +60,13 @@ void FileInput::stream_generator_to_buffer() {
   is_streaming.store(false);
 }
 
-FileInput::FileInput(const std::string filename, py_size_t shape,
+FileInput::FileInput(const std::string &filename, py_size_t shape,
                      device_t device, bool ignore_time)
     : buffer(shape, device, EVENT_BUFFER_SIZE), ignore_time(ignore_time),
       shape(shape), filename(filename), fp(open_file(filename)) {
+  // fp = open_file(filename);
   n_events = dat_read_header(fp);
-  generator = dat_stream_events(fp);
+  generator = dat_stream_events(fp, n_events);
 };
 
 tensor_t FileInput::read() {
@@ -90,8 +91,6 @@ py::array_t<AER::Event> FileInput::events() {
 }
 
 py::array_t<AER::Event> FileInput::events_co() {
-  // generator = dat_stream_events(fp);
-
   AER::Event *event_array = (AER::Event *)malloc(n_events * sizeof(AER::Event));
   size_t index = 0;
   for (auto event : generator) {
@@ -134,7 +133,7 @@ py::array_t<AER::Event> FileInput::events_co() {
 // }
 
 FileInput *FileInput::start_stream() {
-  generator = file_event_generator(filename, is_streaming, ignore_time);
+  // generator = file_event_generator(filename, is_streaming);
   file_thread = std::unique_ptr<std::thread>(
       new std::thread(&FileInput::stream_generator_to_buffer, this));
   return this;

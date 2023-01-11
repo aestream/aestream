@@ -69,9 +69,9 @@ int main(int argc, char *argv[]) {
   app_input_file
       ->add_option("file", input_filename, "Path to .aedat or .aedat4 file")
       ->required();
-  app_input_file->add_flag(
-      "--ignore-time", input_ignore_time,
-      "Playback in real-time (false, default) or ignore timestamps (true).");
+  // app_input_file->add_flag(
+  //     "--ignore-time", input_ignore_time,
+  //     "Playback in real-time (false, default) or ignore timestamps (true).");
 
   //
   // Output
@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
 #endif
   } else if (app_input_file->parsed()) {
     input_generator =
-        file_event_generator(input_filename, runFlag, input_ignore_time);
+        file_event_generator(input_filename, runFlag);
   }
 
   //

@@ -1,11 +1,11 @@
 #pragma once
 
 #if USE_CLANG
-  #include <experimental/coroutine>
-  namespace coroutinestd = std::experimental;
+#include <experimental/coroutine>
+namespace coroutinestd = std::experimental;
 #else
-  #include <coroutine>
-  namespace coroutinestd = std;
+#include <coroutine>
+namespace coroutinestd = std;
 #endif
 #include <iostream>
 #include <optional>
@@ -84,6 +84,6 @@ public:
   }
   std::default_sentinel_t end() { return {}; }
 
-private:
+  // private:
   Handle m_coroutine;
 };
