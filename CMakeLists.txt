@@ -20,6 +20,7 @@ add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
 
 # Add includes
 include_directories("include/")
+include(include/CPM.cmake)
 
 # Add sources
 add_subdirectory("src")

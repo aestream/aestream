@@ -14,7 +14,7 @@ if (USE_TORCH)
 endif()
 
 if (libcaer_FOUND) 
-  set(module_compile_definitions USE_INIVATION)
+  set(module_compile_definitions WITH_CAER)
   set(module_source_files "${module_source_files}" usb.cpp)
 endif()
 
@@ -36,7 +36,6 @@ set(PYTHON_MODULE_NAME aestream_ext)
 pybind11_add_module(${PYTHON_MODULE_NAME} MODULE
       module.cpp 
       udp.cpp 
-      usb.cpp 
       udp_client.cpp 
       udp_client.hpp 
       iterator.cpp

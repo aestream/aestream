@@ -29,18 +29,15 @@ flatbuffers_generate_headers(
 )
 
 # LZ4 for AEDAT encoding
-find_path(LZ4_INCLUDE_DIR NAMES lz4.h)
-find_library(LZ4_LIBRARY NAMES lz4 LZ4)
-# if (NOT LZ4_LIBRARY)
-# FetchContent_Declare(LZ4_LIBRARY
-#   GIT_REPOSITORY "https://github.com/lz4/lz4.git"
-#   GIT_TAG "v1.9.4"
-#   SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../lz4"
-# )
-# FetchContent_MakeAvailable(LZ4_LIBRARY)
-# message(WARNING SRC ${LZ4_LIBRARY_SOURCE_DIR})
-# endif()
-set(input_libraries ${input_libraries} ${LZ4_LIBRARY})
+set(BUILD_STATIC_LIBS ON)
+CPMFindPackage(NAME lz4 
+               GITHUB_REPOSITORY lz4/lz4
+               VERSION 1.9.4
+               SOURCE_SUBDIR build/cmake
+)
+# find_package(lz4_static REQUIRED)
+set(input_include_directories ${input_include_directories} "${LZ4_LIBRARY_BINARY_DIR}" "${LZ4_LIBRARY_SOURCE_DIR}/")
+set(input_libraries ${input_libraries} lz4_static)
 
 # Create the file library
 add_library(aestream_file SHARED ${input_sources})
