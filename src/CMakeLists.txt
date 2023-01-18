@@ -15,10 +15,9 @@ if (CMAKE_CUDA_COMPILER)
 endif()
 
 # Attempt to import Torch
-find_package(Torch)
-if (Torch_FOUND) 
-    message(STATUS "Torch dependencies (libtorch) not found, ignoring")
-    set(module_compile_definitions USE_TORCH)
+if (USE_TORCH)
+  find_package(Torch REQUIRED)
+  set(module_compile_definitions USE_TORCH)
 endif()
 
 # Add subdirectories

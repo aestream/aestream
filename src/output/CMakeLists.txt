@@ -2,7 +2,7 @@ set(output_definitions "")
 set(output_sources dvs_to_udp.hpp dvs_to_udp.cpp dvs_to_file.hpp dvs_to_file.cpp )
 set(output_libraries aer aestream_file)
 
-if (Torch_FOUND)
+if (USE_TORCH)
     set(output_definitions ${output_definitions} WITH_TORCH)
     set(output_sources ${output_sources} dvs_to_tensor.hpp dvs_to_tensor.cpp)
     if (NOT WITH_PYTHON)

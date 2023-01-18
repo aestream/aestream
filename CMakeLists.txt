@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
+option(USE_TORCH "Build with Torch" OFF)
+option(USE_PYTHON "Buid Python lib" OFF)
+
 # set coroutine flags for clang appropriately
 # thanks to https://stackoverflow.com/questions/64703866/is-clang-11s-invocation-of-coroutine-headers-via-fcoroutines-flag
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")

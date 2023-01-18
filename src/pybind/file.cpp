@@ -64,7 +64,6 @@ FileInput::FileInput(const std::string &filename, py_size_t shape,
                      device_t device, bool ignore_time)
     : buffer(shape, device, EVENT_BUFFER_SIZE), ignore_time(ignore_time),
       shape(shape), filename(filename), fp(open_file(filename)) {
-  // fp = open_file(filename);
   n_events = dat_read_header(fp);
   generator = dat_stream_events(fp, n_events);
 };

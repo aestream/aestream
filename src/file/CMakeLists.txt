@@ -5,7 +5,7 @@ set(input_include_directories "")
 
 # Include flatbuffers and generate headers
 find_package(flatbuffers CONFIG NAMES flatbuffers Flatbuffers FlatBuffers QUIET)
-option(FLATBUFFERS_BUILD_TESTS OFF)
+set(FLATBUFFERS_BUILD_TESTS OFF)
 if (flatbuffers_FOUND AND FLATBUFFERS_SOURCE_DIR) # Add flatbuffers from source dir (set in flake.nix)
   add_subdirectory(${FLATBUFFERS_SOURCE_DIR} 
                   ${CMAKE_CURRENT_BINARY_DIR}/flatbuffers-build
@@ -29,15 +29,20 @@ flatbuffers_generate_headers(
 )
 
 # LZ4 for AEDAT encoding
-set(BUILD_STATIC_LIBS ON)
-CPMFindPackage(NAME lz4 
-               GITHUB_REPOSITORY lz4/lz4
-               VERSION 1.9.4
-               SOURCE_SUBDIR build/cmake
-)
-# find_package(lz4_static REQUIRED)
-set(input_include_directories ${input_include_directories} "${LZ4_LIBRARY_BINARY_DIR}" "${LZ4_LIBRARY_SOURCE_DIR}/")
-set(input_libraries ${input_libraries} lz4_static)
+find_path(LZ4_INCLUDE_DIR NAMES lz4.h)
+find_library(lz4 NAMES lz4 LZ4)
+if (lz4)
+  set(input_libraries ${input_libraries} lz4)
+else()
+  set(BUILD_STATIC_LIBS ON)
+  CPMFindPackage(NAME lz4 
+                GITHUB_REPOSITORY lz4/lz4
+                VERSION 1.9.4
+                SOURCE_SUBDIR build/cmake
+  )
+  set(input_include_directories ${input_include_directories} "${LZ4_LIBRARY_BINARY_DIR}" "${LZ4_LIBRARY_SOURCE_DIR}/")
+  set(input_libraries ${input_libraries} lz4_static)
+endif()
 
 # Create the file library
 add_library(aestream_file SHARED ${input_sources})
