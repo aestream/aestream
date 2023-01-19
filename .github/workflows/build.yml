@@ -5,7 +5,10 @@ on: pull_request
 jobs:
   test-cpp:
     name: "Build and test: C++"
-    runs-on: [ubuntu-latest, macos-latest]
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
         with: 
