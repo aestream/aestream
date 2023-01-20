@@ -64,8 +64,18 @@ FileInput::FileInput(const std::string &filename, py_size_t shape,
                      device_t device, bool ignore_time)
     : buffer(shape, device, EVENT_BUFFER_SIZE), ignore_time(ignore_time),
       shape(shape), filename(filename), fp(open_file(filename)) {
-  n_events = dat_read_header(fp);
-  generator = dat_stream_events(fp, n_events);
+  if (ends_with(filename, "dat")) {
+    n_events = dat_read_header(fp);
+  } else {
+    n_events = 0;
+  }
+  // if (ends_with(filename, "dat")) {
+  //   generator = dat_stream_events(fp, n_events);
+  // } else {
+  //   generator = aedat_to_stream(filename);
+  // }
+  auto runFlag = std::atomic<bool>(true);
+  generator = file_event_generator(filename, runFlag);
 };
 
 tensor_t FileInput::read() {
@@ -89,15 +99,14 @@ py::array_t<AER::Event> FileInput::events() {
   return buffer_to_py_array(event_array, n_events_read);
 }
 
-py::array_t<AER::Event> FileInput::events_co() {
-  AER::Event *event_array = (AER::Event *)malloc(n_events * sizeof(AER::Event));
-  size_t index = 0;
-  for (auto event : generator) {
-    event_array[index] = event;
-    index++;
-  }
-  return buffer_to_py_array(event_array, n_events);
-}
+// py::array_t<AER::Event> FileInput::events_co() {
+//   AER::Event *event_array = (AER::Event *)malloc(n_events *
+//   sizeof(AER::Event)); size_t index = 0; for (auto event : generator) {
+//     event_array[index] = event;
+//     index++;
+//   }
+//   return buffer_to_py_array(event_array, n_events);
+// }
 
 // Generator<py::array_t<AER::Event>>
 // FileInput::parts_co(size_t n_events_per_part) {

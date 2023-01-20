@@ -36,6 +36,10 @@ PYBIND11_MODULE(aestream_ext, m) {
       .def("__iter__", [](Iterator &it) -> Iterator & { return it; })
       .def("__next__", &Iterator::next, py::return_value_policy::reference);
 
+  py::class_<FrameIterator>(m, "FrameIterator")
+      .def("__iter__", [](FrameIterator &it) -> FrameIterator & { return it; })
+      .def("__next__", &FrameIterator::next);
+
   py::class_<PartIterator>(m, "PartIterator")
       .def("__iter__", [](PartIterator &it) -> PartIterator & { return it; })
       .def("__next__", &PartIterator::next);
@@ -51,25 +55,24 @@ PYBIND11_MODULE(aestream_ext, m) {
              return false;
            })
       .def("events", &FileInput::events)
-      .def("events_co", &FileInput::events_co)
+      .def("frames",
+           [](py::object fobj, size_t n_events_per_part) {
+             return FrameIterator(fobj.cast<FileInput &>(), n_events_per_part, fobj);
+           })
+      //  .def("events_co", &FileInput::events_co)
       .def("is_streaming", &FileInput::get_is_streaming)
       .def("start_stream", &FileInput::start_stream)
       .def("stop_stream", &FileInput::stop_stream)
       .def("read", &FileInput::read)
       .def("parts",
            [](py::object fobj, size_t n_events_per_part) {
-             //   auto generator = f.parts_co(n_events_per_part);
-             return PartIterator(fobj.cast<FileInput &>(), n_events_per_part,
-                                 fobj);
-             //   return py::make_iterator(generator.begin(), generator.end());
-             //   return Iterator(generator);
-           })
-      .def("parts_co",
-           [](py::object fobj, size_t n_events_per_part) {
-             //   auto generator = f.parts_co(n_events_per_part);
+             //    std::cout << i.filename << std::endl;
+             //    if (endsWith(i.filename, "aedat4")) {
+             // std::cout << "AEDAT" << std::endl;
              return Iterator(fobj.cast<FileInput &>(), n_events_per_part, fobj);
-             //   return py::make_iterator(generator.begin(), generator.end());
-             //   return Iterator(generator);
+             //    } else {
+             // return PartIterator(i, n_events_per_part, fobj);
+             //    }
            })
       .def( // Thanks to https://stackoverflow.com/a/57217995/999865
           "__iter__",

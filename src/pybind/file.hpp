@@ -3,6 +3,7 @@
 
 #include "../aer.hpp"
 #include "../generator.hpp"
+#include "../file/aedat4.hpp"
 #include "../input/file.hpp"
 
 #ifdef USE_TORCH
@@ -30,11 +31,9 @@ private:
   static const uint32_t EVENT_BUFFER_SIZE = 512;
 
   const bool ignore_time;
-  py_size_t shape;
 
   std::unique_ptr<std::thread> file_thread;
   std::vector<AER::Event> event_vector;
-  TensorBuffer buffer;
   // TensorIterator iterator;
   std::atomic<bool> is_streaming = {true};
   std::atomic<bool> is_nonempty = {true};
@@ -44,6 +43,8 @@ private:
   void stream_generator_to_buffer();
 
 public:
+  TensorBuffer buffer;
+  py_size_t shape;
   const shared_file_t &fp;
   Generator<AER::Event> generator;
   const std::string filename;
@@ -61,7 +62,7 @@ public:
 
   py::array_t<AER::Event> events();
 
-  py::array_t<AER::Event> events_co();
+  // py::array_t<AER::Event> events_co();
 
   // Generator<py::array_t<AER::Event>> parts_co(size_t n_events_per_part);
 
