@@ -32,7 +32,7 @@
         };
         aestream = pkgs.stdenv.mkDerivation {
           name = "aestream";
-          version = "0.3.0";
+          version = "0.5.0";
           src = ./.;
           nativeBuildInputs = [
             pkgs.cmake
@@ -84,7 +84,7 @@
         });
         aestream-python = mach-nix.lib.${system}.buildPythonPackage {
           pname = "aestream";
-          version = "0.4.0";
+          version = "0.5.0";
           src = ./.;
           requirements = "scikit-build\nnumpy";
           providers.pip = "wheel";
