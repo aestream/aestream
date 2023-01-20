@@ -6,9 +6,8 @@
 
 #include "CLI11.hpp"
 
-// AEDAT imports
-#include "aedat.hpp"
-#include "aedat4.hpp"
+// AER imports
+#include "aer.hpp"
 
 // Input
 #include "input/file.hpp"
@@ -70,9 +69,9 @@ int main(int argc, char *argv[]) {
   app_input_file
       ->add_option("file", input_filename, "Path to .aedat or .aedat4 file")
       ->required();
-  app_input_file->add_flag(
-      "--ignore-time", input_ignore_time,
-      "Playback in real-time (false, default) or ignore timestamps (true).");
+  // app_input_file->add_flag(
+  //     "--ignore-time", input_ignore_time,
+  //     "Playback in real-time (false, default) or ignore timestamps (true).");
 
   //
   // Output
@@ -119,7 +118,7 @@ int main(int argc, char *argv[]) {
   //
   // Handle input
   //
-  Generator<AEDAT::PolarityEvent> input_generator;
+  Generator<AER::Event> input_generator;
   if (app_input_inivation->parsed()) {
 #ifdef WITH_CAER
     input_generator = inivation_event_generator(
@@ -133,13 +132,14 @@ int main(int argc, char *argv[]) {
 #endif
   } else if (app_input_prophesee->parsed()) {
 #ifdef WITH_METAVISION
-    input_generator = prophesee_event_generator(serial_number, runFlag);
+    input_generator = prophesee_event_generator(runFlag, serial_number);
 #else
     throw std::invalid_argument(
         "Prophesee cameras unavailable: please recompile with MetavisionSDK");
 #endif
   } else if (app_input_file->parsed()) {
-    input_generator = file_event_generator(input_filename, input_ignore_time);
+    input_generator =
+        file_event_generator(input_filename, runFlag);
   }
 
   //
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
     if (app_output_udp->parsed()) {
       std::cout << "Sending events to: " << ipAddress << " on port: " << port
                 << std::endl;
-      DVSToUDP<AEDAT::PolarityEvent> client(bufferSize, port, ipAddress);
+      DVSToUDP<AER::Event> client(bufferSize, port, ipAddress);
       client.stream(input_generator, include_timestamp);
     } else if (app_output_file->parsed()) {
       std::cout << "Sending events to file " << output_filename << std::endl;
@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
       }
     } else { // Default to STDOUT
       uint64_t count = 0;
-      for (AEDAT::PolarityEvent event : input_generator) {
+      for (AER::Event event : input_generator) {
         count += 1;
         std::cout << event.x << "," << event.y << ","
                   << std::to_string(event.timestamp) << std::endl;

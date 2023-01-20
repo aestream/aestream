@@ -24,11 +24,12 @@ _build/
 result
 .eggs/
 *.flv
-*.dat
-*.mp4
+.mp4
 *generated.h
 *.deb
 release/
 wheelhouse/
 _skbuild
 
+# Dependencies
+lz4

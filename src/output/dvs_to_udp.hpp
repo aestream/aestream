@@ -14,7 +14,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "../aedat.hpp"
+#include "../aer.hpp"
 #include "../generator.hpp"
 
 template <typename T> class DVSToUDP {

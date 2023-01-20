@@ -1,33 +1,12 @@
-#include <chrono>
-#include <string>
-#include <thread>
-
-#include "../aedat4.hpp"
-#include "../generator.hpp"
 #include "file.hpp"
 
-#include <iostream>
-
-Generator<AEDAT::PolarityEvent> file_event_generator(const std::string filename,
-                                                     bool ignore_time) {
-  AEDAT4 aedat_file = AEDAT4(filename);
-  const auto polarity_events = aedat_file.polarity_events;
-  const auto time_start = std::chrono::high_resolution_clock::now();
-  const int64_t time_start_us = polarity_events[0].timestamp;
-
-  for (auto event : polarity_events) {
-    // Sleep to align with real-time, unless ignore_time is set
-    if (!ignore_time) {
-      const int64_t time_diff =
-          std::chrono::duration_cast<std::chrono::microseconds>(
-              std::chrono::high_resolution_clock::now() - time_start)
-              .count();
-      const int64_t file_diff = event.timestamp - time_start_us;
-      const int64_t time_offset = file_diff - time_diff;
-      if (time_offset > 1000) {
-        std::this_thread::sleep_for(std::chrono::microseconds(time_offset));
-      }
-    }
-    co_yield event;
+Generator<AER::Event> file_event_generator(const std::string filename,
+                                           const std::atomic<bool> &runFlag) {
+  if (ends_with(filename, ".dat")) {
+    return dat_stream_events(filename);
+  } else if (ends_with(filename, ".aedat4")) {
+    return AEDAT4::aedat_to_stream(filename);
+  } else {
+    throw std::invalid_argument("Unknown file ending for file " + filename);
   }
 }

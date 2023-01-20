@@ -1,16 +1,15 @@
-#include "../aedat.hpp"
+#include "../aer.hpp"
 #include "../generator.hpp"
 #include "../input/inivation.hpp"
 
-#include <torch/extension.h>
-#include <torch/torch.h>
+#include "types.hpp"
 
 #include "tensor_buffer.hpp"
 
 class USBInput {
 
 private:
-  Generator<AEDAT::PolarityEvent> generator;
+  Generator<AER::Event> generator;
   std::thread socket_thread;
   static const uint32_t EVENT_BUFFER_SIZE = 128;
   TensorBuffer buffer;
@@ -20,7 +19,7 @@ private:
     while (is_streaming.load()) {
       // We add a local buffer to avoid overusing the atomic lock in the actual
       // buffer
-      std::vector<AEDAT::PolarityEvent> local_buffer = {};
+      std::vector<AER::Event> local_buffer = {};
       for (auto event : generator) {
         local_buffer.push_back(event);
 
@@ -33,7 +32,7 @@ private:
   };
 
 public:
-  USBInput(torch::IntArrayRef shape, torch::Device device, uint16_t deviceId,
+  USBInput(py_size_t shape, device_t device, uint16_t deviceId,
            uint16_t deviceAddress)
       : buffer(shape, device, EVENT_BUFFER_SIZE) {
     if (deviceId > 0) {
@@ -49,7 +48,7 @@ public:
     }
   }
 
-  at::Tensor read() { return buffer.read(); }
+  tensor_t read() { return buffer.read(); }
 
   USBInput *start_stream() {
     std::thread socket_thread(&USBInput::stream_synchronous, this);

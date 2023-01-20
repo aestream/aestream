@@ -94,10 +94,10 @@ aestream input <input source> [output <output sink>]
 
 | Example | Syntax |
 | ------------- | ------------------------------|
-| Read file to STDOUT | `aestream input file example/davis.aedat4` |
+| Read file to STDOUT | `aestream input file example/sample.aedat4` |
 | Stream DVS Davis346 (USB 0:2) by iniVation AG to STDOUT (Note, requires Inivation libraries) | `aestream input inivation output stdout` |
 | Stream Prophesee 640x480 (serial Prophesee:hal_plugin_gen31_fx3:00001464) to STDOUT (Note, requires Metavision SDK) | `aestream input output stdout` |
-| Read file to remote IP X.X.X.X | `aestream input file example/davis.aedat4 output udp X.X.X.X` |
+| Read file to remote IP X.X.X.X | `aestream input file example/sample.aedat4 output udp X.X.X.X` |
 
 ## Custom installation (C++)
 

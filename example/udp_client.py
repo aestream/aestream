@@ -1,7 +1,6 @@
 import datetime
 import time
 
-import torch  # Torch is needed to import c10 (Core TENsor) context
 from aestream import UDPInput
 
 # Start a stream, receiving tensors of shape (640, 480)

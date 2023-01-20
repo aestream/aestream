@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # System dependencies
-yum install -y lz4-devel ninja-build libgusb-devel || ( apt update && apt install -y liblz4-dev libusb-1.0-0-dev )
+yum install -y lz4-devel ninja-build libgusb-devel gcc-10 || ( apt update && apt install -y cmake ninja-build g++-10 liblz4-dev libusb-1.0-0-dev )
 
 # Install libcaer
 curl -L -s -m 100 https://gitlab.com/inivation/dv/libcaer/-/archive/3.3.14/libcaer-3.3.14.tar.gz | tar zxf -

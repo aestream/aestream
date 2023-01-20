@@ -1,6 +1,12 @@
 #pragma once
 
+#if USE_CLANG
+#include <experimental/coroutine>
+namespace coroutinestd = std::experimental;
+#else
 #include <coroutine>
+namespace coroutinestd = std;
+#endif
 #include <iostream>
 #include <optional>
 
@@ -11,9 +17,11 @@ public:
     Generator<T> get_return_object() {
       return Generator{Handle::from_promise(*this)};
     }
-    static std::suspend_always initial_suspend() noexcept { return {}; }
-    static std::suspend_always final_suspend() noexcept { return {}; }
-    std::suspend_always yield_value(T value) noexcept {
+    void return_void() {}
+    // use coroutinestd instead of {std, std::experimental}
+    static coroutinestd::suspend_always initial_suspend() noexcept { return {}; }
+    static coroutinestd::suspend_always final_suspend() noexcept { return {}; }
+    coroutinestd::suspend_always yield_value(T value) noexcept {
       current_value = std::move(value);
       return {};
     }
@@ -24,7 +32,8 @@ public:
     std::optional<T> current_value;
   };
 
-  using Handle = std::coroutine_handle<promise_type>;
+  // use coroutinestd instead of {std, std::experimental}
+  using Handle = coroutinestd::coroutine_handle<promise_type>;
 
   explicit Generator(const Handle coroutine) : m_coroutine{coroutine} {}
 
@@ -75,6 +84,6 @@ public:
   }
   std::default_sentinel_t end() { return {}; }
 
-private:
+  // private:
   Handle m_coroutine;
 };

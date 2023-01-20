@@ -5,14 +5,17 @@ on: pull_request
 jobs:
   test-cpp:
     name: "Build and test: C++"
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
         with: 
           lfs: True
-      - uses: cachix/install-nix-action@v17
+      - uses: cachix/install-nix-action@v18
         with:
-          nix_path: nixpkgs=channel:nixos-22.05
+          nix_path: nixpkgs=channel:nixos-22.11
       - run: nix run .#test
 
   test-python:
@@ -20,15 +23,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          lfs: true
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
       - name: Install prerequisites
         run: |
-          sudo apt update && sudo apt install cmake ninja-build g++-10 -y && sudo .github/deps/manylinux_dependencies.sh
-          pip3 install torch --extra-index-url https://download.pytorch.org/whl/cpu
-          pip install cmake scikit-build ninja
-          CXX=g++-10 pip install --no-build-isolation . -v
+          sudo .github/deps/manylinux_dependencies.sh
+          CXX=g++-10 pip install . -v
           pip install pytest
       - name: Test
         run: pytest src

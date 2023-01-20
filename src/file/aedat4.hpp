@@ -16,6 +16,8 @@
 
 #include <flatbuffers/flatbuffers.h>
 
+#include <aer.hpp>
+
 #include "aedat.hpp"
 #include "events_generated.h"
 #include "file_data_table_generated.h"
@@ -69,13 +71,13 @@ struct AEDAT4 {
     return attributes;
   }
 
-  void load(const std::string &filename) {
+  void load(const std::string filename) {
     struct stat stat_info;
 
     auto fd = open(filename.c_str(), O_RDONLY, 0);
 
     if (fd < 0) {
-      throw std::runtime_error("Failed to open file");
+      throw std::invalid_argument("Failed to open file");
     }
 
     if (fstat(fd, &stat_info)) {
@@ -217,17 +219,12 @@ struct AEDAT4 {
         auto event_packet = GetSizePrefixedEventPacket(&dst_buffer[0]);
         for (auto event : *event_packet->elements()) {
           count += 1;
-          const auto e = AEDAT::PolarityEvent{
+          const auto e = AER::Event{
               static_cast<uint64_t>(event->t()),
               static_cast<uint16_t>(event->x()),
               static_cast<uint16_t>(event->y()),
-              1,
               static_cast<bool>(event->on()),
           };
-          if (e.x > 640 || e.y > 480) {
-            printf("Wrong coords (%lu) %lu: %ux%u\n", count, e.timestamp, e.x,
-                   e.y);
-          }
           polarity_events.push_back(e);
         }
         break;
@@ -269,6 +266,8 @@ struct AEDAT4 {
       }
       }
     }
+
+    close(fd);
   }
 
   static std::tuple<char *, size_t> compress_lz4(char *buffer, size_t size) {
@@ -279,7 +278,8 @@ struct AEDAT4 {
         LZ4F_compressFrame(new_buffer, lz4FrameBound, buffer, size, nullptr);
     return {new_buffer, compression};
     // LZ4F_compressionContext_t ctx;
-    // auto contextCreation = LZ4F_createCompressionContext(&ctx, LZ4F_VERSION);
+    // auto contextCreation = LZ4F_createCompressionContext(&ctx,
+    // LZ4F_VERSION);
     // auto headerSize =
     //     LZ4F_compressBegin(ctx, new_buffer, lz4FrameBound, nullptr);
     // if (LZ4F_isError(headerSize)) {
@@ -305,6 +305,7 @@ struct AEDAT4 {
         CreateIOHeaderDirect(fbb, CompressionType_LZ4, -1L, infoNode);
     fbb.FinishSizePrefixed(headerOffset);
     stream.write((char *)fbb.GetBufferPointer(), fbb.GetSize());
+    std::cout << "Data " << stream.tellp() << std::endl;
     return fbb.GetSize();
   }
 
@@ -342,7 +343,7 @@ struct AEDAT4 {
     auto [compressed, size] =
         compress_lz4((char *)fbb.GetBufferPointer(), fbb.GetSize());
     stream.write(compressed, size);
-    std::cout << "Wrote " << eventCount << " events" << std::endl;
+    std::cout << "Table " << tableOffset << std::endl;
   }
 
   static void save_events(std::fstream &stream,
@@ -370,11 +371,19 @@ struct AEDAT4 {
     stream.write(compressed, size);
   }
 
+  static Generator<AER::Event> aedat_to_stream(const std::string filename) {
+    AEDAT4 aedat = AEDAT4(filename);
+    // TODO: Iterate over raw file pointer to save memory
+    for (auto event : aedat.polarity_events) {
+      co_yield event;
+    }
+  }
+
   AEDAT4() {}
 
   AEDAT4(const std::string &filename) { load(filename); }
 
   std::vector<OutInfo> outinfos;
   std::vector<Frame> frames;
-  std::vector<AEDAT::PolarityEvent> polarity_events;
+  std::vector<AER::Event> polarity_events;
 };
