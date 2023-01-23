@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
   // Undistortion
   //
   auto app_undistortion = app.add_subcommand("undistortion", "Performs Undistortion");
-  std::string undistortion_filename;
+  std::string undistortion_filename = "";
   std::uint16_t width;
   std::uint16_t height;
   app_undistortion->add_option("undistortion-filename", undistortion_filename,
@@ -165,10 +165,21 @@ int main(int argc, char *argv[]) {
   }
 
   //
-  // Processing - Undistortion
+  // Processing (Undistort, Mirror, Flip, Turn)
   //
+  bool processing = false;
+  if(undistortion_filename.length() > 0){
+    processing = true;
+  }
+  
   Generator<AEDAT::PolarityEvent> processed_generator;
-  processed_generator = undistortion_event_generator(input_generator, undistortion_filename, width, height);
+  Generator<AEDAT::PolarityEvent> * ptr_processed_generator;
+  if(processing){
+    processed_generator = undistortion_event_generator(input_generator, undistortion_filename, width, height);
+    ptr_processed_generator = &processed_generator;
+  } else {    
+    ptr_processed_generator = &input_generator;
+  }
 
   //
   // Handle output
@@ -178,13 +189,13 @@ int main(int argc, char *argv[]) {
       std::cout << "Sending events to: " << ipAddress << " on port: " << port
                 << std::endl;
       DVSToUDP<AER::Event> client(bufferSize, port, ipAddress);
-      client.stream(processed_generator, include_timestamp);
+      client.stream(*ptr_processed_generator, include_timestamp);
     } else if (app_output_file->parsed()) {
       std::cout << "Sending events to file " << output_filename << std::endl;
       if (output_filename.ends_with(".txt")) {
-        dvs_to_file_txt(processed_generator, output_filename);
+        dvs_to_file_txt(*ptr_processed_generator, output_filename);
       } else if (output_filename.ends_with(".aedat4")) {
-        dvs_to_file_aedat(processed_generator, output_filename);
+        dvs_to_file_aedat(*ptr_processed_generator, output_filename);
       } else {
         std::stringstream error;
         error << "Unsupported file ending" << output_filename;
@@ -192,7 +203,7 @@ int main(int argc, char *argv[]) {
       }
     } else { // Default to STDOUT
       uint64_t count = 0;
-      for (AER::Event event : input_generator) {
+      for (AER::Event event : *ptr_processed_generator) {
         count += 1;
         std::cout << event.x << "," << event.y << ","
                   << std::to_string(event.timestamp) << std::endl;
