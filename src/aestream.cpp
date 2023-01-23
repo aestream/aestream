@@ -188,21 +188,17 @@ int main(int argc, char *argv[]) {
   //
   // Processing (Undistort, Mirror, Flip, Turn)
   //
-  bool undistortion = false;
+  bool processing = false;
   if(undistortion_filename.length() > 0){
-    undistortion = true;
+    processing = true;
   }
-  trans transformation = from_string_to_trans(requested_trans);
-
-  Generator<AER::Event> processed_generator;
-  Generator<AER::Event> * ptr_processed_generator;
-  // if(undistortion || transformation != no_trans){
-  if(undistortion + transformation + t_sample + s_sample > 2){
-    std::cout << "Processing requested" << std::endl;
-    processed_generator = transformation_event_generator(input_generator, undistortion_filename, transformation, width, height, t_sample, s_sample);
+  
+  Generator<AEDAT::PolarityEvent> processed_generator;
+  Generator<AEDAT::PolarityEvent> * ptr_processed_generator;
+  if(processing){
+    processed_generator = undistortion_event_generator(input_generator, undistortion_filename, width, height);
     ptr_processed_generator = &processed_generator;
   } else {    
-    std::cout << "NO Processing" << std::endl;
     ptr_processed_generator = &input_generator;
   }
 
