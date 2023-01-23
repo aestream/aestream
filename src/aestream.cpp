@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
   // Undistortion
   //
   auto app_undistortion = app.add_subcommand("undistortion", "Performs Undistortion");
-  std::string undistortion_filename;
+  std::string undistortion_filename = "";
   std::uint16_t width;
   std::uint16_t height;
   app_undistortion->add_option("undistortion-filename", undistortion_filename,
@@ -225,10 +225,21 @@ int main(int argc, char *argv[]) {
   }
 
   //
-  // Processing - Undistortion
+  // Processing (Undistort, Mirror, Flip, Turn)
   //
+  bool processing = false;
+  if(undistortion_filename.length() > 0){
+    processing = true;
+  }
+  
   Generator<AEDAT::PolarityEvent> processed_generator;
-  processed_generator = undistortion_event_generator(input_generator, undistortion_filename, width, height);
+  Generator<AEDAT::PolarityEvent> * ptr_processed_generator;
+  if(processing){
+    processed_generator = undistortion_event_generator(input_generator, undistortion_filename, width, height);
+    ptr_processed_generator = &processed_generator;
+  } else {    
+    ptr_processed_generator = &input_generator;
+  }
 
   //
   // Handle output

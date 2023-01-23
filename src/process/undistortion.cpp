@@ -119,32 +119,23 @@ Generator<AEDAT::PolarityEvent>
 undistortion_event_generator(Generator<AEDAT::PolarityEvent> &input_generator,
                        const std::string &filename, const std::uint16_t width, const std::uint16_t height) {
  
-    if(filename == ""){
-        for (auto event : input_generator) {
+    map lut[MAX_W*MAX_H];
+
+    uint16_t new_x;
+    uint16_t new_y;
+    
+    int count = 0;
+    load_lut(filename, width, height, lut);                
+
+    for (auto event : input_generator) {
+        // co_yield event;
+        for(int pixix = 0; pixix < lut[event.x*height+event.y].np; pixix++){
+            new_x = lut[event.x*height+event.y].p[pixix].x;
+            new_y = lut[event.x*height+event.y].p[pixix].y;
+            event.x = new_x;
+            event.y = new_y;        
             co_yield event;
-        }  
-
-    } 
-    else {
-        map lut[MAX_W*MAX_H];
-
-        uint16_t new_x;
-        uint16_t new_y;
-        
-        int count = 0;
-        load_lut(filename, width, height, lut);                
-
-        for (auto event : input_generator) {
-            // co_yield event;
-            for(int pixix = 0; pixix < lut[event.x*height+event.y].np; pixix++){
-                new_x = lut[event.x*height+event.y].p[pixix].x;
-                new_y = lut[event.x*height+event.y].p[pixix].y;
-                event.x = new_x;
-                event.y = new_y;        
-                co_yield event;
-            } 
-        }
-
-    }                  
+        } 
+    }          
 
 }
