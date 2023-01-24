@@ -199,10 +199,12 @@ int main(int argc, char *argv[]) {
   Generator<AEDAT::PolarityEvent> processed_generator;
   Generator<AEDAT::PolarityEvent> * ptr_processed_generator;
   // if(undistortion || transformation != no_trans){
-  if(undistortion + transformation > 0){
+  if(undistortion + transformation + t_sample + s_sample > 2){
+    std::cout << "Processing requested" << std::endl;
     processed_generator = transformation_event_generator(input_generator, undistortion_filename, transformation, width, height, t_sample, s_sample);
     ptr_processed_generator = &processed_generator;
   } else {    
+    std::cout << "NO Processing" << std::endl;
     ptr_processed_generator = &input_generator;
   }
 
