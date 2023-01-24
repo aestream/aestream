@@ -1,5 +1,5 @@
 set(process_definitions "")
-set(process_sources undistortion.hpp undistortion.cpp)
+set(process_sources transformation.hpp transformation.cpp)
 
 # Create the input library
 add_library(aestream_process SHARED ${process_sources})
