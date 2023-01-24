@@ -126,13 +126,36 @@ int main(int argc, char *argv[]) {
   //
   auto app_undistortion = app.add_subcommand("undistortion", "Performs Undistortion");
   std::string undistortion_filename = "";
-  std::uint16_t width;
-  std::uint16_t height;
   app_undistortion->add_option("undistortion-filename", undistortion_filename,
                               "Undistortion Filename. Supports .csv");
-  app_undistortion->add_option("w", width, "Camera width (in pixels)");
-  app_undistortion->add_option("h", height, "Camera height (in pixels)");
+  //
+  // Transformation
+  //
+  auto app_transformation = app.add_subcommand("transformation", "Performs Transformation");
+  std::string requested_trans = "";
+  app_transformation->add_option("transformation-type", requested_trans,
+                              "no_trans, rot_90, rot_180, rot_270, flip_ud, flip_lr");
  
+  //
+  // Spatio-Temporal Sampling
+  //
+  auto app_sampling = app.add_subcommand("sampling", "Spatio-Temporal Sampling");
+  std::uint8_t t_sample = 1;
+  std::uint8_t s_sample = 1;
+  app_sampling->add_option("t", t_sample, "1 out of <t> events are sent");
+  app_sampling->add_option("s", s_sample, "<s>x<s> pixels become 1 pixel");
+
+  //
+  // Resolution
+  //
+  auto app_resolution = app.add_subcommand("resolution", "Provides resolution");
+  std::uint16_t width;
+  std::uint16_t height;
+  app_resolution->add_option("w", width, "Camera width (in pixels)");
+  app_resolution->add_option("h", height, "Camera height (in pixels)");
+
+
+
   //
   // Output
   //
@@ -227,15 +250,17 @@ int main(int argc, char *argv[]) {
   //
   // Processing (Undistort, Mirror, Flip, Turn)
   //
-  bool processing = false;
+  bool undistortion = false;
   if(undistortion_filename.length() > 0){
-    processing = true;
+    undistortion = true;
   }
-  
+  trans transformation = from_string_to_trans(requested_trans);
+
   Generator<AEDAT::PolarityEvent> processed_generator;
   Generator<AEDAT::PolarityEvent> * ptr_processed_generator;
-  if(processing){
-    processed_generator = undistortion_event_generator(input_generator, undistortion_filename, width, height);
+  // if(undistortion || transformation != no_trans){
+  if(undistortion + transformation > 0){
+    processed_generator = transformation_event_generator(input_generator, undistortion_filename, transformation, width, height, t_sample, s_sample);
     ptr_processed_generator = &processed_generator;
   } else {    
     ptr_processed_generator = &input_generator;
