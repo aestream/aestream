@@ -10,6 +10,9 @@
 #include "../generator.hpp"
 
 
+#define MAX_W 1280
+#define MAX_H 720
+
 struct pixel {
     int x;
     int y;
@@ -38,4 +41,3 @@ Generator<AEDAT::PolarityEvent>
 transformation_event_generator(Generator<AEDAT::PolarityEvent> &input_generator,
                        const std::string &undistortion_filename, trans transformation, 
                        std::uint16_t width, std::uint16_t height, uint8_t t_sample, uint8_t s_sample);
-// Generator<AEDAT::PolarityEvent> transformation_filter(Generator<AEDAT::PolarityEvent> input, std::string filename);
