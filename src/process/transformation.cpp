@@ -3,75 +3,25 @@
 using namespace std;
 
 
-#define MAX_W 1280
-#define MAX_H 720
 
-void print_lut(int width, int height, map lut[]){
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {  
-            printf("(%i, %i): ", x, y);
-            printf("%i --> ", lut[x*height+y].np);
-            printf("(%i, %i)\t\t", lut[x*height+y].p[0].x, lut[x*height+y].p[0].y);
-            printf("(%i, %i)\n", lut[x*height+y].p[1].x, lut[x*height+y].p[1].y);
-        }
-    }
-}
-
-void count_stuff(int width, int height, map lut[]){
-
-    int count_0 = 0;
-    int count_1 = 0;
-    int count_2 = 0;
-
-    
-    for(int idx=0; idx < width*height; idx++){
-        switch(lut[idx].np){
-            case 0:
-                count_0 += 1;
-                break;
-            case 1:
-                count_1 += 1;
-                break;
-            case 2:
-                count_2 += 1;
-                break;
-
-        }
-    }
-
-    printf("%i with 0 maps\n", count_0);
-    printf("%i with 1 maps\n", count_1);
-    printf("%i with 2 maps\n", count_2);
-}
-
-void get_one2one_lut(int width, int height, map lut[]){
-    
+void get_new_lut(int width, int height, map lut[], bool empty){    
 
     for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {           
-            lut[x*height+y].np = 1;
-            lut[x*height+y].p[0].x = x;            
-            lut[x*height+y].p[0].y = y;         
+        for (int y = 0; y < height; y++) {   
+            if(empty){         
+                lut[x*height+y].np = 0;
+                lut[x*height+y].p[0].x = -1;            
+                lut[x*height+y].p[0].y = -1;   
+            } else {
+                lut[x*height+y].np = 1;
+                lut[x*height+y].p[0].x = x;            
+                lut[x*height+y].p[0].y = y;  
+            }       
             lut[x*height+y].p[1].x = -1;      
             lut[x*height+y].p[1].y = -1;
         }
     }
 }
-
-void get_empty_lut(int width, int height, map lut[]){
-    
-
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {           
-            lut[x*height+y].np = 0;
-            lut[x*height+y].p[0].x = -1;            
-            lut[x*height+y].p[0].y = -1;         
-            lut[x*height+y].p[1].x = -1;      
-            lut[x*height+y].p[1].y = -1;
-        }
-    }
-}
-
 void load_undistortion_lut(const std::string & fname, int width, int height, map lut[]){
 
     
@@ -241,12 +191,16 @@ transformation_event_generator(Generator<AEDAT::PolarityEvent> &input_generator,
  
     map lut[MAX_W*MAX_H];
     map aux[MAX_W*MAX_H];
-    
-    get_one2one_lut(width, height, lut);    
-    get_empty_lut(width, height, aux);
-    
+
+    bool empty;
+ 
     if(undistortion_filename.length() > 0){
+        empty = true; 
+        get_new_lut(width, height, aux, empty);  
         load_undistortion_lut(undistortion_filename, width, height, lut);
+    } else {
+        empty = false; 
+        get_new_lut(width, height, lut, empty);  
     }
     trans_lut(&width, &height, lut, aux, transformation, s_sample);
 
@@ -267,27 +221,5 @@ transformation_event_generator(Generator<AEDAT::PolarityEvent> &input_generator,
             count+= 1;
         }
     }        
-
-    // AEDAT::PolarityEvent event;
-    // event.polarity = 1;
-    // event.valid = true;
-    // printf("Width: %d | Height: %d\n", width, height);
-    // for(int looper; looper < 20; looper++)
-    // {
-    //     for(uint64_t i = 0; i < width*height; i++) {
-    //         event.x = i/height;
-    //         event.y = i%height;
-    //         for(int pixix = 0; pixix < lut[event.x*height+event.y].np; pixix++){
-    //             new_x = lut[event.x*height+event.y].p[pixix].x;
-    //             new_y = lut[event.x*height+event.y].p[pixix].y;
-    //             event.x = new_x;
-    //             event.y = new_y;
-    //             if(count%t_sample == 0){
-    //                 co_yield event;
-    //             }
-    //             count+= 1;
-    //         }
-    //     }     
-    // }
 
 }
