@@ -194,6 +194,13 @@ void trans_lut(std::uint16_t max_dim, std::uint16_t * i_width, std::uint16_t * i
                     new_y = y;
                     cross = false;
                     break;
+                default:
+                    new_x = x;
+                    new_y = y;
+                    new_h = o_height;
+                    cross = false;
+                    break;
+
             }
 
             /* Update auxiliary LUT with current element of main LUT*/
