@@ -7,7 +7,7 @@
 #include <sstream>
 #include <map>
 
-#include "../aedat.hpp"
+#include "../aer.hpp"
 #include "../generator.hpp"
 
 
@@ -26,7 +26,7 @@ trans from_string_to_trans(std::string requested_trans);
 
 void load_lut(const std::string & fname, int width, int height, lutmap lut[]);
 
-Generator<AEDAT::PolarityEvent>
-transformation_event_generator(Generator<AEDAT::PolarityEvent> &input_generator,
+Generator<AER::Event>
+transformation_event_generator(Generator<AER::Event> &input_generator,
                        const std::string &undistortion_filename, trans transformation, 
                        std::uint16_t width, std::uint16_t height, uint8_t t_sample, uint8_t s_sample);
