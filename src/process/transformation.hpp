@@ -5,37 +5,26 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <map>
 
 #include "../aedat.hpp"
 #include "../generator.hpp"
 
 
-#define MAX_W 1280
-#define MAX_H 720
-
-struct pixel {
-    int x;
-    int y;
-};
-
 #define MAX_PIXIX 2
 
-struct map {
-        int np;
-        pixel p[MAX_PIXIX];
+struct lutmap {
+        uint8_t np;
+        int x[MAX_PIXIX];
+        int y[MAX_PIXIX];
 };
 
 enum trans {no_trans, rot_90, rot_180, rot_270, flip_ud, flip_lr};
 
+
 trans from_string_to_trans(std::string requested_trans);
 
-void print_lut(int width, int height, map lut[]);
-
-void count_stuff(int width, int height, map lut[]);
-
-void get_empty_lut(int width, int height, map lut[]);
-
-void load_lut(const std::string & fname, int width, int height, map lut[]);
+void load_lut(const std::string & fname, int width, int height, lutmap lut[]);
 
 Generator<AEDAT::PolarityEvent>
 transformation_event_generator(Generator<AEDAT::PolarityEvent> &input_generator,
