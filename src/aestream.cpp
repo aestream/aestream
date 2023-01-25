@@ -195,8 +195,8 @@ int main(int argc, char *argv[]) {
   }
   trans transformation = from_string_to_trans(requested_trans);
 
-  Generator<AEDAT::PolarityEvent> processed_generator;
-  Generator<AEDAT::PolarityEvent> * ptr_processed_generator;
+  Generator<AER::Event> processed_generator;
+  Generator<AER::Event> * ptr_processed_generator;
   // if(undistortion || transformation != no_trans){
   if(undistortion + transformation + t_sample + s_sample > 2){
     std::cout << "Processing requested" << std::endl;
