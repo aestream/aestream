@@ -221,8 +221,6 @@ void trans_lut(std::uint16_t max_dim, std::uint16_t * i_width, std::uint16_t * i
     }    
 }
 
-
-
 Generator<AER::Event>
 transformation_event_generator(Generator<AER::Event> &input_generator,
                        const std::string &undistortion_filename, trans transformation, 
@@ -259,7 +257,6 @@ transformation_event_generator(Generator<AER::Event> &input_generator,
             /* Yield 1 out of t_sample events (temporal sampling)*/
             if(count%t_sample == 0){
                 co_yield event;
-
             }
             count+= 1;
         }
