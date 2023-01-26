@@ -15,6 +15,7 @@ if (CMAKE_CUDA_COMPILER)
 endif()
 
 # Attempt to import Torch
+message(WARNING "USE " ${USE_TORCH})
 if (USE_TORCH)
   find_package(Torch REQUIRED)
   set(module_compile_definitions USE_TORCH)

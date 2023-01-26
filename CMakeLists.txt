@@ -25,12 +25,14 @@ add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
 include_directories("include/")
 include(include/CPM.cmake)
 
-# Add sources
-add_subdirectory("src")
-
 # Add tests
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(USE_TORCH ON)
     add_subdirectory("test")
 else()
     set(GCC_COVERAGE_COMPILE_FLAGS ${GCC_COVERAGE_COMPILE_FLAGS} "-03")
 endif()
+
+
+# Add sources
+add_subdirectory("src")
