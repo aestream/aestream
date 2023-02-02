@@ -1,6 +1,7 @@
 #include "tensor_buffer.hpp"
 
 #ifdef USE_CUDA
+#include <torch/extension.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
 // CUDA functions

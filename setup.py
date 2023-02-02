@@ -2,11 +2,8 @@ import os
 
 from skbuild import setup  # Use scikit-build
 
-try:
-    import torch
-    from torch.utils import cpp_extension
-except ImportError:
-    pass
+import torch
+from torch.utils import cpp_extension
 
 pwd = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(pwd, "README.md"), encoding="utf-8") as fp:
@@ -24,14 +21,13 @@ cuda_home = cpp_extension._find_cuda_home()
 if cuda_home is not None:
     archs = ";".join([x[3:] for x in torch.cuda.get_arch_list()])
     flags = " ".join(cpp_extension._get_cuda_arch_flags())
+    archs = archs.replace("37;", "") # Remove old architecture
     cmake_args += [
         f"-DCMAKE_CUDA_ARCHITECTURES='{archs}'",
-        # "-DCMAKE_CUDA_ARCHITECTURES='50;60;70;75;80;86'",
-        f'-DCMAKE_CUDA_FLAGS={flags}',
+        f"-DCMAKE_CUDA_FLAGS={flags}",
         f"-DCMAKE_CUDA_COMPILER={cuda_home}/bin/nvcc",
         f"-DCUDA_INCLUDE_DIRS={cuda_home}/include",
     ]
-    print(flags)
 
 # Setuptools entrypoint
 setup(
@@ -47,6 +43,7 @@ setup(
     python_requires=">=3.7",
     packages=["aestream"],
     install_requires=["numpy"],
+    extras_require={"torch": ["torch"]},
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",

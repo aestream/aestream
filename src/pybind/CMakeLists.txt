@@ -2,6 +2,7 @@ include(GNUInstallDirs)
 include(FetchContent)
 
 if (USE_TORCH)
+  set(module_compile_definitions USE_TORCH) # C++ Compile definition
   if (CMAKE_CUDA_COMPILER) # Include cuda buffers
     set(module_source_files tensor_buffer_kernel.cu)
   endif()
@@ -10,7 +11,6 @@ if (USE_TORCH)
   find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
   message(STATUS "TORCH_PYTHON_LIBRARY: ${TORCH_PYTHON_LIBRARY} - ${PYTHON_INCLUDE_DIRS}")
   message(STATUS "TORCH_LIBRARIES: ${TORCH_LIBRARIES} - ${TORCH_INCLUDE_DIRS}")
-  
 endif()
 
 if (libcaer_FOUND) 
