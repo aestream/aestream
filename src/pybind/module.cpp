@@ -45,7 +45,7 @@ PYBIND11_MODULE(aestream_ext, m) {
       .def("__next__", &PartIterator::next);
 
   py::class_<FileInput>(m, "FileInput")
-      .def(py::init<std::string, py_size_t, device_t, bool>(),
+      .def(py::init<std::string, py_size_t, std::string, bool>(),
            py::arg("filename"), py::arg("shape"), py::arg("device") = "cpu",
            py::arg("ignore_time") = false)
       .def("__enter__", &FileInput::start_stream)
@@ -81,7 +81,7 @@ PYBIND11_MODULE(aestream_ext, m) {
       .def("__next__", &FileInput::begin);
 
   py::class_<UDPInput>(m, "UDPInput")
-      .def(py::init<py_size_t, device_t, int>(), py::arg("shape"),
+      .def(py::init<py_size_t, std::string, int>(), py::arg("shape"),
            py::arg("device") = "cpu", py::arg("port") = 3333)
       .def("__enter__", &UDPInput::start_server)
       .def("__exit__",

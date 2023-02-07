@@ -1,17 +1,14 @@
 include(GNUInstallDirs)
 include(FetchContent)
 
-if (USE_TORCH)
-  set(module_compile_definitions USE_TORCH) # C++ Compile definition
-  if (CMAKE_CUDA_COMPILER) # Include cuda buffers
-    set(module_source_files tensor_buffer_kernel.cu)
-  endif()
-  # Import PyTorch's Python library to ensure correct linking
-  # Thanks to https://github.com/pytorch/pytorch/issues/38122
-  find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
-  message(STATUS "TORCH_PYTHON_LIBRARY: ${TORCH_PYTHON_LIBRARY} - ${PYTHON_INCLUDE_DIRS}")
-  message(STATUS "TORCH_LIBRARIES: ${TORCH_LIBRARIES} - ${TORCH_INCLUDE_DIRS}")
+if (USE_CUDA) # Include cuda buffers
+  set(module_source_files tensor_buffer_kernel.cu)
 endif()
+# Import PyTorch's Python library to ensure correct linking
+# Thanks to https://github.com/pytorch/pytorch/issues/38122
+# find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
+# message(STATUS "TORCH_PYTHON_LIBRARY: ${TORCH_PYTHON_LIBRARY} - ${PYTHON_INCLUDE_DIRS}")
+# message(STATUS "TORCH_LIBRARIES: ${TORCH_LIBRARIES} - ${TORCH_INCLUDE_DIRS}")
 
 if (libcaer_FOUND) 
   set(module_compile_definitions WITH_CAER)
@@ -34,6 +31,7 @@ endif()
 
 set(PYTHON_MODULE_NAME aestream_ext)
 pybind11_add_module(${PYTHON_MODULE_NAME} MODULE
+      #${module_source_files}
       module.cpp 
       udp.cpp 
       udp_client.cpp 
@@ -43,20 +41,25 @@ pybind11_add_module(${PYTHON_MODULE_NAME} MODULE
       file.cpp
       # convert.cpp 
       # convert.hpp 
-      tensor_buffer.hpp 
+      tensor_buffer.hpp
       tensor_buffer.cpp
+      tensor_buffer_kernel.cu
+      tensor_buffer_kernel.h
       tensor_iterator.hpp
       tensor_iterator.cpp
-      ${module_source_files})
+      )
 
 install(IMPORTED_RUNTIME_ARTIFACTS aer aestream_file aestream_input aestream_output DESTINATION aestream)
 
-target_compile_definitions(${PYTHON_MODULE_NAME} PUBLIC ${module_compile_definitions})
-target_compile_features(${PYTHON_MODULE_NAME} PUBLIC cxx_std_20)
-target_include_directories(${PYTHON_MODULE_NAME} PRIVATE "${TORCH_INCLUDE_DIRS}" "${CMAKE_INSTALL_LIBDIR}" "${PYTHON_SITE_PACKAGES_DIR}/aestream")
-target_link_libraries(${PYTHON_MODULE_NAME} PRIVATE "${TORCH_LIBRARIES}" "${TORCH_PYTHON_LIBRARY}" aer aestream_file aestream_input aestream_output)
 set_target_properties(${PYTHON_MODULE_NAME} PROPERTIES 
+  BUILD_RPATH ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES} # For Apple
   INSTALL_RPATH "\$ORIGIN"
   INSTALL_RPATH_USE_LINK_PATH TRUE
+  CUDA_SEPARABLE_COMPILATION ON
 )
+target_compile_definitions(${PYTHON_MODULE_NAME} PRIVATE USE_CUDA=1)
+target_compile_features(${PYTHON_MODULE_NAME} PUBLIC cxx_std_20)
+target_include_directories(${PYTHON_MODULE_NAME} PRIVATE "${CUDAToolkit_INCLUDE_DIRS}" "${CUDA_LIBRARIES}" "${CMAKE_INSTALL_LIBDIR}" "${PYTHON_SITE_PACKAGES_DIR}/aestream")
+target_link_libraries(${PYTHON_MODULE_NAME} PRIVATE CUDA::cudart CUDA::cuda_driver aer aestream_file aestream_input aestream_output)
+
 install(TARGETS ${PYTHON_MODULE_NAME} DESTINATION aestream)

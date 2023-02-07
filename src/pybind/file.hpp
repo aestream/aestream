@@ -6,11 +6,6 @@
 #include "../file/aedat4.hpp"
 #include "../input/file.hpp"
 
-#ifdef USE_TORCH
-#include <torch/extension.h>
-#include <torch/torch.h>
-#endif
-
 #include "tensor_buffer.hpp"
 #include "tensor_iterator.hpp"
 
@@ -50,7 +45,7 @@ public:
   const std::string filename;
   size_t n_events;
 
-  FileInput(const std::string &filename, py_size_t shape, device_t device,
+  FileInput(const std::string &filename, py_size_t shape, const std::string& device,
             bool ignore_time = false);
 
   tensor_t read();

@@ -20,7 +20,7 @@ private:
 
 public:
   uint64_t count = 0;
-  UDPInput(py_size_t shape, device_t device, int port)
+  UDPInput(py_size_t shape, const std::string &device, int port)
       : buffer(shape, device, max_events_per_packet), port(port) {}
 
   UDPInput *start_server() {

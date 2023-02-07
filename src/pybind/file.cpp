@@ -61,7 +61,7 @@ void FileInput::stream_generator_to_buffer() {
 }
 
 FileInput::FileInput(const std::string &filename, py_size_t shape,
-                     device_t device, bool ignore_time)
+                    const std::string& device, bool ignore_time)
     : buffer(shape, device, EVENT_BUFFER_SIZE), ignore_time(ignore_time),
       shape(shape), filename(filename), fp(open_file(filename)) {
   if (ends_with(filename, "dat")) {
