@@ -1,7 +1,5 @@
-include(CheckLanguage)
 include(GNUInstallDirs)
 include(FetchContent)
-include(FindCUDAToolkit)
 
 MACRO(SUBDIRLIST result curdir)
   FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
@@ -14,40 +12,19 @@ MACRO(SUBDIRLIST result curdir)
   SET(${result} ${dirlist})
 ENDMACRO()
 
-# Attempt to load PyTorch
-if (WITH_PYTHON)
-  check_language(CUDA)
-  find_package(CUDAToolkit REQUIRED)
-  set(CMAKE_CUDA_COMPILER ${CUDAToolkit_BIN_DIR}/nvcc)
-  enable_language(CUDA)
-  # set(module_source_files tensor_buffer_kernel.cu)
-  set(module_compile_definitions USE_CUDA)
-  message(WARNING "USE CUDA SET")
-  # find_package(PythonExtensions REQUIRED)
-  # set(TORCH_RELATIVE_CMAKE_PATH "torch/share/cmake/Torch/") 
-  # set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PYTHON_SITE_PACKAGES_DIR}/${TORCH_RELATIVE_CMAKE_PATH};${PYTHON_RELATIVE_SITE_PACKAGES_DIR}/${TORCH_RELATIVE_CMAKE_PATH}")
-  # add_custom_command(COMMAND "ls ${SKBUILD_MODULE_PATH}/**/*")
-  # message(WARNING SUBDIRLIST(${SKBUILD_MODULE_PATH}))
-  # find_package(Torch)
-  # if (Torch_FOUND)
-  #   set(module_compile_definitions USE_TORCH)
-  #   # Test for CUDA
-  #   message(WARNING ${CMAKE_CUDA_COMPILER})
-  #   quit()
-  #   # Ensure we have proper compile definitions when importing torch
-  #   # if (CMAKE_CUDA_COMPILER) 
-  #   #   set(CMAKE_CXX_STANDARD 17)
-  #   #   set(CMAKE_CUDA_STANDARD 17)
-  #   #   set(CMAKE_CUDA_STANDARD_REQUIRED TRUE)
-  #   #   set(module_compile_definitions USE_CUDA)
-  #   # endif()
-  # endif()
-endif()
-
 # AER processing
 add_library(aer SHARED aer.hpp generator.hpp)
 target_include_directories(aer INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 set_target_properties(aer PROPERTIES LINKER_LANGUAGE CXX)
+# set coroutine flags for clang appropriately
+# thanks to https://stackoverflow.com/questions/64703866/is-clang-11s-invocation-of-coroutine-headers-via-fcoroutines-flag
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_compile_options(aer PUBLIC "-fcoroutines-ts")
+  add_compile_definitions(USE_CLANG)
+  message(STATUS "detected clang, set -ts flag")
+else()
+  target_compile_options(aer PUBLIC "-fcoroutines")
+endif()
 
 # Add subdirectories
 add_subdirectory(file)
