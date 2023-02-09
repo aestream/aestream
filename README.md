@@ -140,6 +140,10 @@ The work has received funding from the EC Horizon 2020 Framework Programme under
 
 Thanks to [Philipp Mondorf](https://github.com/PMMon) for interfacing with Metavision SDK and preliminary network code.
 
+<a href="https://github.com/norse/aestream/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=norse/aestream" />
+</a>
+
 ## Citation
 
 Please cite `aestream` if you use it in your work:
