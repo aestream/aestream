@@ -26,8 +26,8 @@ private:
 #endif
 
   std::mutex buffer_lock;
-  std::shared_ptr<float *> buffer1;
-  std::shared_ptr<float *> buffer2;
+  std::unique_ptr<cache_t> buffer1;
+  std::unique_ptr<cache_t> buffer2;
 #ifdef USE_CUDA
   std::vector<int> offset_buffer;
   int *cuda_device_pointer;

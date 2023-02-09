@@ -1,4 +1,5 @@
 #include "tensor_buffer.hpp"
+#include <iostream>
 
 namespace nb = nanobind;
 
@@ -16,8 +17,8 @@ TensorBuffer::TensorBuffer(py_size_t size, const std::string &device,
         std::make_shared<cache_t>(alloc_memory_cuda<float>(size[0] * size[1]));
   } else {
 #endif
-    buffer1 = std::make_shared<cache_t>(cache_t(size[0] * size[1]));
-    buffer2 = std::make_shared<cache_t>(cache_t(size[0] * size[1]));
+    buffer1 = std::make_unique<cache_t>(size[0] * size[1]);
+    buffer2 = std::make_unique<cache_t>(size[0] * size[1]);
 #ifdef USE_CUDA
   }
 #endif
@@ -37,7 +38,8 @@ void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
       const uint16_t x_coord = data[i + 1] & 0x7FFF;
       offset_buffer.push_back(shape[1] * x_coord + y_coord);
     }
-    index_increment_cuda<float>(*buffer1.get(), offset_buffer, cuda_device_pointer);
+    index_increment_cuda<float>(buffer1.get(), offset_buffer,
+                                cuda_device_pointer);
     return;
   }
 #endif
@@ -56,7 +58,8 @@ void TensorBuffer::set_vector(std::vector<AER::Event> events) {
     for (size_t i = 0; i < events.size(); i++) {
       offset_buffer[i] = shape[1] * events[i].x + events[i].y;
     }
-    index_increment_cuda<float>(*buffer1.get(), offset_buffer, cuda_device_pointer);
+    index_increment_cuda<float>(*buffer1.get(), offset_buffer,
+                                cuda_device_pointer);
     return;
   }
 #endif
@@ -77,24 +80,26 @@ tensor_t TensorBuffer::read() {
     buffer1.swap(buffer2);
   }
   // Copy and clean
-// #ifdef USE_CUDA
-//   tensor_t copy = tensor_t(shape[0] * shape[1], *buffer2.get());
-//   std::cout << "Bob" << std::endl;
-//   free_memory_cuda<float>(*buffer2.get());
-//   buffer2 = std::make_shared<cache_t>(alloc_memory_cuda<float>(shape[0] * shape[1]));
-// #else
-//   // Create a Python object that will free the allocated
-//   // memory when destroyed:
-//   // Thanks to https://stackoverflow.com/a/44682603
-//   // and
-//   // https://github.com/ssciwr/pybind11-numpy-example/blob/main/python/pybind11-numpy-example_python.cpp#L43
-//   tensor_t copy = tensor_t(shape[0] * shape[1], buffer2.get());
-//   copy.resize(shape);
-//   copy.owndata();
-//   cache_t *array = new cache_t(shape[0] * shape[1]);
-//   buffer2.reset(array);
-// #endif
-  float* data = *buffer2.get();
+  // #ifdef USE_CUDA
+  //   tensor_t copy = tensor_t(shape[0] * shape[1], *buffer2.get());
+  //   std::cout << "Bob" << std::endl;
+  //   free_memory_cuda<float>(*buffer2.get());
+  //   buffer2 = std::make_shared<cache_t>(alloc_memory_cuda<float>(shape[0] *
+  //   shape[1]));
+  // #else
+  //   // Create a Python object that will free the allocated
+  //   // memory when destroyed:
+  //   // Thanks to https://stackoverflow.com/a/44682603
+  //   // and
+  //   //
+  //   https://github.com/ssciwr/pybind11-numpy-example/blob/main/python/pybind11-numpy-example_python.cpp#L43
+  //   tensor_t copy = tensor_t(shape[0] * shape[1], buffer2.get());
+  //   copy.resize(shape);
+  //   copy.owndata();
+  //   cache_t *array = new cache_t(shape[0] * shape[1]);
+  //   buffer2.reset(array);
+  // #endif
+  float *data = buffer2.get();
   const size_t s[2] = {shape[0], shape[1]};
   return tensor_t(data, 2, s);
 }

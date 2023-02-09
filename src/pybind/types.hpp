@@ -7,7 +7,7 @@
 
 namespace nb = nanobind;
 
-using cache_t = float *;
+using cache_t = float[];
 // #ifdef USE_CUDA
 // using tensor_t = nb::tensor<nb::pytorch, float, nb::shape<2, nb::any>>;
 // #else

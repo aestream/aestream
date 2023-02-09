@@ -14,10 +14,8 @@ bool ends_with(std::string const &value, std::string const &ending) {
 shared_file_t open_file(const std::string &filename) {
   shared_file_t fp(fopen(filename.c_str(), "rb"), &close_file);
 
-  std::cout << filename << " FP " << fp.get() << " " << (fp.get() == nullptr) << std::endl;
   if (fp.get() == NULL) {
-    throw std::invalid_argument("Cannot open file " + filename);
-    // throw std::runtime_error("");
+    throw std::invalid_argument("Cannot open file " + filename);    // throw std::runtime_error("");
   }
   return fp;
 }

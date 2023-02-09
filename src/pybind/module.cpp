@@ -52,11 +52,7 @@ NB_MODULE(aestream_ext, m) {
            nb::arg("filename"), nb::arg("shape"), nb::arg("device") = "cpu",
            nb::arg("ignore_time") = false)
       .def("__enter__", &FileInput::start_stream)
-      .def("__exit__",
-           [&](FileInput &i, nb::object &t, nb::object &v, nb::object &trace) {
-             i.stop_stream();
-             return false;
-           })
+      .def("__exit__", &FileInput::stop_stream, nb::arg("a").none(), nb::arg("b").none(), nb::arg("c").none())
      //  .def("events", &FileInput::events)
      //  .def("frames",
      //       [](nb::object fobj, size_t n_events_per_part) {

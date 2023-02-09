@@ -52,5 +52,5 @@ public:
 
   FileInput *start_stream();
 
-  void stop_stream();
+  bool stop_stream(nb::object& a, nb::object& b, nb::object&c);
 };

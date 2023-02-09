@@ -61,7 +61,7 @@ void FileInput::stream_generator_to_buffer() {
 }
 
 FileInput::FileInput(const std::string &filename, py_size_t shape,
-                    const std::string& device, bool ignore_time)
+                     const std::string &device, bool ignore_time)
     : buffer(shape, device, EVENT_BUFFER_SIZE), ignore_time(ignore_time),
       shape(shape), filename(filename), fp(open_file(filename)) {
   if (ends_with(filename, "dat")) {
@@ -147,9 +147,10 @@ FileInput *FileInput::start_stream() {
   return this;
 }
 
-void FileInput::stop_stream() {
+bool FileInput::stop_stream(nb::object& a, nb::object& b, nb::object& c) {
   is_streaming.store(false);
   if (file_thread->joinable()) {
     file_thread->join();
   }
+  return false;
 }
