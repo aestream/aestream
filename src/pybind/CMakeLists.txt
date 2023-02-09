@@ -13,7 +13,8 @@ if (WITH_PYTHON)
     set(CMAKE_CUDA_ARCHITECTURES 35 50 52 60 61 70 75 80 86)
   endif()
 
-  set(module_compile_definitions USE_CUDA)
+  set(module_source_files "${module_source_files}" usb.cpp)
+  set(module_compile_definitions ${module_compile_definitions} tensor_buffer_kernel.cu)
 endif()
 
 if (libcaer_FOUND) 
@@ -23,38 +24,43 @@ endif()
 
 # find_library(MetavisionSDK NAMES metavision_sdk_core REQUIRED)
 
-# Thanks to https://github.com/scikit-build/scikit-build-sample-projects/blob/master/projects/hello-pybind11/CMakeLists.txt
-find_package(PythonExtensions REQUIRED)
-find_package(pybind11 CONFIG)
-if (NOT pybind11_FOUND)
-  FetchContent_Declare(
-    pybind11
-    URL https://github.com/pybind/pybind11/archive/refs/tags/v2.9.2.tar.gz
-    URL_HASH SHA256=6bd528c4dbe2276635dc787b6b1f2e5316cf6b49ee3e150264e455a0d68d19c1
-  )
-  FetchContent_MakeAvailable(pybind11)
+# Thanks to https://github.com/wjakob/nanobind_example/blob/master/CMakeLists.txt
+# Create CMake targets for all Python components needed by nanobind
+if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.26)
+  find_package(Python 3.8 COMPONENTS Interpreter Development.Module Development.SABIModule REQUIRED)
+else()
+  find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
 endif()
 
-add_library(aestream_cu STATIC
-  tensor_buffer_kernel.h
-  tensor_buffer_kernel.cu
-)
-target_link_libraries(aestream_cu PRIVATE CUDA::cudart CUDA::cuda_driver)
-target_include_directories(aestream_cu PUBLIC "${CUDAToolkit_INCLUDE_DIRS}")
-set_target_properties(aestream_cu PROPERTIES 
-  CUDA_SEPARABLE_COMPILATION ON
-  POSITION_INDEPENDENT_CODE ON
-  CUDA_VISIBILITY_PRESET "hidden"
-)
+# Run `nanobind.cmake_dir()` from Python to detect where nanobind is installed
+execute_process(
+  COMMAND "${Python_EXECUTABLE}" -c "import nanobind; print(nanobind.cmake_dir())"
+  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE NB_DIR)
+list(APPEND CMAKE_PREFIX_PATH "${NB_DIR}")
 
-set(PYTHON_MODULE_NAME aestream_ext)
-pybind11_add_module(${PYTHON_MODULE_NAME} MODULE
+find_package(nanobind CONFIG REQUIRED)
+
+# add_library(aestream_cu STATIC
+#   tensor_buffer_kernel.h
+#   tensor_buffer_kernel.cu
+# )
+# target_link_libraries(aestream_cu PRIVATE CUDA::cudart CUDA::cuda_driver)
+# target_include_directories(aestream_cu PUBLIC "${CUDAToolkit_INCLUDE_DIRS}")
+# set_target_properties(aestream_cu PROPERTIES 
+#   CUDA_SEPARABLE_COMPILATION ON
+#   POSITION_INDEPENDENT_CODE ON
+#   CUDA_VISIBILITY_PRESET "hidden"
+# )
+
+nanobind_add_module(aestream_ext 
+      STABLE_ABI
+
       "${module_source_files}"
       module.cpp 
       udp.cpp 
       udp_client.cpp 
       udp_client.hpp 
-      iterator.cpp
+      # iterator.cpp
       file.hpp
       file.cpp
       tensor_buffer.hpp
@@ -62,22 +68,21 @@ pybind11_add_module(${PYTHON_MODULE_NAME} MODULE
       tensor_iterator.hpp
       tensor_iterator.cpp
 )
-install(TARGETS aer aestream_cu aestream_file aestream_input aestream_output DESTINATION aestream)
+install(TARGETS aer aestream_file aestream_input aestream_output nanobind LIBRARY DESTINATION aestream)
 
-set_target_properties(${PYTHON_MODULE_NAME} PROPERTIES 
+set_target_properties(aestream_ext PROPERTIES 
   # BUILD_RPATH ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES} # For Apple
   INSTALL_RPATH "\$ORIGIN"
   # INSTALL_RPATH_USE_LINK_PATH TRUE
-  # POSITION_INDEPENDENT_CODE ON
-  # CUDA_SEPARABLE_COMPILATION ON
-  INTERPROCEDURAL_OPTIMIZATION TRUE
-  CXX_VISIBILITY_PRESET "hidden"
-  # COMPILE_FLAGS_RELEASE "-O3" # Overwrite / remove coroutine flag
+#   # POSITION_INDEPENDENT_CODE ON
+#   # CUDA_SEPARABLE_COMPILATION ON
+#   INTERPROCEDURAL_OPTIMIZATION TRUE
+#   CXX_VISIBILITY_PRESET "hidden"
+#   # COMPILE_FLAGS_RELEASE "-O3" # Overwrite / remove coroutine flag
 )
-target_compile_options(${PYTHON_MODULE_NAME} PRIVATE "-ffat-lto-objects")
-target_compile_definitions(${PYTHON_MODULE_NAME} PRIVATE ${module_compile_definitions})
-#target_compile_features(${PYTHON_MODULE_NAME} PUBLIC cxx_std_17)
-target_include_directories(${PYTHON_MODULE_NAME} PRIVATE "${CMAKE_INSTALL_LIBDIR}" "${PYTHON_SITE_PACKAGES_DIR}/aestream")
-target_link_libraries(${PYTHON_MODULE_NAME} PRIVATE aer aestream_cu aestream_file aestream_input aestream_output)
+#target_compile_definitions(aestream_ext PRIVATE ${module_compile_definitions})
+#target_compile_features(aestream_ext PUBLIC cxx_std_17)
+target_include_directories(aestream_ext PRIVATE "${CMAKE_INSTALL_LIBDIR}" "${PYTHON_SITE_PACKAGES_DIR}/aestream")
+target_link_libraries(aestream_ext PRIVATE aer aestream_file aestream_input aestream_output nanobind)
 
-install(TARGETS ${PYTHON_MODULE_NAME} DESTINATION aestream)
+install(TARGETS aestream_ext LIBRARY DESTINATION aestream)

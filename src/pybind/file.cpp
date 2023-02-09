@@ -91,13 +91,13 @@ bool FileInput::get_is_streaming() {
   return is_streaming.load() || is_nonempty.load();
 }
 
-py::array_t<AER::Event> FileInput::events() {
-  // const unique_file_t &fp = open_file(filename);
-  // auto n_events = dat_read_header(fp);
-  auto [event_array, n_events_read] = dat_read_n_events(fp, n_events);
+// nb::tensor<nb::numpy, AER::Event> FileInput::events() {
+//   // const unique_file_t &fp = open_file(filename);
+//   // auto n_events = dat_read_header(fp);
+//   auto [event_array, n_events_read] = dat_read_n_events(fp, n_events);
 
-  return buffer_to_py_array(event_array, n_events_read);
-}
+//   return nb::tensor<nb::numpy, AER::Event>(event_array, 1, n_events_read);
+// }
 
 // py::array_t<AER::Event> FileInput::events_co() {
 //   AER::Event *event_array = (AER::Event *)malloc(n_events *

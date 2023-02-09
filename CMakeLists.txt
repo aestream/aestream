@@ -9,16 +9,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 option(USE_TORCH "Build with Torch" OFF)
 option(USE_PYTHON "Buid Python lib" OFF)
 
-# set coroutine flags for clang appropriately
-# thanks to https://stackoverflow.com/questions/64703866/is-clang-11s-invocation-of-coroutine-headers-via-fcoroutines-flag
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(GCC_COVERAGE_COMPILE_FLAGS "-fcoroutines-ts")
-    add_compile_definitions(USE_CLANG)
-    message(STATUS "detected clang, set -ts flag")
-else()
-    set(GCC_COVERAGE_COMPILE_FLAGS "-fcoroutines")
-endif()
-
 set(default_build_type Release)
 add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
 

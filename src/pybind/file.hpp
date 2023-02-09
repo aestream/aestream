@@ -9,17 +9,6 @@
 #include "tensor_buffer.hpp"
 #include "tensor_iterator.hpp"
 
-inline py::array_t<AER::Event> buffer_to_py_array(AER::Event *event_array,
-                                                  size_t n_events) {
-  py::capsule free_when_done(event_array, [](void *f) {
-    AER::Event *event_array = reinterpret_cast<AER::Event *>(f);
-    delete[] event_array;
-  });
-
-  return py::array_t<AER::Event>({n_events}, {sizeof(AER::Event)}, event_array,
-                                 free_when_done);
-}
-
 class FileInput {
 
 private:
@@ -55,7 +44,7 @@ public:
 
   bool get_is_streaming();
 
-  py::array_t<AER::Event> events();
+  // nb::tensor<nb::numpy, AER::Event> events();
 
   // py::array_t<AER::Event> events_co();
 

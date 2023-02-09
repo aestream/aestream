@@ -19,12 +19,6 @@ tensor_t TensorIterator::next() {
       break;
     }
   }
-#ifdef USE_TORCH
-  auto t = torch::from_blob(array, {shape[0], shape[1]});
-#else
-  auto t = tensor_t(size, array);
-  t.resize(shape);
-  t.owndata();
-#endif
-  return t;
+  const size_t s[2] = {shape[0], shape[1]};
+  return tensor_t(array, 2, s);
 }

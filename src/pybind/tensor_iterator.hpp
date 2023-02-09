@@ -1,10 +1,12 @@
 #pragma once
 
+#include <nanobind/nanobind.h>
+#include <nanobind/tensor.h>
+
 #include "../aer.hpp"
 #include "../generator.hpp"
 
 #include "types.hpp"
-
 class TensorIterator {
 private:
   const py_size_t shape;

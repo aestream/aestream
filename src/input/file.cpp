@@ -4,7 +4,6 @@ Generator<AER::Event> file_event_generator(const std::string filename,
                                            const std::atomic<bool> &runFlag) {
   try {
     const auto fp = open_file(filename); // TODO: Use pointer in functions below
-    std::cout << "no problemn" << std::endl;
   } catch (std::exception e) {
     throw e;
   }

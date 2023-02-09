@@ -1,6 +1,6 @@
 #include "tensor_buffer.hpp"
 
-#include <iostream>
+namespace nb = nanobind;
 
 // TensorBuffer constructor
 TensorBuffer::TensorBuffer(py_size_t size, const std::string &device,
@@ -77,11 +77,11 @@ tensor_t TensorBuffer::read() {
     buffer1.swap(buffer2);
   }
   // Copy and clean
-#ifdef USE_CUDA
-  tensor_t copy = tensor_t(shape[0] * shape[1], *buffer2.get());
-  std::cout << "Bob" << std::endl;
-  free_memory_cuda<float>(*buffer2.get());
-  buffer2 = std::make_shared<cache_t>(alloc_memory_cuda<float>(shape[0] * shape[1]));
+// #ifdef USE_CUDA
+//   tensor_t copy = tensor_t(shape[0] * shape[1], *buffer2.get());
+//   std::cout << "Bob" << std::endl;
+//   free_memory_cuda<float>(*buffer2.get());
+//   buffer2 = std::make_shared<cache_t>(alloc_memory_cuda<float>(shape[0] * shape[1]));
 // #else
 //   // Create a Python object that will free the allocated
 //   // memory when destroyed:
@@ -93,6 +93,8 @@ tensor_t TensorBuffer::read() {
 //   copy.owndata();
 //   cache_t *array = new cache_t(shape[0] * shape[1]);
 //   buffer2.reset(array);
-#endif
-  return copy;
+// #endif
+  float* data = *buffer2.get();
+  const size_t s[2] = {shape[0], shape[1]};
+  return tensor_t(data, 2, s);
 }

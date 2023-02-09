@@ -8,8 +8,8 @@
 #include "../aer.hpp"
 #include "types.hpp"
 
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/tensor.h>
 
 #ifdef USE_CUDA
 #include "tensor_buffer_kernel.h"
