@@ -1,7 +1,14 @@
 #include "tensor_buffer.hpp"
-#include <iostream>
 
 namespace nb = nanobind;
+
+inline std::unique_ptr<cache_t> allocate_buffer(const size_t &length) {
+#ifdef USE_CUDA
+  return std::unique_ptr<cache_t>(alloc_memory_cuda<float>(length));
+#else
+  return std::make_unique<cache_t>(length);
+#endif
+}
 
 // TensorBuffer constructor
 TensorBuffer::TensorBuffer(py_size_t size, const std::string &device,
@@ -11,14 +18,12 @@ TensorBuffer::TensorBuffer(py_size_t size, const std::string &device,
   cuda_device_pointer = alloc_memory_cuda<int>(buffer_size);
   offset_buffer = std::vector<int>(buffer_size);
   if (device == "cuda") {
-    buffer1 =
-        std::make_shared<cache_t>(alloc_memory_cuda<float>(size[0] * size[1]));
-    buffer2 =
-        std::make_shared<cache_t>(alloc_memory_cuda<float>(size[0] * size[1]));
+    buffer1 = allocate_buffer(size[0] * size[1]);
+    buffer2 = allocate_buffer(size[0] * size[1]);
   } else {
 #endif
-    buffer1 = std::make_unique<cache_t>(size[0] * size[1]);
-    buffer2 = std::make_unique<cache_t>(size[0] * size[1]);
+    buffer1 = allocate_buffer(size[0] * size[1]);
+    buffer2 = allocate_buffer(size[0] * size[1]);
 #ifdef USE_CUDA
   }
 #endif
@@ -58,7 +63,7 @@ void TensorBuffer::set_vector(std::vector<AER::Event> events) {
     for (size_t i = 0; i < events.size(); i++) {
       offset_buffer[i] = shape[1] * events[i].x + events[i].y;
     }
-    index_increment_cuda<float>(*buffer1.get(), offset_buffer,
+    index_increment_cuda<float>(buffer1.get(), offset_buffer,
                                 cuda_device_pointer);
     return;
   }
@@ -68,8 +73,8 @@ void TensorBuffer::set_vector(std::vector<AER::Event> events) {
   }
 }
 
-template <typename T>
-inline void TensorBuffer::assign_event(T *array, int16_t x, int16_t y) {
+template <typename R>
+inline void TensorBuffer::assign_event(R *array, int16_t x, int16_t y) {
   (*(array + shape[1] * x + y))++;
 }
 
@@ -99,7 +104,10 @@ tensor_t TensorBuffer::read() {
   //   cache_t *array = new cache_t(shape[0] * shape[1]);
   //   buffer2.reset(array);
   // #endif
-  float *data = buffer2.get();
+  // Extract old buffer
+  float *data = buffer2.release();
+  buffer2 = allocate_buffer(shape[0] * shape[1]);
+  // Replace old new buffer
   const size_t s[2] = {shape[0], shape[1]};
   return tensor_t(data, 2, s);
 }

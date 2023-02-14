@@ -1,4 +1,7 @@
-#include "tensor_buffer_kernel.h"
+#include <cuda.h>
+#include <cuda_runtime.h>
+
+#include <vector>
 
 template <typename scalar_t>
 __global__ void cuda_increment_kernel(scalar_t *__restrict__ array, int *__restrict__ offsets, const size_t size) {

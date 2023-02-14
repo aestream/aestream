@@ -6,5 +6,4 @@ requires = [
         "wheel",
         "nanobind",
         "ninja; platform_system!='Windows'"]
-build-backend = "build_meta"
-backend-path = ["scripts"]
+build-backend = "setuptools.build_meta"

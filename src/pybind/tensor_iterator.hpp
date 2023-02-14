@@ -6,7 +6,8 @@
 #include "../aer.hpp"
 #include "../generator.hpp"
 
-#include "types.hpp"
+#include "tensor_buffer.hpp"
+
 class TensorIterator {
 private:
   const py_size_t shape;

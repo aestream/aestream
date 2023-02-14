@@ -1,9 +1,12 @@
 import multiprocessing
 import socket
 import time
+import pytest
 
 import numpy
 from aestream import UDPInput
+
+from . import _has_cuda_torch
 
 
 def stream_fake_data(port):
@@ -33,6 +36,7 @@ def test_udp():
     assert numpy.equal(frame[218, 15], 1)
 
 
+@pytest.mark.skipif(not _has_cuda_torch, reason="Torch-gpu is not installed")
 def test_udp_gpu():
     try:
         import torch

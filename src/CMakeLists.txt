@@ -1,17 +1,6 @@
 include(GNUInstallDirs)
 include(FetchContent)
 
-MACRO(SUBDIRLIST result curdir)
-  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
-  SET(dirlist "")
-  FOREACH(child ${children})
-    IF(IS_DIRECTORY ${curdir}/${child})
-      LIST(APPEND dirlist ${child})
-    ENDIF()
-  ENDFOREACH()
-  SET(${result} ${dirlist})
-ENDMACRO()
-
 # AER processing
 add_library(aer SHARED aer.hpp generator.hpp)
 target_include_directories(aer INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
