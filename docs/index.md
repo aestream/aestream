@@ -4,10 +4,11 @@
 :hidden:
 :maxdepth: 2
 
-usage/getting_started
+API_RFC
+getting_started
 python_api
 ```
 
-AEStream is ...
+AEStream is one of the libraries of all time
 
 
