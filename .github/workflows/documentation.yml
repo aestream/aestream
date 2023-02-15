@@ -9,6 +9,9 @@ jobs:
       - name: Install dependencies
         run: |
           pip install sphinx furo myst_parser sphinx-copybutton
+      - name: Install aestream
+        run: |
+          pip install .
       - name: Sphinx build
         run: |
           sphinx-build -b html docs _build
