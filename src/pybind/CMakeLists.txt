@@ -3,7 +3,7 @@ include(FetchContent)
 include(FindCUDAToolkit)
 
 # Configure CUDA
-if (WITH_CUDA)
+if (USE_CUDA)
   if(NOT DEFINED ${CMAKE_CUDA_ARCHITECTURES})
     set(CMAKE_CUDA_ARCHITECTURES 50 52 60 61 70 75 80 86)
   endif()
@@ -11,7 +11,7 @@ if (WITH_CUDA)
 
   enable_language(CUDA)
   set(module_source_files "${module_source_files}" tensor_buffer_kernel.cu)
-  set(module_link_libraries CUDA::cudart CUDA::cuda_driver)
+  set(module_link_libraries CUDA::cudart)
   set(module_compile_definitions USE_CUDA)
 endif()
 
@@ -43,12 +43,11 @@ nanobind_add_module(
   aestream_ext 
   STABLE_ABI NOMINSIZE # Remove minimization to prevent -Os flags to propagate to nvcc
 
-  "${module_source_files}"
+  "${module_source_files}" # Include e. g. camera vendors 
   module.cpp 
   udp.cpp 
   udp_client.cpp 
-  udp_client.hpp 
-  # usb.cpp
+  udp_client.hpp
   # iterator.cpp
   file.hpp
   file.cpp
@@ -68,7 +67,7 @@ set_target_properties(aestream_ext PROPERTIES
   CUDA_RESOLVE_DEVICE_SYMBOLS ON
 )
 target_compile_definitions(aestream_ext PRIVATE ${module_compile_definitions})
-target_include_directories(aestream_ext PRIVATE "${CMAKE_INSTALL_LIBDIR}" "${CUDA_INCLUDE_DIRS}" "${PYTHON_SITE_PACKAGES_DIR}/aestream")
+target_include_directories(aestream_ext PRIVATE "${CMAKE_INSTALL_LIBDIR}" "${CUDA_INCLUDE_DIRS}" "${CudaToolkitLibDir}" "${PYTHON_SITE_PACKAGES_DIR}/aestream")
 target_link_libraries(aestream_ext PRIVATE ${module_link_libraries} aer aestream_file aestream_input aestream_output nanobind)
 
 install(TARGETS aestream_ext LIBRARY DESTINATION aestream)
