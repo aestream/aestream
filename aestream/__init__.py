@@ -1,4 +1,5 @@
 """
+This is printed from aestream/__init__.py
 AEStream library for streaming address-event representations.
 
 Please refer to https://github.com/norse/aestream for usage
