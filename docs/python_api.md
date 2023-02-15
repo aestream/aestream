@@ -1,6 +1,6 @@
 Python API
 ==========
 
-```{automodule} aestream_ext
+```{automodule} aestream
 :members:
 ```
