@@ -36,5 +36,6 @@ html:
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
 github:
-      @make html
-      @cp -a _build/html/. ../docs
+    @make html
+	@rm -rf ../docs/*
+    @cp -a _build/html/. ../docs
