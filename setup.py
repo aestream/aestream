@@ -17,7 +17,7 @@ try:
     if cuda_home is not None:
         flags = " ".join(cpp_extension._get_cuda_arch_flags())
         cmake_args += [
-            f"-DWITH_CUDA=1",
+            f"-DUSE_CUDA=1",
             f"-DCMAKE_CUDA_FLAGS={flags}",
             f"-DCMAKE_CUDA_COMPILER={cuda_home}/bin/nvcc",
             f"-DCUDA_INCLUDE_DIRS={cuda_home}/include",

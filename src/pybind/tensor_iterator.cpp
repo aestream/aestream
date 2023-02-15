@@ -9,7 +9,7 @@ inline void TensorIterator::assign_event(T *array, int16_t x, int16_t y) {
   (*(array + shape[1] * x + y))++;
 }
 
-tensor_t TensorIterator::next() {
+float * TensorIterator::next() {
   const size_t size = shape[0] * shape[1];
   float array[size];
   for (const auto &event : generator) {
@@ -19,6 +19,5 @@ tensor_t TensorIterator::next() {
       break;
     }
   }
-  const size_t s[2] = {shape[0], shape[1]};
-  return tensor_t(array, 2, s);
+  return array;
 }
