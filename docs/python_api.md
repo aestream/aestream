@@ -1,5 +1,4 @@
-Python API
-==========
+# Python API
 
 ```{automodule} aestream
 :members:

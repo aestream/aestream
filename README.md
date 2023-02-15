@@ -129,18 +129,6 @@ The open-source version the SDK `openeb` is available with installation instruct
 Using `openeb`, it should be sufficient to install it using `cmake && make && make install` to put it in your path.
 Otherwise, you can point to it using the `-DCMAKE_PREFIX_PATH` option in `cmake`.
 
-## Documentation
-
-Build instructions:
-
-```
-cd docs
-make html
-# or
-# .\make.bat html
-```
-
-
 ## Acknowledgments
 
 AEStream is created by
