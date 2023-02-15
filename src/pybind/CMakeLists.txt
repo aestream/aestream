@@ -48,7 +48,7 @@ nanobind_add_module(
   udp.cpp 
   udp_client.cpp 
   udp_client.hpp 
-  usb.cpp
+  # usb.cpp
   # iterator.cpp
   file.hpp
   file.cpp
