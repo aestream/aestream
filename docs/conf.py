@@ -4,7 +4,10 @@ import sys
 extensions = [
     "sphinx.ext.autodoc", # Imports modules and docs
     "sphinx.ext.intersphinx", # Links to external libs docs
-    "shpinx.ext.napoleon" # Converts docs to rst format
+    "sphinx.ext.napoleon", # Converts docs to rst format
+    "sphinx.ext.autosummary",
+    "sphinx_copybutton",
+    "myst_parser",
 ]
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
@@ -14,7 +17,7 @@ autosummary_generate = True
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = ["_templates"]
 
-source_suffix = ".rst"
+source_suffix = ".md"
 master_doc = "index"
 
 # General information about the project.
@@ -48,7 +51,9 @@ html_theme = "furo"
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-# html_theme_options = {}
+html_theme_options = {
+    "top_of_page_button": "edit",
+}
 
 
 # The name of an image file (relative to this directory) to place at the top
