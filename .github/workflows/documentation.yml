@@ -12,7 +12,7 @@ jobs:
           cuda: '11.7.0'
       - name: Install dependencies
         run: |
-          pip install sphinx furo myst_parser sphinx-copybutton
+          pip install sphinx furo myst_parser sphinx-copybutton nanobind
       - name: Install aestream
         run: |
           pip install .
