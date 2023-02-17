@@ -78,8 +78,8 @@ FileInput::FileInput(const std::string &filename, py_size_t shape,
   generator = file_event_generator(filename, runFlag);
 };
 
-tensor_t FileInput::read() {
-  const auto &tmp = buffer.read();
+BufferPointer FileInput::read() {
+  auto tmp = buffer.read();
   is_nonempty.store(false);
   return tmp;
 }
@@ -147,7 +147,7 @@ FileInput *FileInput::start_stream() {
   return this;
 }
 
-bool FileInput::stop_stream(nb::object& a, nb::object& b, nb::object& c) {
+bool FileInput::stop_stream(nb::object &a, nb::object &b, nb::object &c) {
   is_streaming.store(false);
   if (file_thread->joinable()) {
     file_thread->join();

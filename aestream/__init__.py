@@ -11,11 +11,11 @@ except ImportError:
     logging.debug("Failed to import Torch: AEStream is running in Numpy mode")
     del logging
 
-from .aestream_ext import FileInput, UDPInput
+from aestream.input import FileInput, UDPInput
 
 modules = []
 try:
-    from .aestream_ext import USBInput
+    from aestream_ext import USBInput
 
     modules.append("USBInput")
 except ImportError:

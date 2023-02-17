@@ -4,10 +4,10 @@ import pytest
 import numpy
 from aestream import FileInput
 
-from . import _has_cuda_torch
+from . import _has_cuda_torch, _has_torch
 
 
-def test_read_dat_numpy():
+def test_read_dat():
     with FileInput(
         filename="example/sample.dat", shape=(600, 400), ignore_time=True
     ) as stream:
@@ -19,7 +19,11 @@ def test_read_dat_numpy():
             if time.time() > t_0 + interval:
                 break
             frame = stream.read()
-            assert isinstance(frame, numpy.ndarray)
+            if _has_torch:
+                import torch
+                assert isinstance(frame, torch.Tensor)
+            else:
+                assert isinstance(frame, numpy.array)
             events += frame.sum()
     assert events == 539136
 

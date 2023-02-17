@@ -28,6 +28,10 @@ NB_MODULE(aestream_ext, m) {
       .def_property_readonly("polarity",
                              [](const AER::Event &e) { return e.polarity; });
 
+  nb::class_<BufferPointer>(m, "BufferPointer")
+      .def("to_numpy", &BufferPointer::to_numpy)
+      .def("to_torch", &BufferPointer::to_torch);
+
   //   nb::class_<Iterator>(m, "EventIterator")
   //       //  .def( // Thanks to https://stackoverflow.com/a/57217995/999865
   //       // "__iter__",
@@ -39,7 +43,7 @@ NB_MODULE(aestream_ext, m) {
   //       .def("__iter__", [](Iterator &it) -> Iterator & { return it; })
   //       .def("__next__", &Iterator::next, nb::rv_policy::reference);
 
-  //   nb::class_<FrameIterator>(m, "FrameIterator")
+  //   nb::class_<FrameIterator>(m , "FrameIterator")
   //       .def("__iter__", [](FrameIterator &it) -> FrameIterator & { return
   //       it; }) .def("__next__", &FrameIterator::next);
 
@@ -64,26 +68,26 @@ NB_MODULE(aestream_ext, m) {
       .def("is_streaming", &FileInput::get_is_streaming)
       .def("start_stream", &FileInput::start_stream)
       .def("stop_stream", &FileInput::stop_stream)
-      .def("read", &FileInput::read)
-      //  .def("parts",
-      //       [](nb::object fobj, size_t n_events_per_part) {
-      //         //    std::cout << i.filename << std::endl;
-      //         //    if (endsWith(i.filename, "aedat4")) {
-      //         // std::cout << "AEDAT" << std::endl;
-      //         return Iterator(fobj.cast<FileInput &>(), n_events_per_part,
-      //         fobj);
-      //         //    } else {
-      //         // return PartIterator(i, n_events_per_part, fobj);
-      //         //    }
-      //       })
-      //  .def( // Thanks to https://stackoverflow.com/a/57217995/999865
-      //      "__iter__",
-      //      [](FileInput &f) { return
-      //      nb::make_iterator(nb::type<Generator<AER::Event>::Iter>,
-      //      "iterator", f.begin(), f.end()); }, nb::keep_alive<0, 1>() /* Keep
-      //      object alive while iterator exists */)
-      //  .def("__next__", &FileInput::begin)
-      ;
+      .def("read_buffer", &FileInput::read);
+  //  .def("parts",
+  //       [](nb::object fobj, size_t n_events_per_part) {
+  //         //    std::cout << i.filename << std::endl;
+  //         //    if (endsWith(i.filename, "aedat4")) {
+  //         // std::cout << "AEDAT" << std::endl;
+  //         return Iterator(fobj.cast<FileInput &>(), n_events_per_part,
+  //         fobj);
+  //         //    } else {
+  //         // return PartIterator(i, n_events_per_part, fobj);
+  //         //    }
+  //       })
+  //  .def( // Thanks to https://stackoverflow.com/a/57217995/999865
+  //      "__iter__",
+  //      [](FileInput &f) { return
+  //      nb::make_iterator(nb::type<Generator<AER::Event>::Iter>,
+  //      "iterator", f.begin(), f.end()); }, nb::keep_alive<0, 1>() /* Keep
+  //      object alive while iterator exists */)
+  //  .def("__next__", &FileInput::begin)
+  ;
 
   nb::class_<UDPInput>(m, "UDPInput")
       .def(nb::init<py_size_t, std::string, int>(), nb::arg("shape"),
@@ -94,7 +98,7 @@ NB_MODULE(aestream_ext, m) {
       .def("start_stream", &UDPInput::start_stream)
       .def("stop_stream", &UDPInput::stop_stream, nb::arg("a").none(),
            nb::arg("b").none(), nb::arg("c").none())
-      .def("read", &UDPInput::read);
+      .def("read_buffer", &UDPInput::read);
 
 #ifdef USE_INIVATION
   nb::class_<USBInput>(m, "USBInput")
