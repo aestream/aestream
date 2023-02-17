@@ -17,8 +17,12 @@
 namespace nb = nanobind;
 
 NB_MODULE(aestream_ext, m) {
-     // m.doc() = "aestream_ext docstring";
      //   NB_NUMPY_DTYPE(AER::Event, timestamp, x, y, polarity);
+
+     // m.doc() = "aestream_ext docstring";
+     m.def("add", []() {
+        return "Hello, World!";
+    }, "Add function");
 
      nb::class_<AER::Event>(m, "Event")
          .def_property_readonly("timestamp",
@@ -68,7 +72,7 @@ NB_MODULE(aestream_ext, m) {
                    .def("is_streaming", &FileInput::get_is_streaming)
                    .def("start_stream", &FileInput::start_stream)
                    .def("stop_stream", &FileInput::stop_stream)
-                   .def("read", &FileInput::read)
+                   .def("read", &FileInput::read, "This is a function that reads!!!")
                    //  .def("parts",
                    //       [](nb::object fobj, size_t n_events_per_part) {
                    //         //    std::cout << i.filename << std::endl;
