@@ -41,7 +41,8 @@ find_package(nanobind CONFIG REQUIRED)
 
 nanobind_add_module(
   aestream_ext 
-  STABLE_ABI NOMINSIZE # Remove minimization to prevent -Os flags to propagate to nvcc
+  NB_STATIC STABLE_ABI LTO 
+  NOMINSIZE # Remove minimization to prevent -Os flags to propagate to nvcc
 
   "${module_source_files}" # Include e. g. camera vendors 
   module.cpp 
@@ -56,7 +57,7 @@ nanobind_add_module(
   tensor_iterator.hpp
   tensor_iterator.cpp
 )
-install(TARGETS aer aestream_file aestream_input aestream_output nanobind LIBRARY DESTINATION aestream)
+install(TARGETS aer aestream_file aestream_input aestream_output LIBRARY DESTINATION aestream)
 
 set_target_properties(aestream_ext PROPERTIES 
   # BUILD_RPATH ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES} # For Apple
@@ -68,6 +69,6 @@ set_target_properties(aestream_ext PROPERTIES
 )
 target_compile_definitions(aestream_ext PRIVATE ${module_compile_definitions})
 target_include_directories(aestream_ext PRIVATE "${CMAKE_INSTALL_LIBDIR}" "${CUDA_INCLUDE_DIRS}" "${CudaToolkitLibDir}" "${PYTHON_SITE_PACKAGES_DIR}/aestream")
-target_link_libraries(aestream_ext PRIVATE ${module_link_libraries} aer aestream_file aestream_input aestream_output nanobind)
+target_link_libraries(aestream_ext PRIVATE ${module_link_libraries} aer aestream_file aestream_input aestream_output)
 
 install(TARGETS aestream_ext LIBRARY DESTINATION aestream)

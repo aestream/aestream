@@ -2,8 +2,8 @@
 #include <algorithm>
 
 #include "../aer.hpp"
+#include "../file/aedat4.hpp"
 #include "../generator.hpp"
-// #include "../file/aedat4.hpp"
 #include "../input/file.hpp"
 
 #include "tensor_buffer.hpp"
@@ -34,10 +34,10 @@ public:
   const std::string filename;
   size_t n_events;
 
-  FileInput(const std::string &filename, py_size_t shape, const std::string& device,
-            bool ignore_time = false);
+  FileInput(const std::string &filename, py_size_t shape,
+            const std::string &device, bool ignore_time = false);
 
-  tensor_t read();
+  BufferPointer read();
 
   Generator<AER::Event>::Iter begin();
   std::default_sentinel_t end();
@@ -52,5 +52,5 @@ public:
 
   FileInput *start_stream();
 
-  bool stop_stream(nb::object& a, nb::object& b, nb::object&c);
+  bool stop_stream(nb::object &a, nb::object &b, nb::object &c);
 };

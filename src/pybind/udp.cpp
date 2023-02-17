@@ -29,7 +29,7 @@ public:
     return this;
   }
 
-  tensor_t read() { return buffer.read(); }
+  BufferPointer read() { return buffer.read(); }
 
   void serve_synchronous() {
     int sockfd;
