@@ -1,5 +1,4 @@
 #include "tensor_buffer.hpp"
-#include <iostream>
 
 namespace nb = nanobind;
 
