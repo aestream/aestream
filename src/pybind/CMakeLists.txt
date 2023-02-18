@@ -59,8 +59,10 @@ nanobind_add_module(
 )
 install(TARGETS aer aestream_file aestream_input aestream_output LIBRARY DESTINATION aestream)
 
-set_target_properties(aestream_ext PROPERTIES 
-  BUILD_RPATH ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES} # For Apple
+set_target_properties(aestream_ext PROPERTIES
+  if (USE_CUDA)
+    BUILD_RPATH ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES} # For Apple
+  endif()
   INSTALL_RPATH "\$ORIGIN"
   INSTALL_RPATH_USE_LINK_PATH TRUE
   POSITION_INDEPENDENT_CODE ON
