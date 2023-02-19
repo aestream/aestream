@@ -2,6 +2,7 @@
 def _has_torch():
     try:
         import torch
+        return True
     except ImportError:
         pass
     finally:
