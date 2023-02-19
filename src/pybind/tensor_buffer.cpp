@@ -2,15 +2,20 @@
 
 namespace nb = nanobind;
 
-inline buffer_t allocate_buffer(const size_t &length, std::string device) {
+template <typename scalar_t>
+inline std::unique_ptr<scalar_t[], BufferDeleter<scalar_t>>
+allocate_buffer(const size_t &length, std::string device) {
 #ifdef USE_CUDA
   if (device == "cuda") {
     // Thanks to https://stackoverflow.com/a/47406068
-    buffer_t buffer_ptr(alloc_memory_cuda_float(length), BufferDeleter());
+    std::unique_ptr<scalar_t[], BufferDeleter<scalar_t>> buffer_ptr(
+        static_cast<scalar_t *>(alloc_memory_cuda(length, sizeof(scalar_t))),
+        BufferDeleter<scalar_t>());
     return buffer_ptr;
   }
 #endif
-  return buffer_t(new float[length]{0}, BufferDeleter());
+  return std::unique_ptr<scalar_t[], BufferDeleter<scalar_t>>(
+      new scalar_t[length]{0}, BufferDeleter<scalar_t>());
 }
 
 // TensorBuffer constructor
@@ -19,15 +24,17 @@ TensorBuffer::TensorBuffer(py_size_t size, std::string device,
     : shape(size), device(device) {
 #ifdef USE_CUDA
   if (device == "cuda") {
-    cuda_device_pointer = alloc_memory_cuda_int(buffer_size);
+    cuda_buffer = allocate_buffer<int>(buffer_size, device);
     offset_buffer = std::vector<int>(buffer_size);
   }
 #endif
-  buffer1 = allocate_buffer(size[0] * size[1], device);
-  buffer2 = allocate_buffer(size[0] * size[1], device);
+  buffer1 = allocate_buffer<float>(size[0] * size[1], device);
+  buffer2 = allocate_buffer<float>(size[0] * size[1], device);
 }
 
 TensorBuffer::~TensorBuffer() {}
+
+#include <iostream>
 
 void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
   const auto length = numbytes >> 1;
@@ -35,13 +42,15 @@ void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
 #ifdef USE_CUDA
   if (device == "cuda") {
     offset_buffer.clear();
+    offset_buffer.reserve(length);
     for (int i = 0; i < length; i = i + 2) {
       // Decode x, y
       const uint16_t y_coord = data[i] & 0x7FFF;
       const uint16_t x_coord = data[i + 1] & 0x7FFF;
       offset_buffer.push_back(shape[1] * x_coord + y_coord);
     }
-    index_increment_cuda(buffer1.get(), offset_buffer, cuda_device_pointer);
+    index_increment_cuda(buffer1.get(), offset_buffer.data(),
+                         offset_buffer.size(), cuda_buffer.get());
     return;
   }
 #endif
@@ -57,10 +66,13 @@ void TensorBuffer::set_vector(std::vector<AER::Event> events) {
   const std::lock_guard lock{buffer_lock};
 #ifdef USE_CUDA
   if (device == "cuda") {
+    offset_buffer.clear();
+    offset_buffer.reserve(events.size());
     for (size_t i = 0; i < events.size(); i++) {
-      offset_buffer[i] = shape[1] * events[i].x + events[i].y;
+      offset_buffer.push_back(shape[1] * events[i].x + events[i].y);
     }
-    index_increment_cuda(buffer1.get(), offset_buffer, cuda_device_pointer);
+    index_increment_cuda(buffer1.get(), offset_buffer.data(),
+                                offset_buffer.size(), cuda_buffer.get());
     return;
   }
 #endif
@@ -81,7 +93,7 @@ BufferPointer TensorBuffer::read() {
     buffer1.swap(buffer2);
   }
   // Create new buffer and swap with old
-  buffer_t buffer3 = allocate_buffer(shape[0] * shape[1], device);
+  buffer_t buffer3 = allocate_buffer<float>(shape[0] * shape[1], device);
   buffer2.swap(buffer3);
   // Return pointer
   return BufferPointer(std::move(buffer3), shape, device);
