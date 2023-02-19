@@ -20,7 +20,7 @@ add_subdirectory(file)
 add_subdirectory(output)
 add_subdirectory(input)
 
-if (WITH_PYTHON)
+if (USE_PYTHON)
   # AEStream Python
   add_subdirectory(pybind)
 else() 

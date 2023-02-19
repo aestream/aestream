@@ -6,7 +6,7 @@ with open(os.path.join(pwd, "README.md"), encoding="utf-8") as fp:
     readme_text = fp.read()
 
 # C++ config
-cmake_args = ["-DWITH_PYTHON=1"]
+cmake_args = ["-DUSE_PYTHON=1"]
 
 # Activate CUDA, if found
 try:
