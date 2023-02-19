@@ -19,16 +19,16 @@ def test_read_dat():
             if time.time() > t_0 + interval:
                 break
             frame = stream.read()
-            if _has_torch:
+            if _has_torch():
                 import torch
                 assert isinstance(frame, torch.Tensor)
             else:
-                assert isinstance(frame, numpy.array)
+                assert isinstance(frame, numpy.ndarray)
             events += frame.sum()
     assert events == 539136
 
 
-@pytest.mark.skipif(not _has_cuda_torch, reason="Torch-gpu is not installed")
+@pytest.mark.skipif(not _has_cuda_torch(), reason="Torch-gpu is not installed")
 def test_read_dat_torch_cuda():
     import torch
     with FileInput(
