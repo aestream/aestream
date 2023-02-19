@@ -34,8 +34,6 @@ TensorBuffer::TensorBuffer(py_size_t size, std::string device,
 
 TensorBuffer::~TensorBuffer() {}
 
-#include <iostream>
-
 void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
   const auto length = numbytes >> 1;
   const std::lock_guard lock{buffer_lock};
