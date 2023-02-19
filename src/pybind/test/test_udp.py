@@ -28,7 +28,6 @@ def test_udp():
 
         interval = 0.5
         t_0 = time.time()
-        time.sleep(0.5)
         while True:
             if t_0 + interval <= time.time():
                 frame = stream.read()
@@ -46,11 +45,12 @@ def test_udp_gpu():
                 start_stream(3334)  # Start streaming from file
 
                 interval = 0.5
-                t_0 = time.time()
                 time.sleep(0.5)
+                t_0 = time.time()
                 while True:
                     if t_0 + interval <= time.time():
                         frame = stream.read()
+                        print(frame.argmax(0).argmax(), frame.argmax(1).argmax())
                         break
 
             assert torch.eq(frame[218, 15], 1)

@@ -59,16 +59,21 @@ nanobind_add_module(
 )
 install(TARGETS aer aestream_file aestream_input aestream_output LIBRARY DESTINATION aestream)
 
-set_target_properties(aestream_ext PROPERTIES
-  if (USE_CUDA)
-    BUILD_RPATH ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES} # For Apple
-  endif()
-  INSTALL_RPATH "\$ORIGIN"
-  INSTALL_RPATH_USE_LINK_PATH TRUE
-  POSITION_INDEPENDENT_CODE ON
-  CUDA_SEPARABLE_COMPILATION ON
-  CUDA_RESOLVE_DEVICE_SYMBOLS ON
-)
+if (USE_CUDA)
+  set_target_properties(aestream_ext PROPERTIES
+    INSTALL_RPATH "\$ORIGIN"
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+    BUILD_RPATH "${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES}" # For Apple
+    POSITION_INDEPENDENT_CODE ON
+    CUDA_SEPARABLE_COMPILATION ON
+    CUDA_RESOLVE_DEVICE_SYMBOLS ON
+  )
+else()
+  set_target_properties(aestream_ext PROPERTIES
+    INSTALL_RPATH "\$ORIGIN"
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+  )
+endif()
 target_compile_definitions(aestream_ext PRIVATE ${module_compile_definitions})
 target_include_directories(aestream_ext PRIVATE "${CMAKE_INSTALL_LIBDIR}" "${CUDA_INCLUDE_DIRS}" "${CudaToolkitLibDir}" "${PYTHON_SITE_PACKAGES_DIR}/aestream")
 target_link_libraries(aestream_ext PRIVATE ${module_link_libraries} aer aestream_file aestream_input aestream_output)

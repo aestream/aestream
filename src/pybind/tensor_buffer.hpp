@@ -12,16 +12,15 @@
 #include <nanobind/tensor.h>
 
 #ifdef USE_CUDA
-void index_increment_cuda(float *array, std::vector<int> offsets,
-                          int *event_device_pointer);
-float *alloc_memory_cuda_float(size_t buffer_size);
-int *alloc_memory_cuda_int(size_t buffer_size);
-void free_memory_cuda(float *cuda_device_pointer);
+void index_increment_cuda(float *array, int *offset_pointer, size_t indices,
+                            int *event_device_pointer);
+void *alloc_memory_cuda(size_t buffer_size, size_t bytes);
+void free_memory_cuda(void *cuda_device_pointer);
 #endif
-struct BufferDeleter {
-  void operator()(float *ptr) {
+template <typename scalar_t> struct BufferDeleter {
+  void operator()(scalar_t *ptr) {
 #ifdef USE_CUDA
-    free_memory_cuda(ptr);
+    free_memory_cuda(static_cast<void *>(ptr));
 #else
     delete ptr;
 #endif
@@ -30,10 +29,12 @@ struct BufferDeleter {
 
 using tensor_numpy = nb::tensor<nb::numpy, float, nb::shape<2, nb::any>>;
 using tensor_torch = nb::tensor<nb::pytorch, float, nb::shape<2, nb::any>>;
-using buffer_t = std::unique_ptr<float[], BufferDeleter>;
+using buffer_t = std::unique_ptr<float[], BufferDeleter<float>>;
+using index_t = std::unique_ptr<int[], BufferDeleter<int>>;
 
 struct BufferPointer {
-  BufferPointer(buffer_t data, const std::vector<int64_t> &shape, std::string device);
+  BufferPointer(buffer_t data, const std::vector<int64_t> &shape,
+                std::string device);
   tensor_numpy to_numpy();
   tensor_torch to_torch();
 
@@ -45,6 +46,7 @@ private:
 
 class TensorBuffer {
 private:
+  int sum = 0;
   const std::vector<int64_t> shape;
   uint64_t current_timestamp = 0;
   std::string device;
@@ -54,7 +56,7 @@ private:
   buffer_t buffer2;
 #ifdef USE_CUDA
   std::vector<int> offset_buffer;
-  int *cuda_device_pointer;
+  index_t cuda_buffer;
 #endif
 public:
   TensorBuffer(py_size_t size, std::string device, size_t buffer_size);
