@@ -8,6 +8,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx_copybutton",
     "myst_parser",
+    "sphinx.ext.napoleon"
 ]
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
