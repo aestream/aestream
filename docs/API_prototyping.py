@@ -1,83 +1,48 @@
 # AEStream API Prototyping
 
-## Ideas
+class FileInput():
+    """
+    Load or Iterate Events or Frames from a file
 
-from enum import Enum, auto
+    Supported file formats: aedat, aedat4, dat
 
+    Args:
+        file_path (str): Path of file to be used
+        resolution (int, int): X,Y resolution of file
 
-class BinningMode(Enum):
-    n_timesteps = auto()
-    n_events = auto()
+    Attributes:
+        file_path (str): Path of file to be used
+        resolution (int, int): X,Y resolution of file
+    """
+    def __init__(self, file_path, resolution) -> None:
+        pass
 
+    def load(frame_ms=0, device="cpu"):
+        """
+        Loads the whole file onto device memory
 
-mode = BinningMode.n_timesteps
+        Args:
+            frame_ms (int): Selects data format. When `0`, events are loaded as is.
+                Otherwise, events are accumulated into frames with synchronous period of `frame_ms`
+            device (str: `cpu`, `cuda`): Selects the device to which the file is loaded
 
-# vs
-'''
-- `mode (str)` : Method for deciding how to bin events
-    - `n_timesteps {default}` : Bins events in groups of `n` timesteps
-    - `n_events` : Bins events in groups of `n` events
-'''
-mode = "n_timesteps"
+        Returns:
+            Array/Tensor containing the contents of the file
+        """
+        pass
+    
+    def get_iterator(frame_ms=0, device="cpu", mode="safe", memory_limit=1024): 
+        """
+        Provides functionality that allows files larger than device memory to be iteratively loaded
 
-#
-# - Maybe group by source/sink instead
-# - Maybe group by dense/sparse instead of frame/event
-#
+        Args:
+            frame_ms (int): Selects data format. When `0`, events are loaded as is. Otherwise, events are accumulated into frames with synchronous period of `frame_ms`
+            device (str: `cpu`, `cuda`): Selects the device to which the file is loaded.
+            mode (str: `safe`, `unsafe`): Selects if slower deterministic (`safe`) or faster nondeterministic (`unsafe`) method is used to create frames. When using `unsafe` the exact frame a event is part of is subject to jitter at runtime.
+        
+        Returns:
+            A generator that loads events or frames to `device` as specified.
+        """
 
-## Reader
+class FileInputIterator():
 
-
-class EventReader:
-
-    def __init__(self, file):
-        self.file = file
-        self.events = read_file(file)
-
-
-class FrameReader:
-
-    def __init__(self, file):
-        self.file = file
-        self.frames = read_file(file)
-
-
-## Iterator
-
-
-class EventIterator:
-
-    def __init__(
-        self,
-        file,
-        start_timestep=0,
-        end_timestep=None,
-        mode="n_timesteps",
-        n=1,
-    ):
-        self.file = file
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        return next_event()
-
-
-class FrameIterator:
-
-    def __init__(
-        self,
-        file,
-        start_timestep=0,
-        end_timestep=None,
-        mode="n_timesteps",
-        n=1,
-    ):
-        self.file = file
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        return next_frame()
