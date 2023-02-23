@@ -1,6 +1,13 @@
 # AEStream API Prototyping
 
-class FileInput():
+from typing import Union, Tuple
+import numpy as np
+try:
+    import torch
+except:
+    "torch not found, proceeding with numpy only"
+
+class FileInputReader():
     """
     Load or Iterate Events or Frames from a file
 
@@ -14,10 +21,10 @@ class FileInput():
         file_path (str): Path of file to be used
         resolution (int, int): X,Y resolution of file
     """
-    def __init__(self, file_path, resolution) -> None:
-        pass
+    def __init__(self, file_path: str, resolution: Tuple[int, int]) -> None:
+        ...
 
-    def load(frame_ms=0, device="cpu"):
+    def load(self, frame_ms: int = 0, device: str = "cpu") -> Union[np.ndarray, torch.tensor]  :
         """
         Loads the whole file onto device memory
 
@@ -29,9 +36,9 @@ class FileInput():
         Returns:
             Array/Tensor containing the contents of the file
         """
-        pass
+        ...
     
-    def get_iterator(frame_ms=0, device="cpu", mode="safe", memory_limit=1024): 
+    def get_iterator(self, frame_ms: int = 0, device: str = "cpu", mode: str = "safe", memory_limit: int = 1024) -> FileInputIterator:
         """
         Provides functionality that allows files larger than device memory to be iteratively loaded
 
@@ -43,6 +50,21 @@ class FileInput():
         Returns:
             A generator that loads events or frames to `device` as specified.
         """
+        ...
 
 class FileInputIterator():
+    """
+    Load or Iterate Events or Frames from a file
 
+    Supported file formats: aedat, aedat4, dat
+
+    Args:
+        file_path (str): Path of file to be used
+        resolution (int, int): X,Y resolution of file
+
+    Attributes:
+        file_path (str): Path of file to be used
+        resolution (int, int): X,Y resolution of file
+    """
+    def __init__(self, file_path: str, resolution: Tuple[int, int]) -> None:
+        ...

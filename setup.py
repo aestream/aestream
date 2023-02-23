@@ -48,4 +48,5 @@ setup(
         "Topic :: System :: Hardware :: Universal Serial Bus (USB)",
     ],
     cmake_args=cmake_args,
+    package_data={"aestream": ["*.pyi", "*.typed"]},
 )
