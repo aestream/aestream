@@ -7,7 +7,8 @@ template <typename scalar_t>
 __global__ void cuda_increment_kernel(scalar_t *__restrict__ array, int *__restrict__ offsets, const size_t size) {
     int index = threadIdx.x; // Pixel offset
     if (index < size) {
-      array[offsets[index]]++;
+      float val = 1;
+      atomicAdd((array + offsets[index]), val);
     }
 }
 
