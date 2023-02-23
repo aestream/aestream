@@ -7,6 +7,12 @@ try:
 except:
     "torch not found, proceeding with numpy only"
 
+class FileInput():
+    """
+    If you see this, its good :)
+    """
+    ...
+
 class FileInputReader():
     """
     Load or Iterate Events or Frames from a file
