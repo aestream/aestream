@@ -11,7 +11,14 @@ class FileInput():
     """
     If you see this, its good :)
     """
-    ...
+    def init():
+        ...
+    
+    def read():
+        """
+        Read :P
+        """
+        ...
 
 class FileInputReader():
     """
