@@ -1,9 +1,11 @@
 ```{toctree}
+:caption: Getting Started
 :hidden: 
 :maxdepth: 2
 
+install
 getting_started
-frc_api
+rfc_api
 stubs_api
 ```
 
