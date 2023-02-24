@@ -1,9 +1,12 @@
 #pragma once
 
+#include <nanobind/nanobind.h>
+#include <nanobind/tensor.h>
+
 #include "../aer.hpp"
 #include "../generator.hpp"
 
-#include "types.hpp"
+#include "tensor_buffer.hpp"
 
 class TensorIterator {
 private:
@@ -18,5 +21,5 @@ public:
   TensorIterator(Generator<AER::Event> &generator, py_size_t shape,
                  size_t time_window);
   template <typename T> void assign_event(T *array, int16_t x, int16_t y);
-  tensor_t next();
+  float * next();
 };

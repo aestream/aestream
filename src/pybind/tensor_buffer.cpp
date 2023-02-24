@@ -1,39 +1,35 @@
 #include "tensor_buffer.hpp"
 
-#ifdef USE_CUDA
-#include <cuda.h>
-#include <cuda_runtime.h>
-// CUDA functions
-int *alloc_memory_cuda(size_t buffer_size);
-void free_memory_cuda(int *cuda_device_pointer);
-void index_increment_cuda(torch::Tensor array, std::vector<int> events,
-                          int *event_device_pointer);
-#endif
-// TensorBuffer constructor
-TensorBuffer::TensorBuffer(py_size_t size, device_t device, size_t buffer_size)
-#ifdef USE_TORCH
-    : shape(size.vec()) {
-  options_buffer = torch::TensorOptions()
-                       .dtype(torch::kInt16)
-                       .device(device)
-                       .memory_format(c10::MemoryFormat::Contiguous)
-                       .pinned_memory(true);
-  options_copy = torch::TensorOptions().dtype(torch::kFloat32).device(device);
-  buffer1 = std::make_shared<tensor_t>(torch::zeros(size, options_buffer));
-  buffer2 = std::make_shared<tensor_t>(torch::zeros(size, options_buffer));
-#else
-    : shape(size) {
-  if (device != "cpu") {
-    throw std::invalid_argument("Unknown device for Numpy tensor");
-  }
-  buffer1 = std::make_shared<cache_t>(cache_t(size[0] * size[1]));
-  buffer2 = std::make_shared<cache_t>(cache_t(size[0] * size[1]));
-#endif
+namespace nb = nanobind;
 
+template <typename scalar_t>
+inline std::unique_ptr<scalar_t[], BufferDeleter<scalar_t>>
+allocate_buffer(const size_t &length, std::string device) {
 #ifdef USE_CUDA
-  cuda_device_pointer = alloc_memory_cuda(buffer_size);
-  offset_buffer = std::vector<int>(buffer_size);
+  if (device == "cuda") {
+    // Thanks to https://stackoverflow.com/a/47406068
+    std::unique_ptr<scalar_t[], BufferDeleter<scalar_t>> buffer_ptr(
+        static_cast<scalar_t *>(alloc_memory_cuda(length, sizeof(scalar_t))),
+        BufferDeleter<scalar_t>());
+    return buffer_ptr;
+  }
 #endif
+  return std::unique_ptr<scalar_t[], BufferDeleter<scalar_t>>(
+      new scalar_t[length]{0}, BufferDeleter<scalar_t>());
+}
+
+// TensorBuffer constructor
+TensorBuffer::TensorBuffer(py_size_t size, std::string device,
+                           size_t buffer_size)
+    : shape(size), device(device) {
+#ifdef USE_CUDA
+  if (device == "cuda") {
+    cuda_buffer = allocate_buffer<int>(buffer_size, device);
+    offset_buffer = std::vector<int>(buffer_size);
+  }
+#endif
+  buffer1 = allocate_buffer<float>(size[0] * size[1], device);
+  buffer2 = allocate_buffer<float>(size[0] * size[1], device);
 }
 
 TensorBuffer::~TensorBuffer() {}
@@ -42,78 +38,79 @@ void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
   const auto length = numbytes >> 1;
   const std::lock_guard lock{buffer_lock};
 #ifdef USE_CUDA
-  if (buffer1->device().is_cuda()) {
+  if (device == "cuda") {
     offset_buffer.clear();
+    offset_buffer.reserve(length);
     for (int i = 0; i < length; i = i + 2) {
       // Decode x, y
       const uint16_t y_coord = data[i] & 0x7FFF;
       const uint16_t x_coord = data[i + 1] & 0x7FFF;
       offset_buffer.push_back(shape[1] * x_coord + y_coord);
     }
-    index_increment_cuda(*buffer1, offset_buffer, cuda_device_pointer);
+    index_increment_cuda(buffer1.get(), offset_buffer.data(),
+                         offset_buffer.size(), cuda_buffer.get());
     return;
   }
-#endif
-#ifdef USE_TORCH
-  int16_t *array = buffer1->data_ptr<int16_t>();
-#else
-  float *array = buffer1->data();
 #endif
   for (int i = 0; i < length; i = i + 2) {
     // Decode x, y
     const int16_t y_coord = data[i] & 0x7FFF;
     const int16_t x_coord = data[i + 1] & 0x7FFF;
-    assign_event(array, x_coord, y_coord);
+    assign_event(buffer1.get(), x_coord, y_coord);
   }
 }
 
 void TensorBuffer::set_vector(std::vector<AER::Event> events) {
   const std::lock_guard lock{buffer_lock};
 #ifdef USE_CUDA
-  if (buffer1->device().is_cuda()) {
+  if (device == "cuda") {
+    offset_buffer.clear();
+    offset_buffer.reserve(events.size());
     for (size_t i = 0; i < events.size(); i++) {
-      offset_buffer[i] = shape[1] * events[i].x + events[i].y;
+      offset_buffer.push_back(shape[1] * events[i].x + events[i].y);
     }
-    index_increment_cuda(*buffer1, offset_buffer, cuda_device_pointer);
+    index_increment_cuda(buffer1.get(), offset_buffer.data(),
+                         offset_buffer.size(), cuda_buffer.get());
     return;
   }
 #endif
-#ifdef USE_TORCH
-  int16_t *array = buffer1->data_ptr<int16_t>();
-#else
-  float *array = buffer1->data();
-#endif
   for (auto event : events) {
-    assign_event(array, event.x, event.y);
+    assign_event(buffer1.get(), event.x, event.y);
   }
 }
 
-template <typename T>
-inline void TensorBuffer::assign_event(T *array, int16_t x, int16_t y) {
+template <typename R>
+inline void TensorBuffer::assign_event(R *array, int16_t x, int16_t y) {
   (*(array + shape[1] * x + y))++;
 }
 
-tensor_t TensorBuffer::read() {
+BufferPointer TensorBuffer::read() {
   // Swap out old pointer
   {
     const std::lock_guard lock{buffer_lock};
     buffer1.swap(buffer2);
   }
-  // Copy and clean
-#ifdef USE_TORCH
-  tensor_t copy = buffer2->to(options_copy, false, true);
-  buffer2->index_put_({torch::indexing::Slice()}, 0);
-#else
-  // Create a Python object that will free the allocated
-  // memory when destroyed:
-  // Thanks to https://stackoverflow.com/a/44682603
-  // and
-  // https://github.com/ssciwr/pybind11-numpy-example/blob/main/python/pybind11-numpy-example_python.cpp#L43
-  tensor_t copy = tensor_t(buffer2->size(), buffer2->data());
-  copy.resize(shape);
-  copy.owndata();
-  cache_t *array = new cache_t(shape[0] * shape[1]);
-  buffer2.reset(array);
-#endif
-  return copy;
+  // Create new buffer and swap with old
+  buffer_t buffer3 = allocate_buffer<float>(shape[0] * shape[1], device);
+  buffer2.swap(buffer3);
+  // Return pointer
+  return BufferPointer(std::move(buffer3), shape, device);
+}
+
+BufferPointer::BufferPointer(buffer_t data, const std::vector<int64_t> &shape,
+                             std::string device)
+    : data(std::move(data)), shape(shape), device(device) {}
+
+tensor_numpy BufferPointer::to_numpy() {
+  const size_t s[2] = {shape[0], shape[1]};
+  return tensor_numpy(data.release(), 2, s);
+}
+
+tensor_torch BufferPointer::to_torch() {
+  const size_t s[2] = {shape[0], shape[1]};
+  int32_t device_type =
+      device == "cuda" ? nb::device::cuda::value : nb::device::cpu::value;
+  return tensor_torch(data.release(), 2, s, nanobind::handle(), /* owner */
+                      nullptr,                                  /* strides */
+                      nanobind::dtype<float>(), device_type);
 }

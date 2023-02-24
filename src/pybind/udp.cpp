@@ -20,16 +20,16 @@ private:
 
 public:
   uint64_t count = 0;
-  UDPInput(py_size_t shape, device_t device, int port)
+  UDPInput(py_size_t shape, const std::string &device, int port)
       : buffer(shape, device, max_events_per_packet), port(port) {}
 
-  UDPInput *start_server() {
+  UDPInput *start_stream() {
     std::thread socket_thread(&UDPInput::serve_synchronous, this);
     socket_thread.detach();
     return this;
   }
 
-  tensor_t read() { return buffer.read(); }
+  BufferPointer read() { return buffer.read(); }
 
   void serve_synchronous() {
     int sockfd;
@@ -57,5 +57,7 @@ public:
     close(sockfd);
   }
 
-  void stop_server() { is_serving.store(false); }
+  void stop_stream(nb::object &a, nb::object &b, nb::object &c) {
+    is_serving.store(false);
+  }
 };

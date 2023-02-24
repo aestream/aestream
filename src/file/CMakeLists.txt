@@ -16,7 +16,7 @@ else()
   FetchContent_Declare(
     flatbuffers
     GIT_REPOSITORY https://github.com/google/flatbuffers.git
-    GIT_TAG v2.0.6
+    GIT_TAG v23.1.21
   )
   FetchContent_MakeAvailable(flatbuffers)
 endif()

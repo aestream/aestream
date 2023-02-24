@@ -30,6 +30,7 @@ result
 release/
 wheelhouse/
 _skbuild
+*.dist-info
 
 # Dependencies
 lz4

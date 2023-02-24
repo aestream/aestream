@@ -2,28 +2,12 @@
 #include <algorithm>
 
 #include "../aer.hpp"
-#include "../generator.hpp"
 #include "../file/aedat4.hpp"
+#include "../generator.hpp"
 #include "../input/file.hpp"
-
-#ifdef USE_TORCH
-#include <torch/extension.h>
-#include <torch/torch.h>
-#endif
 
 #include "tensor_buffer.hpp"
 #include "tensor_iterator.hpp"
-
-inline py::array_t<AER::Event> buffer_to_py_array(AER::Event *event_array,
-                                                  size_t n_events) {
-  py::capsule free_when_done(event_array, [](void *f) {
-    AER::Event *event_array = reinterpret_cast<AER::Event *>(f);
-    delete[] event_array;
-  });
-
-  return py::array_t<AER::Event>({n_events}, {sizeof(AER::Event)}, event_array,
-                                 free_when_done);
-}
 
 class FileInput {
 
@@ -50,17 +34,17 @@ public:
   const std::string filename;
   size_t n_events;
 
-  FileInput(const std::string &filename, py_size_t shape, device_t device,
-            bool ignore_time = false);
+  FileInput(const std::string &filename, py_size_t shape,
+            const std::string &device, bool ignore_time = false);
 
-  tensor_t read();
+  BufferPointer read();
 
   Generator<AER::Event>::Iter begin();
   std::default_sentinel_t end();
 
   bool get_is_streaming();
 
-  py::array_t<AER::Event> events();
+  // nb::tensor<nb::numpy, AER::Event> events();
 
   // py::array_t<AER::Event> events_co();
 
@@ -68,5 +52,5 @@ public:
 
   FileInput *start_stream();
 
-  void stop_stream();
+  bool stop_stream(nb::object &a, nb::object &b, nb::object &c);
 };

@@ -61,7 +61,7 @@ void FileInput::stream_generator_to_buffer() {
 }
 
 FileInput::FileInput(const std::string &filename, py_size_t shape,
-                     device_t device, bool ignore_time)
+                     const std::string &device, bool ignore_time)
     : buffer(shape, device, EVENT_BUFFER_SIZE), ignore_time(ignore_time),
       shape(shape), filename(filename), fp(open_file(filename)) {
   if (ends_with(filename, "dat")) {
@@ -78,8 +78,8 @@ FileInput::FileInput(const std::string &filename, py_size_t shape,
   generator = file_event_generator(filename, runFlag);
 };
 
-tensor_t FileInput::read() {
-  const auto &tmp = buffer.read();
+BufferPointer FileInput::read() {
+  auto tmp = buffer.read();
   is_nonempty.store(false);
   return tmp;
 }
@@ -91,13 +91,13 @@ bool FileInput::get_is_streaming() {
   return is_streaming.load() || is_nonempty.load();
 }
 
-py::array_t<AER::Event> FileInput::events() {
-  // const unique_file_t &fp = open_file(filename);
-  // auto n_events = dat_read_header(fp);
-  auto [event_array, n_events_read] = dat_read_n_events(fp, n_events);
+// nb::tensor<nb::numpy, AER::Event> FileInput::events() {
+//   // const unique_file_t &fp = open_file(filename);
+//   // auto n_events = dat_read_header(fp);
+//   auto [event_array, n_events_read] = dat_read_n_events(fp, n_events);
 
-  return buffer_to_py_array(event_array, n_events_read);
-}
+//   return nb::tensor<nb::numpy, AER::Event>(event_array, 1, n_events_read);
+// }
 
 // py::array_t<AER::Event> FileInput::events_co() {
 //   AER::Event *event_array = (AER::Event *)malloc(n_events *
@@ -147,9 +147,10 @@ FileInput *FileInput::start_stream() {
   return this;
 }
 
-void FileInput::stop_stream() {
+bool FileInput::stop_stream(nb::object &a, nb::object &b, nb::object &c) {
   is_streaming.store(false);
   if (file_thread->joinable()) {
     file_thread->join();
   }
+  return false;
 }

@@ -32,7 +32,7 @@ private:
   };
 
 public:
-  USBInput(py_size_t shape, device_t device, uint16_t deviceId,
+  USBInput(py_size_t shape, const std::string& device, uint16_t deviceId,
            uint16_t deviceAddress)
       : buffer(shape, device, EVENT_BUFFER_SIZE) {
     if (deviceId > 0) {

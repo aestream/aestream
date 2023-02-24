@@ -8,35 +8,60 @@
 #include "../aer.hpp"
 #include "types.hpp"
 
-#ifdef USE_TORCH
-#include <torch/extension.h>
-#include <torch/torch.h>
-#else
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/tensor.h>
+
+#ifdef USE_CUDA
+void index_increment_cuda(float *array, int *offset_pointer, size_t indices,
+                            int *event_device_pointer);
+void *alloc_memory_cuda(size_t buffer_size, size_t bytes);
+void free_memory_cuda(void *cuda_device_pointer);
 #endif
+template <typename scalar_t> struct BufferDeleter {
+  void operator()(scalar_t *ptr) {
+#ifdef USE_CUDA
+    free_memory_cuda(static_cast<void *>(ptr));
+#else
+    delete ptr;
+#endif
+  }
+};
+
+using tensor_numpy = nb::tensor<nb::numpy, float, nb::shape<2, nb::any>>;
+using tensor_torch = nb::tensor<nb::pytorch, float, nb::shape<2, nb::any>>;
+using buffer_t = std::unique_ptr<float[], BufferDeleter<float>>;
+using index_t = std::unique_ptr<int[], BufferDeleter<int>>;
+
+struct BufferPointer {
+  BufferPointer(buffer_t data, const std::vector<int64_t> &shape,
+                std::string device);
+  tensor_numpy to_numpy();
+  tensor_torch to_torch();
+
+private:
+  buffer_t data;
+  std::string device;
+  const std::vector<int64_t> &shape;
+};
 
 class TensorBuffer {
 private:
   const std::vector<int64_t> shape;
   uint64_t current_timestamp = 0;
-#ifdef USE_TORCH
-  torch::TensorOptions options_buffer;
-  torch::TensorOptions options_copy;
-#endif
+  std::string device;
 
   std::mutex buffer_lock;
-  std::shared_ptr<cache_t> buffer1;
-  std::shared_ptr<cache_t> buffer2;
+  buffer_t buffer1;
+  buffer_t buffer2;
 #ifdef USE_CUDA
   std::vector<int> offset_buffer;
-  int *cuda_device_pointer;
+  index_t cuda_buffer;
 #endif
 public:
-  TensorBuffer(py_size_t size, device_t device, size_t buffer_size);
+  TensorBuffer(py_size_t size, std::string device, size_t buffer_size);
   ~TensorBuffer();
-  template <typename T> void assign_event(T *array, int16_t x, int16_t y);
+  template <typename R> void assign_event(R *array, int16_t x, int16_t y);
   void set_buffer(uint16_t data[], int numbytes);
   void set_vector(std::vector<AER::Event> events);
-  tensor_t read();
+  BufferPointer read();
 };

@@ -5,20 +5,14 @@ include(FetchContent)
 add_library(aer SHARED aer.hpp generator.hpp)
 target_include_directories(aer INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 set_target_properties(aer PROPERTIES LINKER_LANGUAGE CXX)
-
-# Ensure we have proper compile definitions when importing torch
-if (CMAKE_CUDA_COMPILER) 
-  set(CMAKE_CXX_STANDARD 17)
-  set(CMAKE_CUDA_STANDARD 17)
-  set(CMAKE_CUDA_STANDARD_REQUIRED TRUE)
-  set(module_compile_definitions USE_CUDA)
-endif()
-
-# Attempt to import Torch
-message(WARNING "USE " ${USE_TORCH})
-if (USE_TORCH)
-  find_package(Torch REQUIRED)
-  set(module_compile_definitions USE_TORCH)
+# set coroutine flags for clang appropriately
+# thanks to https://stackoverflow.com/questions/64703866/is-clang-11s-invocation-of-coroutine-headers-via-fcoroutines-flag
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_compile_options(aer PUBLIC "-fcoroutines-ts")
+  add_compile_definitions(USE_CLANG)
+  message(STATUS "detected clang, set -ts flag")
+else()
+  target_compile_options(aer PUBLIC "-fcoroutines")
 endif()
 
 # Add subdirectories
@@ -26,7 +20,7 @@ add_subdirectory(file)
 add_subdirectory(output)
 add_subdirectory(input)
 
-if (WITH_PYTHON)
+if (USE_PYTHON)
   # AEStream Python
   add_subdirectory(pybind)
 else() 

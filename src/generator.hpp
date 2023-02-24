@@ -14,6 +14,9 @@ template <std::movable T> class Generator {
   // Thanks to https://en.cppreference.com/w/cpp/coroutine/coroutine_handle
 public:
   struct promise_type {
+    std::optional<T> current_value;
+    std::exception_ptr current_exception;
+
     Generator<T> get_return_object() {
       return Generator{Handle::from_promise(*this)};
     }
@@ -27,9 +30,7 @@ public:
     }
     // Disallow co_await in generator coroutines.
     void await_transform() = delete;
-    [[noreturn]] static void unhandled_exception() { throw; }
-
-    std::optional<T> current_value;
+    void unhandled_exception() noexcept { current_exception = std::current_exception(); }
   };
 
   // use coroutinestd instead of {std, std::experimental}
@@ -65,7 +66,14 @@ public:
   class Iter {
   public:
     void operator++() { m_coroutine.resume(); }
-    const T &operator*() const { return *m_coroutine.promise().current_value; }
+    const T &operator*() const {
+      promise_type promise = m_coroutine.promise();
+      if (promise.current_exception) {
+        std::rethrow_exception(promise.current_exception);
+      } else {
+        return *promise.current_value;
+      }
+    }
     bool operator==(std::default_sentinel_t) const {
       return !m_coroutine || m_coroutine.done();
     }
