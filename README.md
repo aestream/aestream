@@ -21,19 +21,15 @@ AEStream supports reading from files, USB cameras, as well as network via UDP an
 
 <img src="https://jegp.github.io/aestream-paper/2212_aestream.svg" />
 
-
 ## Installation
 
-AEStream can be installed with the Python package manage `pip`.
-However, **AEStream depends on [PyTorch](https://pytorch.org/), [LZ4](https://lz4.github.io/lz4/), and [libcaer](https://gitlab.com/inivation/dv/libcaer/)**, so please install these dependencies manually **before** you install AEStream.
-For PyTorch, recall whether you are using the CPU or CUDA version and use the corresponding command below to install AEStream:
+AEStream is usable both as a command-line binary or Python tool.
 
-| **PyTorch version** | **Command** |
+| **Source** | **Installation** |
 | -------------------- | --- |
-| With CPU | `pip install aestream --extra-index-url https://download.pytorch.org/whl/cpu ` |
-| With CUDA | `pip install aestream --extra-index-url https://download.pytorch.org/whl/cu116` |
+| [pip](https://pypi.org/) | `pip install aestream` |
+| [nix](https://nixos.org/) | `nix run github:norse/aestream` |
 
-Note that this uses CUDA 11.6. Other versions can be found at [the website of PyTorch](https://pytorch.org/).
 We do not currently support other platforms than Linux, but contributions are most welcome.
 
 ## Usage (Python)
@@ -81,7 +77,7 @@ aestream input <input source> [output <output sink>]
 | --------- | :----------- | ----- |
 | DAVIS, DVXPlorer | [Inivation](https://inivation.com/) DVS Camera over USB | `input inivation` |
 | EVK Cameras      | [Prophesee](https://www.prophesee.ai/) DVS camera over USB  | `input prophesee` |
-| File             | [AEDAT file format](https://gitlab.com/inivation/inivation-docs/blob/master/Software%20user%20guides/AEDAT_file_formats.md) as `.aedat` or `.aedat4` | `input file x.aedat4` |
+| File             | [AEDAT file format](https://gitlab.com/inivation/inivation-docs/blob/master/Software%20user%20guides/AEDAT_file_formats.md) as `.aedat`, `.aedat4`, or `.dat` | `input file x.aedat4` |
 
 | Output | Description | Usage |
 | --------- | ----------- | ----- |
@@ -94,21 +90,20 @@ aestream input <input source> [output <output sink>]
 
 | Example | Syntax |
 | ------------- | ------------------------------|
-| Read file to STDOUT | `aestream input file example/sample.aedat4` |
-| Stream DVS Davis346 (USB 0:2) by iniVation AG to STDOUT (Note, requires Inivation libraries) | `aestream input inivation output stdout` |
-| Stream Prophesee 640x480 (serial Prophesee:hal_plugin_gen31_fx3:00001464) to STDOUT (Note, requires Metavision SDK) | `aestream input output stdout` |
+| Echo file to STDOUT | `aestream input file example/sample.aedat4` |
+| Stream DVS cameara from iniVation AG to STDOUT (Note, requires Inivation libraries) | `aestream input inivation output stdout` |
+| Stream DVS camera from Prophesee to STDOUT (Note, requires Metavision SDK) | `aestream input output stdout` |
 | Read file to remote IP X.X.X.X | `aestream input file example/sample.aedat4 output udp X.X.X.X` |
 
 ## Custom installation (C++)
 
-AEStream requires [libtorch](https://pytorch.org/cppdocs/installing.html). [Metavision SDK](https://docs.prophesee.ai/stable/metavision_sdk/index.html) and [libcaer](https://github.com/inivation/libcaer) are optional dependencies, but are needed for connecting to Prophesee and Inivation cameras respectively.
+[Metavision SDK](https://docs.prophesee.ai/stable/metavision_sdk/index.html) and [libcaer](https://github.com/inivation/libcaer) are optional dependencies, but are needed for connecting to Prophesee and Inivation cameras respectively.
 
 AEStream is based on [C++20](https://en.cppreference.com/w/cpp/20). Since C++20 is not yet fully supported by all compilers, we recommend using `GCC >= 10.2`. 
 
 To build the binaries of this repository, run the following code:
 ```
-export CMAKE_PREFIX_PATH=`absolute path to libtorch/`
-# Optional: Ensure paths to libcaer, Metavision, or OpenCV is in place
+# Optional: Ensure paths to libcaer or Metavision are in place
 mkdir build/
 cd build/
 cmake -GNinja ..
@@ -116,7 +111,7 @@ ninja
 ```
 
 If your default C++ compiler doesn't support C++ 20, you will have to install an up-to-date compiler and provide the environmental variable `CXX`.
-For instance like this: `CXX=/path/to/g++ cmake -GNinja ..`
+For instance like this: `CXX=/path/to/g++-10 cmake -GNinja ..`
 
 ### Inivation cameras
 For [Inivation](https://inivation.com/) cameras, the [libcaer](https://gitlab.com/inivation/dv/libcaer/) library needs to be available, either by a `-DCMAKE_PREFIX_PATH` flag to `cmake` or included in the `PATH` environmental variable.
@@ -131,10 +126,12 @@ Otherwise, you can point to it using the `-DCMAKE_PREFIX_PATH` option in `cmake`
 
 ## Acknowledgments
 
-AEStream is created by
+AEStream is developed by:
 
-* [Jens E. Pedersen](https://www.kth.se/profile/jeped) (@GitHub [jegp](https://github.com/jegp/)), doctoral student at KTH Royal Institute of Technology, Sweden.
-* [Christian Pehle](https://www.kip.uni-heidelberg.de/people/10110) (@GitHub [cpehle](https://github.com/cpehle/)), PostDoc at University of Heidelberg, Germany.
+* Cameron Barker (@GitHub [cameron-git](https://github.com/cameron-git/))
+* Alexander Hadjivanov (@Github [cantordust](https://github.com/cantordust))
+* [Jens E. Pedersen](https://www.kth.se/profile/jeped) (@GitHub [jegp](https://github.com/jegp/))
+* [Christian Pehle](https://www.kip.uni-heidelberg.de/people/10110) (@GitHub [cpehle](https://github.com/cpehle/))
 
 The work has received funding from the EC Horizon 2020 Framework Programme under Grant Agreements 785907 and 945539 (HBP) and by the Deutsche Forschungsgemeinschaft (DFG, German Research Fundation) under Germany's Excellence Strategy EXC 2181/1 - 390900948 (the Heidelberg STRUCTURES Excellence Cluster).
 
@@ -143,6 +140,7 @@ Thanks to [Philipp Mondorf](https://github.com/PMMon) for interfacing with Metav
 <a href="https://github.com/norse/aestream/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=norse/aestream" />
 </a>
+
 
 ## Citation
 
