@@ -21,16 +21,19 @@ AEStream supports reading from files, USB cameras, as well as network via UDP an
 
 <img src="https://jegp.github.io/aestream-paper/2212_aestream.svg" />
 
+Read more in [the AEStream publication](https://jegp.github.io/aestream-paper/).
+
 ## Installation
 
 AEStream is usable both as a command-line binary or Python tool.
 
 | **Source** | **Installation** |
 | -------------------- | --- |
-| [pip](https://pypi.org/) | `pip install aestream` |
-| [nix](https://nixos.org/) | `nix run github:norse/aestream` |
+| [pip](https://pypi.org/) | <code>pip install aestream <br/> pip install aestream[torch]</code> ([PyTorch support](https://pytorch.com)) |
+| [nix](https://nixos.org/) | <code>nix run github:norse/aestream</code> (CLI) <br/> <code>nix develop github:norse/aestream</code> (Python environment) |
+| [docker](https://docker.com/) | See [Installation documentation](https://norse.github.io/aestream/install.html) |
 
-We do not currently support other platforms than Linux, but contributions are most welcome.
+Contributions to support AEStream on additional platforms are always welcome.
 
 ## Usage (Python)
 
@@ -126,7 +129,7 @@ Otherwise, you can point to it using the `-DCMAKE_PREFIX_PATH` option in `cmake`
 
 ## Acknowledgments
 
-AEStream is developed by:
+AEStream is developed by (in alphabetical order):
 
 * Cameron Barker (@GitHub [cameron-git](https://github.com/cameron-git/))
 * Alexander Hadjivanov (@Github [cantordust](https://github.com/cantordust))

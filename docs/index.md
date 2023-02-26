@@ -7,6 +7,7 @@ install
 getting_started
 rfc_api
 stubs_api
+about
 ```
 
 ```{toctree}
@@ -39,18 +40,20 @@ aestream_ext
 AEStream efficiently reads sparse events from an input source and streams it to an output sink.
 AEStream supports reading from files, USB cameras, as well as network via UDP and can stream events to files, network over UDP, and peripherals such as [GPU](https://en.wikipedia.org/wiki/Graphics_processing_unit)s and [neuromorphic hardware](https://en.wikipedia.org/wiki/Neuromorphic_engineering).
 
-<img src="https://jegp.github.io/aestream-paper/2212_aestream.svg" />
+[Read more in the publication](https://jegp.github.io/aestream-paper/).
 
+<img src="https://jegp.github.io/aestream-paper/2212_aestream.svg" />
 ## Installation
 
 AEStream is usable both as a command-line binary or Python tool.
 
 | **Source** | **Installation** |
 | -------------------- | --- |
-| [pip](https://pypi.org/) | `pip install aestream` |
-| [nix](https://nixos.org/) | `nix run github:norse/aestream` |
+| [pip](https://pypi.org/) | <code>pip install aestream <br/> pip install aestream[torch]</code> ([PyTorch support](https://pytorch.com)) |
+| [nix](https://nixos.org/) | <code>nix run github:norse/aestream</code> (CLI) <br/> <code>nix develop github:norse/aestream</code> (Python environment) |
+| [docker](https://docker.com/) | See [Installation documentation](https://norse.github.io/aestream/install.html) |
 
-We do not currently support other platforms than Linux, but contributions are most welcome.
+Contributions to support AEStream on additional platforms are always welcome.
 
 ## Usage (Python)
 
@@ -146,7 +149,7 @@ Otherwise, you can point to it using the `-DCMAKE_PREFIX_PATH` option in `cmake`
 
 ## Acknowledgments
 
-AEStream is developed by:
+AEStream is developed by (in alphabetical order):
 
 * Cameron Barker (@GitHub [cameron-git](https://github.com/cameron-git/))
 * Alexander Hadjivanov (@Github [cantordust](https://github.com/cantordust))
