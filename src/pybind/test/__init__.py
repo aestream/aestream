@@ -5,17 +5,13 @@ def _has_torch():
         return True
     except ImportError:
         pass
-    finally:
-        return False
+    return False
 
 
 def _has_cuda_torch():
     try:
         import torch
-        return torch.has_cuda()
+        return torch.has_cuda
     except ImportError:
         pass
-    finally:
-        return False
-    
-
+    return False

@@ -70,7 +70,7 @@ void TensorBuffer::set_vector(std::vector<AER::Event> events) {
       offset_buffer.push_back(shape[1] * events[i].x + events[i].y);
     }
     index_increment_cuda(buffer1.get(), offset_buffer.data(),
-                                offset_buffer.size(), cuda_buffer.get());
+                         offset_buffer.size(), cuda_buffer.get());
     return;
   }
 #endif
