@@ -9,8 +9,8 @@ By insisting that each input and output operates on the same notion of event, we
 And adding any peripheral is as simple as translating to or from AER.
 
 ## Related work
-We are not the first to work towards user-friendly neuromorphic libraries.
-However, most of the libraries are developed from the vantage point of a hardware producer, single lab, or even lonely student who needs to solve a problem.
+We are not the first to work towards user-friendly neuromorphic device libraries.
+However, most of the libraries are developed from the vantage point of a hardware producer, single lab, or even the occasional lonely student who needs to solve a problem.
 The figure below shows the current landscape (February 2023) of event-based libraries for cameras and AER files.
 While there are much great software out there, AEStream is, at the moment of writing, supporting more peripherals than other libraries.
 
@@ -30,6 +30,7 @@ AEStream is an inter-institutional and international effort, spanning several re
 Particularly, AEStream has received contributions from 
 * KTH Royal Institute of Technology
 * University of Heidelberg
+* Heriot-Watt University
 * European Space Agency
 
 The developers would like to thank Anders Bo Sørensen for his friendly and invaluable help with CUDA and GPU profiling. Emil Jansson deserves our gratitude for scrutinizing and improving the coroutine benchmark C++ code.
