@@ -15,5 +15,3 @@ def _has_cuda_torch():
     except ImportError:
         pass
     return False
-    
-

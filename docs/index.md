@@ -1,3 +1,24 @@
+```{toctree}
+:caption: Getting Started
+:hidden: 
+:maxdepth: 2
+
+install
+getting_started
+rfc_api
+stubs_api
+about
+```
+
+```{toctree}
+:caption: Python API
+:hidden:
+:maxdepth: 2
+
+aestream
+aestream_ext
+```
+
 # AEStream - Address Event streaming library
 
 <p align="center">
@@ -19,10 +40,9 @@
 AEStream efficiently reads sparse events from an input source and streams it to an output sink.
 AEStream supports reading from files, USB cameras, as well as network via UDP and can stream events to files, network over UDP, and peripherals such as [GPU](https://en.wikipedia.org/wiki/Graphics_processing_unit)s and [neuromorphic hardware](https://en.wikipedia.org/wiki/Neuromorphic_engineering).
 
+[Read more in the publication](https://jegp.github.io/aestream-paper/).
+
 <img src="https://jegp.github.io/aestream-paper/2212_aestream.svg" />
-
-Read more in [the AEStream publication](https://jegp.github.io/aestream-paper/).
-
 ## Installation
 
 AEStream is usable both as a command-line binary or Python tool.
@@ -160,3 +180,6 @@ Please cite `aestream` if you use it in your work:
 }
 
 ```
+
+
+
