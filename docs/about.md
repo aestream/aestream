@@ -30,6 +30,7 @@ AEStream is an inter-institutional and international effort, spanning several re
 Particularly, AEStream has received contributions from 
 * KTH Royal Institute of Technology
 * University of Heidelberg
+* University of Groningen
 * Heriot-Watt University
 * European Space Agency
 
