@@ -9,8 +9,7 @@ except:
     "torch not found, proceeding with numpy only"
 
 
-def load_file(
-    self,
+def read_file(
     frame_ms: int = 0,
     device: str = "cpu",
 ) -> Union[np.ndarray, torch.tensor]:
@@ -30,10 +29,13 @@ def load_file(
     """
     ...
 
+def write_file():
+    ...
+
 
 class FileInIterator:
     """
-    ### File Input Iterator
+    # File Input Iterator
     Lazily iterate through Events or Frames from a file.
     ??? Explain how the batches work and that all constraints are kept.
 
@@ -42,7 +44,14 @@ class FileInIterator:
     - aedat
     - aedat4
 
-    ### Args:
+    ## Examples
+    ```
+    with FileInputIterator("path_to_my_file.dat", (640, 480)) as file_iterator:
+        for event in file_iterator:
+            print(event)
+    ```
+
+    ## Args:
         - `file_path: str` Path of file to be used.
         - `resolution: (int, int)` X,Y resolution of file.
         - `frame_ms: int = 0` Selects data format.
@@ -60,20 +69,13 @@ class FileInIterator:
             - `0` Disables this limit
         - `memory_limit: int = 1024` Maximum device memory to be used in MB.
 
-    ### Methods: ??? needs expanding
+    ## Methods: ??? needs expanding
     ??? needs adding to other classes
         - `__next__()` Returns next batch ??? needs expanding
 
-    ### Attributes:
+    ## Attributes:
         - `file_path: str` Path of file to be used.
         - `resolution: (int, int)` X,Y resolution of file.
-
-    ### Examples
-    ```
-    with FileInputIterator("path_to_my_file.dat", (640, 480)) as file_iterator:
-        for event in file_iterator:
-            print(event)
-    ```
     """
 
     def __init__(
