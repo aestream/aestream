@@ -2,82 +2,68 @@
 
 from typing import Union, Tuple
 import numpy as np
+
 try:
     import torch
 except:
     "torch not found, proceeding with numpy only"
 
-class FileInput():
-    """
-    If you see this, its good :)
-    """
-    def init():
-        ...
-    
-    def read():
-        """
-        Read :P
-        """
-        ...
 
-class FileInputReader():
+def load_file(
+    self,
+    frame_ms: int = 0,
+    device: str = "cpu",
+) -> Union[np.ndarray, torch.tensor]:
     """
-    Load or Iterate Events or Frames from a file
-
-    Supported file formats: aedat, aedat4, dat
+    Loads the whole file onto device memory
 
     Args:
-        file_path (str): Path of file to be used
-        resolution (int, int): X,Y resolution of file
+        - `frame_ms: int = 0` Selects data format.
+            - `0` Events are loaded as events of dims `[x, y, polarity, time]`
+            - `else` Frames generated with synchronous period of `frame_ms`
+        - `device: str = "cpu"` Selects the device to which the file is loaded
+            - `cpu` CPU
+            - `cuda` Nvidia CUDA compatible GPU
 
-    Attributes:
-        file_path (str): Path of file to be used
-        resolution (int, int): X,Y resolution of file
+    Returns:
+        Array/Tensor containing the contents of the file
     """
-    def __init__(self, file_path: str, resolution: Tuple[int, int]) -> None:
-        ...
+    ...
 
-    def load(self, frame_ms: int = 0, device: str = "cpu") -> Union[np.ndarray, torch.tensor]  :
-        """
-        Loads the whole file onto device memory
 
-        Args:
-            frame_ms (int): Selects data format. When `0`, events are loaded as is.
-                Otherwise, events are accumulated into frames with synchronous period of `frame_ms`
-            device (str: `cpu`, `cuda`): Selects the device to which the file is loaded
-
-        Returns:
-            Array/Tensor containing the contents of the file
-        """
-        ...
-    
-    def get_iterator(self, frame_ms: int = 0, device: str = "cpu", mode: str = "safe", memory_limit: int = 1024) -> FileInputIterator:
-        """
-        Provides functionality that allows files larger than device memory to be iteratively loaded
-
-        Args:
-            frame_ms (int): Selects data format. When `0`, events are loaded as is. Otherwise, events are accumulated into frames with synchronous period of `frame_ms`
-            device (str: `cpu`, `cuda`): Selects the device to which the file is loaded.
-            mode (str: `safe`, `unsafe`): Selects if slower deterministic (`safe`) or faster nondeterministic (`unsafe`) method is used to create frames. When using `unsafe` the exact frame a event is part of is subject to jitter at runtime.
-        
-        Returns:
-            A generator that loads events or frames to `device` as specified.
-        """
-        ...
-
-class FileInputIterator():
+class FileInputIterator:
     """
-    Load or Iterate Events or Frames from a file
-
+    Iterate Events or Frames from a file using a generator
     Supported file formats: aedat, aedat4, dat
 
-    Args:
-        file_path (str): Path of file to be used
-        resolution (int, int): X,Y resolution of file
+    ### Args:
+        - `file_path: str` Path of file to be used.
+        - `resolution: (int, int)` X,Y resolution of file.
+        - `frame_ms: int = 0` Selects data format.
+            - `0` Events are loaded as events of dims `[x, y, polarity, time]`
+            - `else` Frames generated with synchronous period of `frame_ms`
+        - `device: str = "cpu"` Selects the device to which the file is loaded
+            - `cpu` CPU
+            - `cuda` Nvidia CUDA compatible GPU
+        - `mode: str = "safe"` Selects which method is used to create frames.
+            - `safe` Slower deterministic method.
+            - `unsafe` Faster non-deterministic method. The exact frame a event is part of is subject to jitter at runtime.
+        - `memory_limit: int = 1024` Maximum device memory to be uses in MB.
 
-    Attributes:
-        file_path (str): Path of file to be used
-        resolution (int, int): X,Y resolution of file
+    ### Attributes:
+        - `file_path: str` Path of file to be used.
+        - `resolution: (int, int)` X,Y resolution of file.
     """
-    def __init__(self, file_path: str, resolution: Tuple[int, int]) -> None:
+
+    def __init__(
+        self,
+        file_path: str,
+        resolution: Tuple[int, int],
+        frame_ms: int = 0,
+        device: str = "cpu",
+        mode: str = "safe",
+        memory_limit: int = 1024,
+    ) -> None: ...
+
+    def __next__():
         ...
