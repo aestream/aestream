@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <span>
 
 #include "../aer.hpp"
 #include "../file/aedat4.hpp"
@@ -44,7 +45,7 @@ public:
 
   bool get_is_streaming();
 
-  // nb::tensor<nb::numpy, AER::Event> events();
+  std::vector<AER::Event> load();
 
   // py::array_t<AER::Event> events_co();
 

@@ -15,18 +15,17 @@
 #endif
 
 namespace nb = nanobind;
+using EventVector = std::vector<AER::Event>;
 
 NB_MODULE(aestream_ext, m) {
-
   //   NB_NUMPY_DTYPE(AER::Event, timestamp, x, y, polarity);
 
   nb::class_<AER::Event>(m, "Event")
-      .def_property_readonly("timestamp",
-                             [](const AER::Event &e) { return e.timestamp; })
-      .def_property_readonly("x", [](const AER::Event &e) { return e.x; })
-      .def_property_readonly("y", [](const AER::Event &e) { return e.y; })
-      .def_property_readonly("polarity",
-                             [](const AER::Event &e) { return e.polarity; });
+      .def(nb::init<uint64_t, uint16_t, uint16_t, bool>())
+      .def_rw("timestamp", &AER::Event::timestamp)
+      .def_rw("x", &AER::Event::x)
+      .def_rw("y", &AER::Event::y)
+      .def_rw("polarity", &AER::Event::polarity);
 
   nb::class_<BufferPointer>(m, "BufferPointer")
       .def("to_numpy", &BufferPointer::to_numpy)
@@ -58,7 +57,7 @@ NB_MODULE(aestream_ext, m) {
       .def("__enter__", &FileInput::start_stream)
       .def("__exit__", &FileInput::stop_stream, nb::arg("a").none(),
            nb::arg("b").none(), nb::arg("c").none())
-      //  .def("events", &FileInput::events)
+      .def("load", &FileInput::load)
       //  .def("frames",
       //       [](nb::object fobj, size_t n_events_per_part) {
       //         return FrameIterator(fobj.cast<FileInput &>(),

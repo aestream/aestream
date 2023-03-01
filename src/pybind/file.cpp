@@ -91,13 +91,21 @@ bool FileInput::get_is_streaming() {
   return is_streaming.load() || is_nonempty.load();
 }
 
-// nb::tensor<nb::numpy, AER::Event> FileInput::events() {
-//   // const unique_file_t &fp = open_file(filename);
-//   // auto n_events = dat_read_header(fp);
-//   auto [event_array, n_events_read] = dat_read_n_events(fp, n_events);
 
-//   return nb::tensor<nb::numpy, AER::Event>(event_array, 1, n_events_read);
-// }
+std::vector<AER::Event> FileInput::load() {
+  const shared_file_t &fp = open_file(filename);
+  auto n_events = dat_read_header(fp);
+  auto [event_array, n_events_read] = dat_read_n_events(fp, n_events);
+
+  // return event_array;
+  // AER::Event* arr = new AER::Event[] { AER::Event( 0, 1, 2, true ), AER::Event( 0, 2, 3, true )};
+  // return nb::handle(PyMemoryView_FromMemory((char *) arr, 2, PyBUF_WRITE));
+  // return nb::handle(PyMemoryView_FromObject(arr));
+  // std::unique_ptr<AER::Event[]> p(event_array);
+  // return p;
+  std::span<AER::Event> data_span = std::span(event_array, n_events_read);
+  return std::vector<AER::Event>(data_span.begin(), data_span.end());
+}
 
 // py::array_t<AER::Event> FileInput::events_co() {
 //   AER::Event *event_array = (AER::Event *)malloc(n_events *

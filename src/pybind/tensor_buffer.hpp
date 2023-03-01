@@ -9,7 +9,8 @@
 #include "types.hpp"
 
 #include <nanobind/nanobind.h>
-#include <nanobind/tensor.h>
+#include <nanobind/ndarray.h>
+#include <nanobind/stl/unique_ptr.h>
 
 #ifdef USE_CUDA
 void index_increment_cuda(float *array, int *offset_pointer, size_t indices,
@@ -27,8 +28,8 @@ template <typename scalar_t> struct BufferDeleter {
   }
 };
 
-using tensor_numpy = nb::tensor<nb::numpy, float, nb::shape<2, nb::any>>;
-using tensor_torch = nb::tensor<nb::pytorch, float, nb::shape<2, nb::any>>;
+using tensor_numpy = nb::ndarray<nb::numpy, float, nb::shape<2, nb::any>>;
+using tensor_torch = nb::ndarray<nb::pytorch, float, nb::shape<2, nb::any>>;
 using buffer_t = std::unique_ptr<float[], BufferDeleter<float>>;
 using index_t = std::unique_ptr<int[], BufferDeleter<int>>;
 
@@ -39,9 +40,9 @@ struct BufferPointer {
   tensor_torch to_torch();
 
 private:
-  buffer_t data;
   std::string device;
   const std::vector<int64_t> &shape;
+  buffer_t data;
 };
 
 class TensorBuffer {
