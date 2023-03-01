@@ -14,6 +14,8 @@ add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
 
 # Add includes
 include_directories("include/")
+include_directories("/opt/homebrew/opt/lz4/include")
+link_directories("/opt/homebrew/opt/lz4/lib")
 include(include/CPM.cmake)
 
 # Add tests

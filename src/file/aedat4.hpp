@@ -6,6 +6,7 @@
 #include <sstream>
 #include <stdlib.h>
 #include <vector>
+#include <unistd.h>
 
 #include <fcntl.h>
 #include <sys/mman.h>
