@@ -35,9 +35,17 @@ AEStream is usable both as a command-line binary or Python tool.
 
 Contributions to support AEStream on additional platforms are always welcome.
 
-## Usage (Python)
+## Usage: read event-address files in Python
 
-The Python API exposes two classes for reading DVS data sources into PyTorch tensors: `USBInput` and `UDPInput`.
+AEStream can process fixed input sources like files like so:
+
+```python
+FileInput("file", (640, 480)).load()
+```
+
+## Usage: stream real-time data in Python
+AEStream also supports streaming data in real-time *without strict guarantees on orders*. 
+This is particularly useful in real-time scenarios, for instance when operating with `USBInput` or `UDPInput`
 
 ```python
 # Stream events from a DVS camera over USB

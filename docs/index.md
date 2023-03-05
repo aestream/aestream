@@ -55,9 +55,17 @@ AEStream is usable both as a command-line binary or Python tool.
 
 Contributions to support AEStream on additional platforms are always welcome.
 
-## Usage (Python)
+## Usage: read event-address files in Python
 
-The Python API exposes two classes for reading DVS data sources into PyTorch tensors: `USBInput` and `UDPInput`.
+AEStream can process fixed input sources like files like so:
+
+```python
+FileInput("file", (640, 480)).load()
+```
+
+## Usage: stream real-time data in Python
+AEStream also supports streaming data in real-time *without strict guarantees on orders*. 
+This is particularly useful in real-time scenarios, for instance when operating with `USBInput` or `UDPInput`
 
 ```python
 # Stream events from a DVS camera over USB
@@ -80,7 +88,7 @@ Please note the examples may require additional dependencies (such as [Norse](ht
 
 ### Example: real-time edge detection with spiking neural networks
 
-![](example/usb_edgedetection.gif)
+![](https://github.com/norse/aestream/raw/main/example/usb_edgedetection.gif)
 
 We stream events from a camera connected via USB and process them on a GPU in real-time using the [spiking neural network library, Norse](https://github.com/norse/norse) using fewer than 50 lines of Python.
 The left panel in the video shows the raw signal, while the middle and right panels show horizontal and vertical edge detection respectively.
