@@ -11,6 +11,7 @@ except ImportError:
     logging.debug("Failed to import Torch: AEStream is running in Numpy mode")
     del logging
 
+# Import AEStream modules
 from aestream.aestream_ext import Event
 from aestream._input import FileInput, UDPInput
 

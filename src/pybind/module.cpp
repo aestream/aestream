@@ -57,7 +57,7 @@ NB_MODULE(aestream_ext, m) {
       .def("__enter__", &FileInput::start_stream)
       .def("__exit__", &FileInput::stop_stream, nb::arg("a").none(),
            nb::arg("b").none(), nb::arg("c").none())
-      .def("load", &FileInput::load)
+      .def("load_all", &FileInput::load)
       //  .def("frames",
       //       [](nb::object fobj, size_t n_events_per_part) {
       //         return FrameIterator(fobj.cast<FileInput &>(),

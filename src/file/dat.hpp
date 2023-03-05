@@ -19,9 +19,9 @@ struct DATEvent {
 
 inline AER::Event dat_decode_event(uint64_t data, size_t overflows);
 
-size_t dat_read_header(const shared_file_t &fp);
+size_t dat_read_header(shared_file_t &fp);
 
-std::tuple<AER::Event *, size_t> dat_read_n_events(const shared_file_t &fp,
+std::tuple<AER::Event *, size_t> dat_read_n_events(shared_file_t &fp,
                                                    const size_t &n_events);
 
 Generator<AER::Event> dat_stream_events(const std::string filename);

@@ -74,8 +74,6 @@ FileInput::FileInput(const std::string &filename, py_size_t shape,
   // } else {
   //   generator = aedat_to_stream(filename);
   // }
-  auto runFlag = std::atomic<bool>(true);
-  generator = file_event_generator(filename, runFlag);
 };
 
 BufferPointer FileInput::read() {
@@ -91,20 +89,10 @@ bool FileInput::get_is_streaming() {
   return is_streaming.load() || is_nonempty.load();
 }
 
-
-std::vector<AER::Event> FileInput::load() {
-  const shared_file_t &fp = open_file(filename);
-  auto n_events = dat_read_header(fp);
-  auto [event_array, n_events_read] = dat_read_n_events(fp, n_events);
-
-  // return event_array;
-  // AER::Event* arr = new AER::Event[] { AER::Event( 0, 1, 2, true ), AER::Event( 0, 2, 3, true )};
-  // return nb::handle(PyMemoryView_FromMemory((char *) arr, 2, PyBUF_WRITE));
-  // return nb::handle(PyMemoryView_FromObject(arr));
-  // std::unique_ptr<AER::Event[]> p(event_array);
-  // return p;
-  std::span<AER::Event> data_span = std::span(event_array, n_events_read);
-  return std::vector<AER::Event>(data_span.begin(), data_span.end());
+nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>> FileInput::load() {
+  auto [arr, n_read] = dat_read_n_events(fp, n_events);
+  const size_t shape[1] = {n_read * sizeof(AER::Event)};
+  return nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>>(arr, 1, shape);
 }
 
 // py::array_t<AER::Event> FileInput::events_co() {
@@ -149,7 +137,9 @@ std::vector<AER::Event> FileInput::load() {
 // }
 
 FileInput *FileInput::start_stream() {
-  // generator = file_event_generator(filename, is_streaming);
+  auto runFlag = std::atomic<bool>(true);
+  generator =
+      file_event_generator(filename, runFlag); // TODO: Use file pointer (fp)
   file_thread = std::unique_ptr<std::thread>(
       new std::thread(&FileInput::stream_generator_to_buffer, this));
   return this;
