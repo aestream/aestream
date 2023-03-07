@@ -25,9 +25,9 @@ template <typename T, typename H, H h(const shared_file_t &),
 T file_reader(const std::string &filename) {
   const auto fp = open_file(filename);
   const H header = h(fp);
-  const uint64_t buffer[BUFFER_SIZE];
+  uint64_t buffer[BUFFER_SIZE];
 
   const auto out = f(fp, header, buffer);
-  delete[] buffer;
+  // delete[] buffer;
   return out;
 }
