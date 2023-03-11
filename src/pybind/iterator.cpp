@@ -20,7 +20,7 @@ public:
   // Generator<AER::Event>::Iter begin() { return generator.begin(); }
   // std::default_sentinel_t end() { return generator.end(); }
 
-  nb::tensor<nb::numpy, AER::Event> next() {
+  nb::ndarray<nb::numpy, AER::Event> next() {
     if (done) {
       throw nb::stop_iteration();
     }
@@ -34,7 +34,7 @@ public:
       index++;
       if (index >= n_events_per_part) {
         const size_t s[] = {n_events_per_part};
-        return nb::tensor<nb::numpy, AER::Event>(array, 1, s);
+        return nb::ndarray<nb::numpy, AER::Event>(array, 1, s);
       }
     }
 
@@ -42,7 +42,7 @@ public:
       // return buffer_to_py_array(event_array, index);
       done = true;
       const size_t s[] = {index};
-      return nb::tensor<nb::numpy, AER::Event>(array, 1, s);
+      return nb::ndarray<nb::numpy, AER::Event>(array, 1, s);
     } else {
       throw nb::stop_iteration();
     }
@@ -101,7 +101,7 @@ public:
   // Generator<AER::Event>::Iter begin() { return generator.begin(); }
   // std::default_sentinel_t end() { return generator.end(); }
 
-  nb::tensor<nb::numpy, AER::Event> next() {
+  nb::ndarray<nb::numpy, AER::Event> next() {
     auto [event_array, n_events_read] =
         dat_read_n_events(file.fp, n_events_per_part);
 
@@ -109,6 +109,6 @@ public:
       throw nb::stop_iteration();
     }
 
-    return nb::tensor<nb::numpy, AER::Event>(event_array, 1, n_events_read);
+    return nb::ndarray<nb::numpy, AER::Event>(event_array, 1, n_events_read);
   }
 };

@@ -74,8 +74,6 @@ FileInput::FileInput(const std::string &filename, py_size_t shape,
   // } else {
   //   generator = aedat_to_stream(filename);
   // }
-  auto runFlag = std::atomic<bool>(true);
-  generator = file_event_generator(filename, runFlag);
 };
 
 BufferPointer FileInput::read() {
@@ -91,13 +89,11 @@ bool FileInput::get_is_streaming() {
   return is_streaming.load() || is_nonempty.load();
 }
 
-// nb::tensor<nb::numpy, AER::Event> FileInput::events() {
-//   // const unique_file_t &fp = open_file(filename);
-//   // auto n_events = dat_read_header(fp);
-//   auto [event_array, n_events_read] = dat_read_n_events(fp, n_events);
-
-//   return nb::tensor<nb::numpy, AER::Event>(event_array, 1, n_events_read);
-// }
+nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>> FileInput::load() {
+  auto [arr, n_read] = dat_read_n_events(fp, n_events);
+  const size_t shape[1] = {n_read * sizeof(AER::Event)};
+  return nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>>(arr, 1, shape);
+}
 
 // py::array_t<AER::Event> FileInput::events_co() {
 //   AER::Event *event_array = (AER::Event *)malloc(n_events *
@@ -141,7 +137,9 @@ bool FileInput::get_is_streaming() {
 // }
 
 FileInput *FileInput::start_stream() {
-  // generator = file_event_generator(filename, is_streaming);
+  auto runFlag = std::atomic<bool>(true);
+  generator =
+      file_event_generator(filename, runFlag); // TODO: Use file pointer (fp)
   file_thread = std::unique_ptr<std::thread>(
       new std::thread(&FileInput::stream_generator_to_buffer, this));
   return this;

@@ -29,7 +29,7 @@ private:
 public:
   TensorBuffer buffer;
   py_size_t shape;
-  const shared_file_t &fp;
+  shared_file_t fp;
   Generator<AER::Event> generator;
   const std::string filename;
   size_t n_events;
@@ -44,7 +44,7 @@ public:
 
   bool get_is_streaming();
 
-  // nb::tensor<nb::numpy, AER::Event> events();
+  nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>> load();
 
   // py::array_t<AER::Event> events_co();
 

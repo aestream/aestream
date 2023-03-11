@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nanobind/nanobind.h>
-#include <nanobind/tensor.h>
+#include <nanobind/ndarray.h>
 
 #include "../aer.hpp"
 #include "../generator.hpp"

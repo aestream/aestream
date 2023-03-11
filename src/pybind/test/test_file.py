@@ -1,13 +1,26 @@
 import time
 import pytest
 
-import numpy
-from aestream import FileInput
+import numpy as np
+from aestream import Event, FileInput
 
 from . import _has_cuda_torch, _has_torch
 
+class namespace:
+    pass
 
-def test_read_dat():
+def test_load_dat():
+    f = FileInput("example/sample.dat", shape=(600, 400))
+    buf = f.load()
+
+    assert len(buf) == 539481
+    assert buf[0]["timestamp"] == 0
+    assert buf[0]["x"] == 237
+    assert buf[0]["y"] == 121
+    assert buf[0]["polarity"] == True
+
+
+def test_stream_dat():
     with FileInput(
         filename="example/sample.dat", shape=(600, 400), ignore_time=True
     ) as stream:
@@ -23,13 +36,12 @@ def test_read_dat():
                 import torch
                 assert isinstance(frame, torch.Tensor)
             else:
-                assert isinstance(frame, numpy.ndarray)
+                assert isinstance(frame, np.ndarray)
             events += frame.sum()
     assert events == 539136
 
-
 @pytest.mark.skipif(not _has_cuda_torch(), reason="Torch-gpu is not installed")
-def test_read_dat_torch_cuda():
+def test_stream_dat_torch_cuda():
     import torch
     with FileInput(
         filename="example/sample.dat", shape=(600, 400), ignore_time=True, device="cuda"
@@ -47,5 +59,4 @@ def test_read_dat_torch_cuda():
             events += frame.sum()
             time.sleep(0.1)
         events += stream.read().sum()
-    #assert events == 539136 TODO: Fix this
-    assert events >= 534000
+    assert events == 539136
