@@ -11,12 +11,13 @@ TEST(FileTest, FailEmptyFile) {
   EXPECT_THROW(file_event_generator("idonotexist.dat", flag).begin(),
                std::invalid_argument);
 }
-TEST(FileTest, ReadAEDATFile) {
+TEST(FileTest, ReadAEDAT4File) {
   auto file = AEDAT4("example/sample.aedat4");
+  auto [events, size] = file.read_events(-1);
   const size_t expected = 117667;
-  ASSERT_EQ(file.polarity_events.size(), expected);
+  ASSERT_EQ(size, expected);
 }
-TEST(FileTest, StreamAEDATFile) {
+TEST(FileTest, StreamAEDAT4File) {
   const std::atomic<bool> flag = {true};
   auto generator = file_event_generator("example/sample.aedat4", flag);
   const size_t expected = 117667;

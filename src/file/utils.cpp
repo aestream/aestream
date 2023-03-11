@@ -1,6 +1,10 @@
 #include "utils.hpp"
 
-void close_file(FILE *fp) { fclose(fp); }
+void close_file(FILE *fp) {
+  if (fp) {
+    fclose(fp);
+  }
+}
 
 // Thanks to https://stackoverflow.com/a/2072890/999865
 bool ends_with(std::string const &value, std::string const &ending) {
@@ -15,7 +19,8 @@ shared_file_t open_file(const std::string &filename) {
   shared_file_t fp(fopen(filename.c_str(), "rb"), &close_file);
 
   if (fp.get() == NULL) {
-    throw std::invalid_argument("Cannot open file " + filename);    // throw std::runtime_error("");
+    throw std::invalid_argument("Cannot open file " +
+                                filename); // throw std::runtime_error("");
   }
   return fp;
 }

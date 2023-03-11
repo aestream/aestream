@@ -17,6 +17,7 @@
 
 #include <flatbuffers/flatbuffers.h>
 
+#include "utils.hpp"
 #include <aer.hpp>
 
 #include "aedat.hpp"
@@ -30,6 +31,7 @@
 #include "trigger_generated.h"
 
 struct AEDAT4 {
+
   struct Frame {
     int64_t time;
     int16_t width;
@@ -72,21 +74,15 @@ struct AEDAT4 {
     return attributes;
   }
 
-  void load(const std::string filename) {
+  void open_aedat() {
     struct stat stat_info;
 
-    auto fd = open(filename.c_str(), O_RDONLY, 0);
-
-    if (fd < 0) {
-      throw std::invalid_argument("Failed to open file");
-    }
-
-    if (fstat(fd, &stat_info)) {
+    if (fstat(fileno(fp.get()), &stat_info)) {
       throw std::runtime_error("Failed to stat file");
     }
 
-    char *data = static_cast<char *>(
-        mmap(NULL, stat_info.st_size, PROT_READ, MAP_SHARED, fd, 0));
+    char *data = static_cast<char *>(mmap(NULL, stat_info.st_size, PROT_READ,
+                                          MAP_SHARED, fileno(fp.get()), 0));
     char *buffer_start = data;
 
     auto header = std::string(data, 14);
@@ -149,68 +145,69 @@ struct AEDAT4 {
     //   }
     // }
 
-    // for (auto info : outinfos) {
-    //   std::cout << "{" << info.name << ", " << info.compression << ", "
-    //             << info.type << ", " << info.size_x << ", " << info.size_y
-    //             << "}" << std::endl;
-    // }
-
-    int64_t data_table_position = ioheader->data_table_position();
+    data_table_position = ioheader->data_table_position();
 
     if (data_table_position < 0) {
       throw std::runtime_error(
           "AEDAT files without datatables are currently not supported");
     }
 
-    data += ioheader_offset + 4;
+    // Seek file pointer
+    fseek(fp.get(), 14 + data_table_position + 4, SEEK_SET);
+
+    // TODO: Re-introduce header file parsing
+    // data += ioheader_offset + 4;
 
     // we have to treat each packet according the compression method used,
     // which can be found in ioheader->compression()
     // assume LZ4 compression for now
 
-    const size_t dst_size_fixed = 10000000;
-    std::vector<uint8_t> dst_buffer(dst_size_fixed);
-    LZ4F_decompressionContext_t ctx;
-    LZ4F_errorCode_t lz4_error =
-        LZ4F_createDecompressionContext(&ctx, LZ4F_VERSION);
+    // std::vector<uint8_t> dst_buffer(BUFFER_SIZE);
+    // LZ4F_errorCode_t lz4_error =
+    //     LZ4F_createDecompressionContext(&ctx, LZ4F_VERSION);
 
-    if (LZ4F_isError(lz4_error)) {
-      printf("Decompression context error: %s\n", LZ4F_getErrorName(lz4_error));
-      return;
-    }
+    // if (LZ4F_isError(lz4_error)) {
+    //   printf("Decompression context error: %s\n",
+    //   LZ4F_getErrorName(lz4_error)); return;
+    // }
 
-    size_t dst_size = dst_size_fixed;
-    char *data_table_start = buffer_start + data_table_position;
-    size_t data_table_size = stat_info.st_size - data_table_position;
+    // size_t dst_size = BUFFER_SIZE;
+    // char *data_table_start = buffer_start + data_table_position;
+    // size_t data_table_size = stat_info.st_size - data_table_position;
 
-    auto ret = LZ4F_decompress(ctx, &dst_buffer[0], &dst_size, data_table_start,
-                               &data_table_size, nullptr);
-    if (LZ4F_isError(ret)) {
-      printf("Decompression DataTable error: %s\n", LZ4F_getErrorName(ret));
-      return;
-    }
+    // auto ret = LZ4F_decompress(ctx, &dst_buffer[0], &dst_size,
+    // data_table_start,
+    //                            &data_table_size, nullptr);
+    // if (LZ4F_isError(ret)) {
+    //   printf("Decompression DataTable error: %s\n", LZ4F_getErrorName(ret));
+    //   return;
+    // }
 
-    auto file_data_table = GetSizePrefixedFileDataTable(&dst_buffer[0]);
+    // auto file_data_table = GetSizePrefixedFileDataTable(&dst_buffer[0]);
 
-    for (auto elem : *file_data_table->table()) {
-      // just here to illustrate access to the data
-    }
+    // for (auto elem : *file_data_table->table()) {
+    //   // just here to illustrate access to the data
+    // }
+  }
 
+  std::tuple<AER::Event *, size_t> read_events(size_t n_events) {
+    std::vector<uint8_t> dst_buffer(BUFFER_SIZE);
+    AER::Event *events = (AER::Event *)malloc(n_events * sizeof(AER::Event));
     uint64_t count = 0;
-    while (data < buffer_start + data_table_position) {
-      int32_t stream_id = *reinterpret_cast<int32_t *>(data);
-      data += 4;
-      size_t size = *reinterpret_cast<int32_t *>(data);
-      data += 4;
+    do {
+      int32_t stream_id = *reinterpret_cast<int32_t *>(fp.get());
+      fseek(fp.get(), 4, SEEK_SET);
+      size_t size = *reinterpret_cast<int32_t *>(fp.get());
+      fseek(fp.get(), 4, SEEK_SET);
 
-      size_t dst_size = dst_size_fixed;
-      auto ret =
-          LZ4F_decompress(ctx, &dst_buffer[0], &dst_size, data, &size, nullptr);
-      data += size;
+      size_t dst_size = BUFFER_SIZE;
+      auto ret = LZ4F_decompress(ctx, &dst_buffer[0], &dst_size, fp.get(),
+                                 &size, nullptr);
+      fseek(fp.get(), size, SEEK_SET);
 
       if (LZ4F_isError(ret)) {
         printf("Decompression package error: %s\n", LZ4F_getErrorName(ret));
-        return;
+        return {nullptr, 0};
       }
 
       switch (stream_id) {
@@ -219,56 +216,51 @@ struct AEDAT4 {
       case 0: {
         auto event_packet = GetSizePrefixedEventPacket(&dst_buffer[0]);
         for (auto event : *event_packet->elements()) {
-          count += 1;
           const auto e = AER::Event{
               static_cast<uint64_t>(event->t()),
               static_cast<uint16_t>(event->x()),
               static_cast<uint16_t>(event->y()),
               static_cast<bool>(event->on()),
           };
-          polarity_events.push_back(e);
+          events[count] = e;
+          count += 1;
         }
         break;
       }
       case OutInfo::Type::FRME: {
-        Frame res;
-        auto frame_packet = GetSizePrefixedFrame(&dst_buffer[0]);
-        res.time = frame_packet->t();
-        res.width = frame_packet->width();
-        res.height = frame_packet->height();
+        // Frame res;
+        // auto frame_packet = GetSizePrefixedFrame(&dst_buffer[0]);
+        // res.time = frame_packet->t();
+        // res.width = frame_packet->width();
+        // res.height = frame_packet->height();
 
-        // std::cout << frame_packet->offset_y() << std::endl;
+        // auto pixels = frame_packet->pixels()->data();
 
-        auto pixels = frame_packet->pixels()->data();
+        // for (int j = 0; j < res.height; j++) {
+        //   for (int i = 0; i < res.width; i++) {
+        //     res.pixels.push_back(pixels[i + j * res.width]);
+        //     res.pixels.push_back(pixels[i + j * res.width]);
+        //     res.pixels.push_back(pixels[i + j * res.width]);
+        //   }
+        // }
 
-        // res.pixels.reserve(res.width * res.height * 3);
-
-        for (int j = 0; j < res.height; j++) {
-          for (int i = 0; i < res.width; i++) {
-            res.pixels.push_back(pixels[i + j * res.width]);
-            res.pixels.push_back(pixels[i + j * res.width]);
-            res.pixels.push_back(pixels[i + j * res.width]);
-          }
-        }
-
-        frames.push_back(res);
+        // frames.push_back(res);
         break;
       }
       case OutInfo::Type::IMUS: {
-        auto imu_packet = GetSizePrefixedImuPacket(&dst_buffer[0]);
+        // auto imu_packet = GetSizePrefixedImuPacket(&dst_buffer[0]);
         break;
       }
       case OutInfo::Type::TRIG: {
-        auto trigger_packet = GetSizePrefixedTriggerPacket(&dst_buffer[0]);
+        // auto trigger_packet = GetSizePrefixedTriggerPacket(&dst_buffer[0]);
         break;
       }
       default: {
         break;
       }
       }
-    }
-
-    close(fd);
+    } while (ftell(fp.get()) < data_table_position && n_events - count > 0);
+    return {events, count};
   }
 
   static std::tuple<char *, size_t> compress_lz4(char *buffer, size_t size) {
@@ -372,19 +364,23 @@ struct AEDAT4 {
     stream.write(compressed, size);
   }
 
-  static Generator<AER::Event> aedat_to_stream(const std::string filename) {
-    AEDAT4 aedat = AEDAT4(filename);
-    // TODO: Iterate over raw file pointer to save memory
-    for (auto event : aedat.polarity_events) {
-      co_yield event;
-    }
+  Generator<AER::Event> stream() {
+    size_t size = 0;
+    static const size_t STREAM_BUFFER_SIZE = 128;
+    do {
+      auto [events, size] = read_events(STREAM_BUFFER_SIZE);
+      for (size_t i; i < size; i++) {
+        co_yield events[i];
+      }
+    } while (size > 0);
   }
 
-  AEDAT4() {}
+  // AEDAT4() {}
+  AEDAT4(shared_file_t &fp): fp(fp) {}
+  AEDAT4(const std::string &filename) { open_file(filename); }
 
-  AEDAT4(const std::string &filename) { load(filename); }
-
-  std::vector<OutInfo> outinfos;
-  std::vector<Frame> frames;
-  std::vector<AER::Event> polarity_events;
+private:
+  shared_file_t fp;
+  uint64_t data_table_position;
+  LZ4F_decompressionContext_t ctx;
 };

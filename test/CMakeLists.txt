@@ -14,8 +14,6 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 set(CMAKE_C_FLAGS_DEBUG "-g -DDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
 
-find_package(Torch REQUIRED)
-
 # Enable testing
 enable_testing()
 
@@ -23,7 +21,6 @@ add_executable(
   aestream_test
   main_test.cpp
   file_test.cpp
-  torch_test.cpp
 )
 target_link_libraries(
   aestream_test
@@ -32,5 +29,4 @@ target_link_libraries(
   aestream_output
   gtest
   ${LZ4_LIBRARY}
-  ${TORCH_LIBRARIES}
 )
