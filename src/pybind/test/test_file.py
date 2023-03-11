@@ -9,6 +9,16 @@ from . import _has_cuda_torch, _has_torch
 class namespace:
     pass
 
+def test_load_aedat4():
+    f = FileInput("example/sample.aedat4", shape=(600, 400))
+    buf = f.load()
+
+    assert len(buf) == 539481
+    assert buf[0]["timestamp"] == 0
+    assert buf[0]["x"] == 237
+    assert buf[0]["y"] == 121
+    assert buf[0]["polarity"] == True
+
 def test_load_dat():
     f = FileInput("example/sample.dat", shape=(600, 400))
     buf = f.load()

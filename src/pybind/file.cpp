@@ -69,11 +69,6 @@ FileInput::FileInput(const std::string &filename, py_size_t shape,
   } else {
     n_events = 0;
   }
-  // if (ends_with(filename, "dat")) {
-  //   generator = dat_stream_events(fp, n_events);
-  // } else {
-  //   generator = aedat_to_stream(filename);
-  // }
 };
 
 BufferPointer FileInput::read() {
@@ -90,7 +85,16 @@ bool FileInput::get_is_streaming() {
 }
 
 nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>> FileInput::load() {
-  auto [arr, n_read] = dat_read_n_events(fp, n_events);
+  std::tuple<AER::Event *, size_t> result;
+  if (ends_with(filename, ".dat")) {
+    result = dat_read_n_events(fp, n_events);
+  } else if (ends_with(filename, ".aedat4")) {
+    result = AEDAT4(fp).read_events(-1);
+  } else {
+    throw std::invalid_argument("Unknown file type " + filename);
+  }
+
+  auto [arr, n_read] = result;
   const size_t shape[1] = {n_read * sizeof(AER::Event)};
   return nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>>(arr, 1, shape);
 }
@@ -138,8 +142,7 @@ nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>> FileInput::load() {
 
 FileInput *FileInput::start_stream() {
   auto runFlag = std::atomic<bool>(true);
-  generator =
-      file_event_generator(filename, runFlag); // TODO: Use file pointer (fp)
+  generator = file_event_generator(filename, runFlag);
   file_thread = std::unique_ptr<std::thread>(
       new std::thread(&FileInput::stream_generator_to_buffer, this));
   return this;
