@@ -15,6 +15,15 @@
 #include "../file/utils.hpp"
 
 /**
+ * Attempts to open a file containing address-event representations.
+ *
+ * @param filename The path to the file
+ * @return A FileBase pointer
+ * @throws std::invalid_argument if the file could not be found or opened
+ */
+std::unique_ptr<FileBase> file_base(const std::string &filename);
+
+/**
  * Reads AEDAT events from a file and replays them either in real-time
  * (ignore_time = false) or as fast as possible (ignore_time = true).
  *

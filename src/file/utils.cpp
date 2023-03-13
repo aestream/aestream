@@ -15,24 +15,12 @@ bool ends_with(std::string const &value, std::string const &ending) {
 
 #include <iostream>
 
-shared_file_t open_file(const std::string &filename) {
-  shared_file_t fp(fopen(filename.c_str(), "rb"), &close_file);
+file_t open_file(const std::string &filename) {
+  file_t fp(fopen(filename.c_str(), "rb"), &close_file);
 
   if (fp.get() == NULL) {
     throw std::invalid_argument("Cannot open file " +
                                 filename); // throw std::runtime_error("");
   }
   return fp;
-}
-
-template <typename T, typename H, H h(const shared_file_t &),
-          T f(const shared_file_t &, const H &, uint64_t *)>
-T file_reader(const std::string &filename) {
-  const auto fp = open_file(filename);
-  const H header = h(fp);
-  uint64_t buffer[BUFFER_SIZE];
-
-  const auto out = f(fp, header, buffer);
-  // delete[] buffer;
-  return out;
 }

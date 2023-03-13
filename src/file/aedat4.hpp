@@ -5,8 +5,8 @@
 #include <map>
 #include <sstream>
 #include <stdlib.h>
-#include <vector>
 #include <unistd.h>
+#include <vector>
 
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -30,7 +30,7 @@
 #include "rapidxml.hpp"
 #include "trigger_generated.h"
 
-struct AEDAT4 {
+struct AEDAT4 : FileBase {
 
   struct Frame {
     int64_t time;
@@ -190,15 +190,15 @@ struct AEDAT4 {
     // }
   }
 
-  std::tuple<AER::Event *, size_t> read_events(size_t n_events) {
+  std::tuple<AER::Event *, size_t> read_events(const size_t &n_events) {
     std::vector<uint8_t> dst_buffer(BUFFER_SIZE);
     AER::Event *events = (AER::Event *)malloc(n_events * sizeof(AER::Event));
     uint64_t count = 0;
     do {
-      int32_t stream_id = *reinterpret_cast<int32_t *>(fp.get());
-      fseek(fp.get(), 4, SEEK_SET);
-      size_t size = *reinterpret_cast<int32_t *>(fp.get());
-      fseek(fp.get(), 4, SEEK_SET);
+      int32_t stream_id;
+      fread(&stream_id, sizeof(int32_t), 1, fp.get());
+      size_t size;
+      fread(&size, sizeof(int32_t), 1, fp.get());
 
       size_t dst_size = BUFFER_SIZE;
       auto ret = LZ4F_decompress(ctx, &dst_buffer[0], &dst_size, fp.get(),
@@ -364,23 +364,26 @@ struct AEDAT4 {
     stream.write(compressed, size);
   }
 
-  Generator<AER::Event> stream() {
+  Generator<AER::Event> stream(size_t n_events = -1) {
     size_t size = 0;
+    size_t count = 0;
     static const size_t STREAM_BUFFER_SIZE = 128;
     do {
       auto [events, size] = read_events(STREAM_BUFFER_SIZE);
       for (size_t i; i < size; i++) {
         co_yield events[i];
+        count++;
       }
-    } while (size > 0);
+    } while (size > 0 && count - n_events > 0);
   }
 
-  // AEDAT4() {}
-  AEDAT4(shared_file_t &fp): fp(fp) {}
-  AEDAT4(const std::string &filename) { open_file(filename); }
+  AEDAT4(const file_t &fp) : fp(fp) { open_aedat(); }
+  AEDAT4(const std::string &filename) : fp(open_file(filename)) {
+    open_aedat();
+  }
 
 private:
-  shared_file_t fp;
+  const file_t &fp;
   uint64_t data_table_position;
   LZ4F_decompressionContext_t ctx;
 };

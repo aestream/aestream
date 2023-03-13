@@ -63,13 +63,7 @@ void FileInput::stream_generator_to_buffer() {
 FileInput::FileInput(const std::string &filename, py_size_t shape,
                      const std::string &device, bool ignore_time)
     : buffer(shape, device, EVENT_BUFFER_SIZE), ignore_time(ignore_time),
-      shape(shape), filename(filename), fp(open_file(filename)) {
-  if (ends_with(filename, "dat")) {
-    n_events = dat_read_header(fp);
-  } else {
-    n_events = 0;
-  }
-};
+      shape(shape), filename(filename), file(file_base(filename)){};
 
 BufferPointer FileInput::read() {
   auto tmp = buffer.read();
@@ -85,16 +79,7 @@ bool FileInput::get_is_streaming() {
 }
 
 nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>> FileInput::load() {
-  std::tuple<AER::Event *, size_t> result;
-  if (ends_with(filename, ".dat")) {
-    result = dat_read_n_events(fp, n_events);
-  } else if (ends_with(filename, ".aedat4")) {
-    result = AEDAT4(fp).read_events(-1);
-  } else {
-    throw std::invalid_argument("Unknown file type " + filename);
-  }
-
-  auto [arr, n_read] = result;
+  auto [arr, n_read] = file->read_events(-1);
   const size_t shape[1] = {n_read * sizeof(AER::Event)};
   return nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>>(arr, 1, shape);
 }
