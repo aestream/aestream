@@ -10,6 +10,7 @@ from . import _has_cuda_torch, _has_torch
 class namespace:
     pass
 
+
 def test_load_aedat4():
     f = FileInput("example/sample.aedat4", shape=(600, 400))
     buf = f.load()
@@ -74,6 +75,7 @@ def test_stream_dat():
                 assert isinstance(frame, np.ndarray)
             events += frame.sum()
     assert events == 539481
+
 
 
 @pytest.mark.skipif(not _has_cuda_torch(), reason="Torch-gpu is not installed")
