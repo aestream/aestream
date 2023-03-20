@@ -119,6 +119,7 @@ int main(int argc, char *argv[]) {
   // Handle input
   //
   Generator<AER::Event> input_generator;
+  std::unique_ptr<FileBase> file_handle = nullptr;
   if (app_input_inivation->parsed()) {
 #ifdef WITH_CAER
     input_generator = inivation_event_generator(
@@ -138,8 +139,8 @@ int main(int argc, char *argv[]) {
         "Prophesee cameras unavailable: please recompile with MetavisionSDK");
 #endif
   } else if (app_input_file->parsed()) {
-    input_generator =
-        file_event_generator(input_filename, runFlag);
+    file_handle = open_event_file(input_filename);
+    input_generator = file_handle->stream();
   }
 
   //

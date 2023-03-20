@@ -31,5 +31,4 @@ target_include_directories(aestream PRIVATE ${CMAKE_INSTALL_LIBDIR})
 target_link_libraries(aestream PRIVATE aer aestream_file aestream_input aestream_output)
 
 # Install targets
-# install(TARGETS aer aestream_input aestream_output aestream_lib LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(IMPORTED_RUNTIME_ARTIFACTS aestream DESTINATION ${CMAKE_INSTALL_BINDIR})

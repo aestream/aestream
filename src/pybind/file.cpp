@@ -63,7 +63,7 @@ void FileInput::stream_generator_to_buffer() {
 FileInput::FileInput(const std::string &filename, py_size_t shape,
                      const std::string &device, bool ignore_time)
     : buffer(shape, device, EVENT_BUFFER_SIZE), ignore_time(ignore_time),
-      shape(shape), filename(filename), file(file_base(filename)){};
+      shape(shape), filename(filename), file(open_event_file(filename)){};
 
 BufferPointer FileInput::read() {
   auto tmp = buffer.read();
@@ -80,6 +80,7 @@ bool FileInput::get_is_streaming() {
 
 nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>> FileInput::load() {
   auto [arr, n_read] = file->read_events(-1);
+  std::cout << "Read " << n_read << " events" << std::endl;
   const size_t shape[1] = {n_read * sizeof(AER::Event)};
   return nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>>(arr, 1, shape);
 }
@@ -126,8 +127,7 @@ nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>> FileInput::load() {
 // }
 
 FileInput *FileInput::start_stream() {
-  auto runFlag = std::atomic<bool>(true);
-  generator = file_event_generator(filename, runFlag);
+  generator = file->stream();
   file_thread = std::unique_ptr<std::thread>(
       new std::thread(&FileInput::stream_generator_to_buffer, this));
   return this;

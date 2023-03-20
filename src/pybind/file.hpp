@@ -29,7 +29,7 @@ private:
 public:
   TensorBuffer buffer;
   py_size_t shape;
-  const std::unique_ptr<FileBase> &file;
+  const std::unique_ptr<FileBase> file;
   Generator<AER::Event> generator;
   const std::string filename;
 

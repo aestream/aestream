@@ -15,10 +15,8 @@
 #endif
 
 namespace nb = nanobind;
-using EventVector = std::vector<AER::Event>;
 
 NB_MODULE(aestream_ext, m) {
-  //   NB_NUMPY_DTYPE(AER::Event, timestamp, x, y, polarity);
 
   nb::class_<AER::Event>(m, "Event")
       .def(nb::init<uint64_t, uint16_t, uint16_t, bool>())
