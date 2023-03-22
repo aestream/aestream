@@ -169,7 +169,7 @@ struct AEDAT4 : FileBase {
         (n_events > 0 ? n_events : total_number_of_events) * sizeof(AER::Event);
     AER::Event *events = (AER::Event *)malloc(byte_count);
 
-    size_t count = 0;
+    int64_t count = 0;
     while (get_packet()) {
       for (; packet_events_read < event_vector->size(); packet_events_read++) {
         const Event *event = event_vector->Get(packet_events_read);
@@ -191,7 +191,7 @@ struct AEDAT4 : FileBase {
   }
 
   Generator<AER::Event> stream(const int64_t n_events = -1) {
-    size_t size = 0, count = 0;
+    int64_t size = 0, count = 0;
     static const size_t STREAM_BUFFER_SIZE = 128;
     do {
       auto ret = read_events(STREAM_BUFFER_SIZE);
@@ -204,8 +204,8 @@ struct AEDAT4 : FileBase {
     } while (size == STREAM_BUFFER_SIZE && (n_events < 0 || (count - n_events >= 0)));
   }
 
-  AEDAT4(file_t &&fp) : fp{std::move(fp)} { read_file_header(); }
-  AEDAT4(const std::string &filename) : AEDAT4(open_file(filename)) {}
+  explicit AEDAT4(file_t &&fp) : fp{std::move(fp)} { read_file_header(); }
+  explicit AEDAT4(const std::string &filename) : AEDAT4(open_file(filename)) {}
   ~AEDAT4() {
     if (ctx) {
       LZ4F_freeDecompressionContext(ctx);
@@ -246,7 +246,7 @@ private:
       throw std::runtime_error("Failed to stat file");
     }
 
-    size_t header_ret = fread(data, 1, dst_size, fp.get());
+    auto header_ret = fread(data, 1, dst_size, fp.get());
     if (header_ret <= 0) {
       throw std::runtime_error("Failed to read file version number");
     }
@@ -404,7 +404,7 @@ private:
     int32_t id, size;
     auto id_ret = fread(&id, 4, 1, fp.get());
     auto size_ret = fread(&size, 4, 1, fp.get());
-    if (id_ret <= 0 || size_ret <= 0) { // Error or EOF
+    if (id_ret == 0 || size_ret == 0) { // Error or EOF
       return false;
     }
     if (size == 0) { // Continue if packet is empty
@@ -418,8 +418,8 @@ private:
     }
 
     // Read packet bytes
-    size_t packet_ret = fread(&packet_buffer[0], 1, size, fp.get());
-    if (packet_ret <= 0) { // Error or EOF
+    auto packet_ret = fread(&packet_buffer[0], 1, size, fp.get());
+    if (packet_ret == 0) { // Error or EOF
       return false;
     }
 

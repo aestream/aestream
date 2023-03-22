@@ -22,10 +22,8 @@ struct DAT : FileBase {
   Generator<AER::Event> stream(const int64_t n_events = -1) {
     static const size_t STREAM_BUFFER_SIZE = 4096;
     uint64_t buffer[STREAM_BUFFER_SIZE];
-    size_t count = 0;
     uint64_t timestep = 0;
     size_t overflows = 0;
-    int n = 0;
     size_t size;
     do {
       size = fread(buffer, sizeof(uint64_t), STREAM_BUFFER_SIZE, fp.get());
@@ -79,8 +77,8 @@ struct DAT : FileBase {
     return {events, index};
   }
 
-  DAT(const std::string &filename) : DAT(open_file(filename)) {}
-  DAT(file_t &&fp)
+  explicit DAT(const std::string &filename) : DAT(open_file(filename)) {}
+  explicit DAT(file_t &&fp)
       : fp(std::move(fp)), total_number_of_events{dat_read_header()} {}
 
 private:
