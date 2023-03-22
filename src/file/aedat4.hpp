@@ -201,7 +201,7 @@ struct AEDAT4 : FileBase {
         co_yield events[i];
         count++;
       }
-    } while (size > 0 && (n_events < 0 || (count - n_events >= 0)));
+    } while (size == STREAM_BUFFER_SIZE && (n_events < 0 || (count - n_events >= 0)));
   }
 
   AEDAT4(file_t &&fp) : fp{std::move(fp)} { read_file_header(); }

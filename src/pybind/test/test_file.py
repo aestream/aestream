@@ -24,7 +24,7 @@ def test_load_aedat4():
 
 def test_stream_aedat4():
     with FileInput(
-        filename="example/sample.aedat4", shape=(346, 280), ignore_time=True
+        filename="example/sample.aedat4", shape=(346, 260), ignore_time=True
     ) as stream:
         time.sleep(0.3)
         interval = 0.5
@@ -74,7 +74,7 @@ def test_stream_dat():
             else:
                 assert isinstance(frame, np.ndarray)
             events += frame.sum()
-    assert events == 539136
+    assert events == 539481
 
 
 @pytest.mark.skipif(not _has_cuda_torch(), reason="Torch-gpu is not installed")

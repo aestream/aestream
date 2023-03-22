@@ -60,6 +60,8 @@ void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
   }
 }
 
+#include <iostream>
+
 void TensorBuffer::set_vector(std::vector<AER::Event> events) {
   const std::lock_guard lock{buffer_lock};
 #ifdef USE_CUDA

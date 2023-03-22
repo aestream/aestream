@@ -1,46 +1,5 @@
 #include "file.hpp"
 
-void FileInput::stream_file_to_buffer() {
-  while (is_streaming.load()) {
-    const auto time_start = std::chrono::high_resolution_clock::now();
-    const int64_t time_start_us = event_vector[0].timestamp;
-
-    std::vector<AER::Event> local_buffer = {};
-    for (auto event : event_vector) {
-      local_buffer.push_back(event);
-
-      // Sleep to align with real-time, unless ignore_time is set
-      if (!ignore_time) {
-        const int64_t time_diff =
-            std::chrono::duration_cast<std::chrono::microseconds>(
-                std::chrono::high_resolution_clock::now() - time_start)
-                .count();
-        const int64_t file_diff = event.timestamp - time_start_us;
-        const int64_t time_offset = file_diff - time_diff;
-        if (time_offset > 1000) {
-          std::this_thread::sleep_for(std::chrono::microseconds(time_offset));
-        }
-      }
-
-      if (local_buffer.size() >= EVENT_BUFFER_SIZE) {
-        buffer.set_vector(local_buffer);
-        is_nonempty.store(true);
-        local_buffer.clear();
-
-        if (!is_streaming) {
-          break;
-        }
-      }
-    }
-    // Stream remaining events
-    if (local_buffer.size() > 0) {
-      buffer.set_vector(local_buffer);
-      is_nonempty.store(true);
-    }
-    is_streaming.store(false);
-  }
-}
-
 void FileInput::stream_generator_to_buffer() {
   // We add a local buffer to avoid overusing the atomic
   // lock in the actual buffer
@@ -56,6 +15,9 @@ void FileInput::stream_generator_to_buffer() {
       is_nonempty.store(true);
       local_buffer.clear();
     }
+  }
+  if (local_buffer.size() > 0) {
+    buffer.set_vector(local_buffer);
   }
   is_streaming.store(false);
 }
