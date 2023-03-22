@@ -77,7 +77,6 @@ def test_stream_dat():
     assert events == 539481
 
 
-
 @pytest.mark.skipif(not _has_cuda_torch(), reason="Torch-gpu is not installed")
 def test_stream_dat_torch_cuda():
     import torch
