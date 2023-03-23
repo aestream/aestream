@@ -35,5 +35,5 @@ jobs:
           pip install pytest
       - name: Test
         run: pytest src
-      - name: Run binary
-        run: aestream
+      - name: Install and test for binary
+        run: pip install . && which aestream
