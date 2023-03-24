@@ -98,7 +98,7 @@ private:
             throw std::runtime_error("Failed to process .dat file header");
           }
           --bytes_read;
-          goto process_length;
+          return process_length(bytes_read);
         } else {
           header_begins = 0;
         }
@@ -109,11 +109,14 @@ private:
       throw std::runtime_error("Failed to process .dat file header");
     }
 
-  process_length:
+    return process_length(bytes_read);
+  }
+
+  size_t process_length(size_t bytes_read) {
     fseek(fp.get(), 0, SEEK_END);
-    size_t fileLength = ftell(fp.get());
+    size_t file_length = ftell(fp.get());
     fseek(fp.get(), bytes_read + 2, SEEK_SET); // Skip header bytes
-    return (fileLength - bytes_read) / sizeof(int64_t);
+    return (file_length - bytes_read) / sizeof(int64_t);
   }
 
   inline AER::Event dat_decode_event(uint64_t data, size_t overflows) {

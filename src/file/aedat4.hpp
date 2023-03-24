@@ -201,10 +201,14 @@ struct AEDAT4 : FileBase {
         co_yield events[i];
         count++;
       }
-    } while (size == STREAM_BUFFER_SIZE && (n_events < 0 || (n_events - count >= 0)));
+    } while (size == STREAM_BUFFER_SIZE &&
+             (n_events < 0 || (n_events - count >= 0)));
   }
 
-  explicit AEDAT4(file_t &&fp) : fp{std::move(fp)} { read_file_header(); }
+  explicit AEDAT4(file_t &&fp)
+      : fp{std::move(fp)}, dst_buffer(4096), packet_buffer(4096) {
+    read_file_header();
+  }
   explicit AEDAT4(const std::string &filename) : AEDAT4(open_file(filename)) {}
   ~AEDAT4() {
     if (ctx) {
@@ -217,7 +221,7 @@ private:
   const file_t fp;
 
   size_t total_number_of_events = 0;
-  std::vector<uint8_t> dst_buffer = std::vector<uint8_t>(4096);
+  std::vector<uint8_t> dst_buffer;
   std::vector<char> packet_buffer;
   size_t packet_index = 0;
   size_t packet_events_read = 0;
