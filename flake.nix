@@ -4,11 +4,10 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-22.11";
     flake-utils.url = "github:numtide/flake-utils";
-    mach-nix.url = "mach-nix/3.5.0";
-    # mach-nix.pypiDataRev = "322a4f20c357704644abe8c2e50412e9b9c16909";
+    # mach-nix.url = "mach-nix/3.5.0";
   };
 
-  outputs = { self, nixpkgs, flake-utils, mach-nix }:
+  outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
@@ -44,12 +43,10 @@
             pkgs.python39
             pkgs.ninja
             pkgs.lz4
-            py.torch
             libcaer
           ];
           cmakeFlags = [
             "-GNinja"
-            "-DCMAKE_PREFIX_PATH=${py.torch}"
             "-DCMAKE_SKIP_BUILD_RPATH=ON"
             "-DFLATBUFFERS_SOURCE_DIR=${pkgs.flatbuffers.src}"
           ];
@@ -73,8 +70,8 @@
             pkgs.gtest
           ];
           cmakeFlags = parent.cmakeFlags ++ [
-            "-DCMAKE_BUILD_TYPE=Debug"
-            "-DCMAKE_PREFIX_PATH=${py.torch};${pkgs.gtest}"
+            "-DCMAKE_BUILD_TYPE=Debug"  
+            "-DCMAKE_PREFIX_PATH=${pkgs.gtest}"
           ];
           installPhase = parent.installPhase + ''
             install -m555 -D $src/example/sample.aedat4 $out/example/sample.aedat4
@@ -82,31 +79,25 @@
             install -m755 -D test/aestream_test $out/bin/aestream_test
           '';
         });
-        aestream-python = mach-nix.lib.${system}.buildPythonPackage {
-          pname = "aestream";
-          version = "0.5.0";
-          src = ./.;
-          requirements = "scikit-build\nnumpy";
-          providers.pip = "wheel";
+        # aestream-python = mach-nix.lib.${system}.buildPythonPackage {
+        #   pname = "aestream";
+        #   version = "0.5.0";
+        #   src = ./.;
+        #   requirements = "scikit-build\nnumpy\nnanobind";
+        #   providers.pip = "wheel";
 
-          buildInputs = [ pkgs.lz4 pkgs.zlib py.pybind11 libcaer pkgs.torch ];
-          nativeBuildInputs = [
-            pkgs.cmake 
-            pkgs.which
-          ];
-          python = "python310";
-          # pypiDataRev = "c8a55398a0e24b5560732cc94cb24172eaddf72f";
-          # pypiDataSha256 = "sha256-8geJawMHqrwk/+Dvx5pkm/T9BzVJPFqN0leHe3VSsQg=";
-          postShellHook = ''
-              echo ${pkgs.torch}
-          #   export LD_LIBRARY_PATH=${pkgs.glibc.bin}:$LD_LIBRARY_PATH
-          '';
-        };
+        #   buildInputs = [ pkgs.lz4 pkgs.zlib py.pybind11 libcaer ];
+        #   nativeBuildInputs = [
+        #     pkgs.cmake 
+        #     pkgs.which
+        #   ];
+        #   python = "python310";
+        # };
       in
       rec {
         devShells = flake-utils.lib.flattenTree {
           default = aestream;
-          python = aestream-python;
+          # python = aestream-python;
         };
         packages = flake-utils.lib.flattenTree {
           default = aestream;
