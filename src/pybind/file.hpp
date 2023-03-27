@@ -29,10 +29,9 @@ private:
 public:
   TensorBuffer buffer;
   py_size_t shape;
-  shared_file_t fp;
+  const std::unique_ptr<FileBase> file;
   Generator<AER::Event> generator;
   const std::string filename;
-  size_t n_events;
 
   FileInput(const std::string &filename, py_size_t shape,
             const std::string &device, bool ignore_time = false);

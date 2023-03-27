@@ -47,7 +47,6 @@ private:
 
 class TensorBuffer {
 private:
-  int sum = 0;
   const std::vector<int64_t> shape;
   uint64_t current_timestamp = 0;
   std::string device;

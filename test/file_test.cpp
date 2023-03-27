@@ -5,20 +5,54 @@
 #include "input/file.hpp"
 
 TEST(FileTest, FailEmptyFile) {
-  const std::atomic<bool> flag = {true};
-  EXPECT_THROW(file_event_generator("idonotexist.aedat4", flag).begin(),
-               std::invalid_argument);
-  EXPECT_THROW(file_event_generator("idonotexist.dat", flag).begin(),
-               std::invalid_argument);
+  EXPECT_THROW(open_event_file("idonotexist.aedat4"), std::invalid_argument);
+  EXPECT_THROW(open_event_file("idonotexist.dat"), std::invalid_argument);
 }
-TEST(FileTest, ReadAEDATFile) {
-  auto file = AEDAT4("example/sample.aedat4");
+TEST(FileTest, ReadDATFile) {
+  auto file = open_event_file("example/sample.dat");
+  auto [events, size] = file->read_events(-1);
+  const size_t expected = 539481;
+  ASSERT_EQ(size, expected);
+}
+TEST(FileTest, ReadDATFilePart) {
+  auto file = open_event_file("example/sample.dat");
+  auto [events, size] = file->read_events(10000);
+  const size_t expected = 10000;
+  ASSERT_EQ(size, expected);
+}
+TEST(FileTest, ReadDATFileParts) {
+  auto file = open_event_file("example/sample.dat");
+  auto [events1, size1] = file->read_events(10000);
+  const size_t expected1 = 10000;
+  ASSERT_EQ(size1, expected1);
+  auto [events2, size2] = file->read_events(-1);
+  const size_t expected2 = 539481 - 10000;
+  ASSERT_EQ(size2, expected2);
+}
+TEST(FileTest, ReadAEDAT4File) {
+  auto file = open_event_file("example/sample.aedat4");
+  auto [events, size] = file->read_events(-1);
   const size_t expected = 117667;
-  ASSERT_EQ(file.polarity_events.size(), expected);
+  ASSERT_EQ(size, expected);
 }
-TEST(FileTest, StreamAEDATFile) {
-  const std::atomic<bool> flag = {true};
-  auto generator = file_event_generator("example/sample.aedat4", flag);
+TEST(FileTest, ReadAEDAT4FilePart) {
+  auto file = open_event_file("example/sample.aedat4");
+  auto [events, size] = file->read_events(10000);
+  const size_t expected = 10000;
+  ASSERT_EQ(size, expected);
+}
+TEST(FileTest, ReadAEDAT4FileParts) {
+  auto file = open_event_file("example/sample.aedat4");
+  auto [events1, size1] = file->read_events(10000);
+  const size_t expected1 = 10000;
+  ASSERT_EQ(size1, expected1);
+  auto [events2, size2] = file->read_events(-1);
+  const size_t expected2 = 117667 - 10000;
+  ASSERT_EQ(size2, expected2);
+}
+TEST(FileTest, StreamAEDAT4File) {
+  auto handle = open_event_file("example/sample.aedat4");
+  auto generator = handle->stream();
   const size_t expected = 117667;
   int count = 0;
   for (auto event : generator) {
@@ -27,8 +61,8 @@ TEST(FileTest, StreamAEDATFile) {
   ASSERT_EQ(count, expected);
 }
 TEST(FileTest, StreamDATFile) {
-  const std::atomic<bool> flag = {true};
-  auto generator = file_event_generator("example/sample.dat", flag);
+  auto handle = open_event_file("example/sample.dat");
+  auto generator = handle->stream();
   int i = 0;
   int x;
   size_t count = 0;
@@ -40,7 +74,8 @@ TEST(FileTest, StreamDATFile) {
   EXPECT_EQ(count, 539481);
 }
 TEST(FileTest, ReadFileStream) {
-  auto generator = file_event_generator("example/sample.aedat4", false);
+  auto handle = open_event_file("example/sample.aedat4");
+  auto generator = handle->stream();
   for (auto event : generator) {
     EXPECT_EQ(event.x, 218);
     break;

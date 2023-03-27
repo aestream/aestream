@@ -1,12 +1,13 @@
 #pragma once
 
+#include <atomic>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <sstream>
 #include <stdlib.h>
-#include <vector>
 #include <unistd.h>
+#include <vector>
 
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -17,6 +18,7 @@
 
 #include <flatbuffers/flatbuffers.h>
 
+#include "utils.hpp"
 #include <aer.hpp>
 
 #include "aedat.hpp"
@@ -29,7 +31,8 @@
 #include "rapidxml.hpp"
 #include "trigger_generated.h"
 
-struct AEDAT4 {
+struct AEDAT4 : FileBase {
+
   struct Frame {
     int64_t time;
     int16_t width;
@@ -59,217 +62,6 @@ struct AEDAT4 {
       }
     }
   };
-
-  std::map<std::string, std::string>
-  collect_attributes(rapidxml::xml_node<> *node) {
-    std::map<std::string, std::string> attributes;
-    for (const rapidxml::xml_attribute<> *a = node->first_attribute(); a;
-         a = a->next_attribute()) {
-      auto name = std::string(a->name(), a->name_size());
-      auto value = std::string(a->value(), a->value_size());
-      attributes[name] = value;
-    }
-    return attributes;
-  }
-
-  void load(const std::string filename) {
-    struct stat stat_info;
-
-    auto fd = open(filename.c_str(), O_RDONLY, 0);
-
-    if (fd < 0) {
-      throw std::invalid_argument("Failed to open file");
-    }
-
-    if (fstat(fd, &stat_info)) {
-      throw std::runtime_error("Failed to stat file");
-    }
-
-    char *data = static_cast<char *>(
-        mmap(NULL, stat_info.st_size, PROT_READ, MAP_SHARED, fd, 0));
-    char *buffer_start = data;
-
-    auto header = std::string(data, 14);
-    if (header != "#!AER-DAT4.0\r\n") {
-      throw std::runtime_error("Invalid AEDAT version");
-    }
-
-    data += 14; // size of the version string
-
-    // find size of IOHeader (it is variable)
-    flatbuffers::uoffset_t ioheader_offset =
-        *reinterpret_cast<flatbuffers::uoffset_t *>(data);
-    const IOHeader *ioheader = GetSizePrefixedIOHeader(data);
-
-    rapidxml::xml_document<> doc;
-
-    // doc.parse<0>((char *)(ioheader->info_node()->str().c_str()));
-
-    // extract necessary data from XML
-    // auto node = doc.first_node();
-    // for (rapidxml::xml_node<> *outinfo = node->first_node(); outinfo;
-    //      outinfo = outinfo->next_sibling()) {
-
-    //   auto attributes = collect_attributes(outinfo);
-    //   if (attributes["name"] != "outInfo") {
-    //     continue;
-    //   }
-
-    //   for (rapidxml::xml_node<> *child = outinfo->first_node(); child;
-    //        child = child->next_sibling()) {
-    //     OutInfo info;
-    //     auto attributes = collect_attributes(child);
-    //     if (!attributes.contains("name")) {
-    //       continue;
-    //     }
-
-    //     info.name = std::stoi(attributes["name"]);
-
-    //     for (rapidxml::xml_node<> *attr = child->first_node(); attr;
-    //          attr = attr->next_sibling()) {
-    //       auto attributes = collect_attributes(attr);
-    //       if (attributes["key"] == "compression") {
-    //         info.compression = attr->value();
-    //       } else if (attributes["key"] == "typeIdentifier") {
-    //         info.type = OutInfo::to_type(attr->value());
-    //       } else if (attributes["name"] == "info") {
-    //         for (rapidxml::xml_node<> *info_node = attr->first_node();
-    //              info_node; info_node = info_node->next_sibling()) {
-    //           auto infos = collect_attributes(info_node);
-
-    //           if (infos["key"] == "sizeX") {
-    //             info.size_x = std::stoi(info_node->value());
-    //           } else if (infos["key"] == "sizeY") {
-    //             info.size_y = std::stoi(info_node->value());
-    //           }
-    //         }
-    //       }
-    //     }
-    //     outinfos.push_back(info);
-    //   }
-    // }
-
-    // for (auto info : outinfos) {
-    //   std::cout << "{" << info.name << ", " << info.compression << ", "
-    //             << info.type << ", " << info.size_x << ", " << info.size_y
-    //             << "}" << std::endl;
-    // }
-
-    int64_t data_table_position = ioheader->data_table_position();
-
-    if (data_table_position < 0) {
-      throw std::runtime_error(
-          "AEDAT files without datatables are currently not supported");
-    }
-
-    data += ioheader_offset + 4;
-
-    // we have to treat each packet according the compression method used,
-    // which can be found in ioheader->compression()
-    // assume LZ4 compression for now
-
-    const size_t dst_size_fixed = 10000000;
-    std::vector<uint8_t> dst_buffer(dst_size_fixed);
-    LZ4F_decompressionContext_t ctx;
-    LZ4F_errorCode_t lz4_error =
-        LZ4F_createDecompressionContext(&ctx, LZ4F_VERSION);
-
-    if (LZ4F_isError(lz4_error)) {
-      printf("Decompression context error: %s\n", LZ4F_getErrorName(lz4_error));
-      return;
-    }
-
-    size_t dst_size = dst_size_fixed;
-    char *data_table_start = buffer_start + data_table_position;
-    size_t data_table_size = stat_info.st_size - data_table_position;
-
-    auto ret = LZ4F_decompress(ctx, &dst_buffer[0], &dst_size, data_table_start,
-                               &data_table_size, nullptr);
-    if (LZ4F_isError(ret)) {
-      printf("Decompression DataTable error: %s\n", LZ4F_getErrorName(ret));
-      return;
-    }
-
-    auto file_data_table = GetSizePrefixedFileDataTable(&dst_buffer[0]);
-
-    for (auto elem : *file_data_table->table()) {
-      // just here to illustrate access to the data
-    }
-
-    uint64_t count = 0;
-    while (data < buffer_start + data_table_position) {
-      int32_t stream_id = *reinterpret_cast<int32_t *>(data);
-      data += 4;
-      size_t size = *reinterpret_cast<int32_t *>(data);
-      data += 4;
-
-      size_t dst_size = dst_size_fixed;
-      auto ret =
-          LZ4F_decompress(ctx, &dst_buffer[0], &dst_size, data, &size, nullptr);
-      data += size;
-
-      if (LZ4F_isError(ret)) {
-        printf("Decompression package error: %s\n", LZ4F_getErrorName(ret));
-        return;
-      }
-
-      switch (stream_id) {
-      // switch (outinfos[stream_id].type) {
-      // case OutInfo::Type::EVTS: {
-      case 0: {
-        auto event_packet = GetSizePrefixedEventPacket(&dst_buffer[0]);
-        for (auto event : *event_packet->elements()) {
-          count += 1;
-          const auto e = AER::Event{
-              static_cast<uint64_t>(event->t()),
-              static_cast<uint16_t>(event->x()),
-              static_cast<uint16_t>(event->y()),
-              static_cast<bool>(event->on()),
-          };
-          polarity_events.push_back(e);
-        }
-        break;
-      }
-      case OutInfo::Type::FRME: {
-        Frame res;
-        auto frame_packet = GetSizePrefixedFrame(&dst_buffer[0]);
-        res.time = frame_packet->t();
-        res.width = frame_packet->width();
-        res.height = frame_packet->height();
-
-        // std::cout << frame_packet->offset_y() << std::endl;
-
-        auto pixels = frame_packet->pixels()->data();
-
-        // res.pixels.reserve(res.width * res.height * 3);
-
-        for (int j = 0; j < res.height; j++) {
-          for (int i = 0; i < res.width; i++) {
-            res.pixels.push_back(pixels[i + j * res.width]);
-            res.pixels.push_back(pixels[i + j * res.width]);
-            res.pixels.push_back(pixels[i + j * res.width]);
-          }
-        }
-
-        frames.push_back(res);
-        break;
-      }
-      case OutInfo::Type::IMUS: {
-        auto imu_packet = GetSizePrefixedImuPacket(&dst_buffer[0]);
-        break;
-      }
-      case OutInfo::Type::TRIG: {
-        auto trigger_packet = GetSizePrefixedTriggerPacket(&dst_buffer[0]);
-        break;
-      }
-      default: {
-        break;
-      }
-      }
-    }
-
-    close(fd);
-  }
 
   static std::tuple<char *, size_t> compress_lz4(char *buffer, size_t size) {
     auto lz4FrameBound = LZ4F_compressBound(size, nullptr);
@@ -372,19 +164,280 @@ struct AEDAT4 {
     stream.write(compressed, size);
   }
 
-  static Generator<AER::Event> aedat_to_stream(const std::string filename) {
-    AEDAT4 aedat = AEDAT4(filename);
-    // TODO: Iterate over raw file pointer to save memory
-    for (auto event : aedat.polarity_events) {
-      co_yield event;
+  std::tuple<AER::Event *, size_t> read_events(const int64_t n_events = -1) {
+    int64_t byte_count =
+        (n_events > 0 ? n_events : total_number_of_events) * sizeof(AER::Event);
+    AER::Event *events = (AER::Event *)malloc(byte_count);
+
+    int64_t count = 0;
+    while (get_packet()) {
+      for (; packet_events_read < event_vector->size(); ++packet_events_read) {
+        const Event *event = event_vector->Get(packet_events_read);
+        if (n_events > 0 && n_events - count <= 0) {
+          return {events, count};
+        }
+
+        const auto e = AER::Event{
+            static_cast<uint64_t>(event->t()),
+            static_cast<uint16_t>(event->x()),
+            static_cast<uint16_t>(event->y()),
+            static_cast<bool>(event->on()),
+        };
+        events[count] = e;
+        count += 1;
+      }
+    }
+    return {events, count};
+  }
+
+  Generator<AER::Event> stream(const int64_t n_events = -1) {
+    int64_t size = 0, count = 0;
+    static const size_t STREAM_BUFFER_SIZE = 128;
+    do {
+      auto ret = read_events(STREAM_BUFFER_SIZE);
+      auto events = std::get<0>(ret);
+      size = std::get<1>(ret);
+      for (size_t i = 0; i < size; i++) {
+        co_yield events[i];
+        count++;
+      }
+    } while (size == STREAM_BUFFER_SIZE &&
+             (n_events < 0 || (n_events - count >= 0)));
+  }
+
+  explicit AEDAT4(file_t &&fp)
+      : fp{std::move(fp)}, dst_buffer(4096), packet_buffer(4096) {
+    read_file_header();
+  }
+  explicit AEDAT4(const std::string &filename) : AEDAT4(open_file(filename)) {}
+  ~AEDAT4() {
+    if (ctx) {
+      LZ4F_freeDecompressionContext(ctx);
     }
   }
 
-  AEDAT4() {}
+private:
+  LZ4F_decompressionContext_t ctx;
+  const file_t fp;
 
-  AEDAT4(const std::string &filename) { load(filename); }
+  size_t total_number_of_events = 0;
+  std::vector<uint8_t> dst_buffer;
+  std::vector<char> packet_buffer;
+  size_t packet_index = 0;
+  size_t packet_events_read = 0;
+  std::vector<size_t> event_packet_offsets;
+  const flatbuffers::Vector<const Event *> *event_vector = nullptr;
 
-  std::vector<OutInfo> outinfos;
-  std::vector<Frame> frames;
-  std::vector<AER::Event> polarity_events;
+  std::map<std::string, std::string>
+  collect_attributes(rapidxml::xml_node<> *node) {
+    std::map<std::string, std::string> attributes;
+    for (const rapidxml::xml_attribute<> *a = node->first_attribute(); a;
+         a = a->next_attribute()) {
+      auto name = std::string(a->name(), a->name_size());
+      auto value = std::string(a->value(), a->value_size());
+      attributes[name] = value;
+    }
+    return attributes;
+  }
+
+  void read_file_header() {
+    static const uint32_t VERSION_STRING_SIZE = 14;
+    char data[BUFFER_SIZE];
+    size_t dst_size = dst_buffer.size();
+
+    struct stat stat_info;
+    if (fstat(fileno(fp.get()), &stat_info)) {
+      throw std::runtime_error("Failed to stat file");
+    }
+
+    auto header_ret = fread(data, 1, dst_size, fp.get());
+    if (header_ret <= 0) {
+      throw std::runtime_error("Failed to read file version number");
+    }
+
+    auto header = std::string(data, VERSION_STRING_SIZE);
+    if (header != "#!AER-DAT4.0\r\n") {
+      throw std::runtime_error("Invalid AEDAT version");
+    }
+
+    // find size of IOHeader (it is variable)
+    flatbuffers::uoffset_t ioheader_offset =
+        *reinterpret_cast<flatbuffers::uoffset_t *>(data + VERSION_STRING_SIZE);
+    const IOHeader *ioheader =
+        GetSizePrefixedIOHeader(data + VERSION_STRING_SIZE);
+
+    // TODO: We currently only support LZ4 compression
+    if (ioheader->compression() != CompressionType_LZ4 &&
+        ioheader->compression() != CompressionType_LZ4_HIGH) {
+      throw std::runtime_error("Only LZ4 compression is supported");
+    }
+
+    const auto data_table_position = ioheader->data_table_position();
+    if (data_table_position < 0) {
+      throw std::runtime_error(
+          "AEDAT files without datatables are currently not supported");
+    }
+
+    // rapidxml::xml_document<> doc;
+    // doc.parse<0>((char *)(ioheader->info_node()->str().c_str()));
+    // extract necessary data from XML
+    // auto node = doc.first_node();
+    // for (rapidxml::xml_node<> *outinfo = node->first_node(); outinfo;
+    //      outinfo = outinfo->next_sibling()) {
+
+    //   auto attributes = collect_attributes(outinfo);
+    //   if (attributes["name"] != "outInfo") {
+    //     continue;
+    //   }
+
+    //   for (rapidxml::xml_node<> *child = outinfo->first_node(); child;
+    //        child = child->next_sibling()) {
+    //     OutInfo info;
+    //     auto attributes = collect_attributes(child);
+    //     if (!attributes.contains("name")) {
+    //       continue;
+    //     }
+
+    //     info.name = std::stoi(attributes["name"]);
+
+    //     for (rapidxml::xml_node<> *attr = child->first_node(); attr;
+    //          attr = attr->next_sibling()) {
+    //       auto attributes = collect_attributes(attr);
+    //       if (attributes["key"] == "compression") {
+    //         info.compression = attr->value();
+    //       } else if (attributes["key"] == "typeIdentifier") {
+    //         info.type = OutInfo::to_type(attr->value());
+    //       } else if (attributes["name"] == "info") {
+    //         for (rapidxml::xml_node<> *info_node = attr->first_node();
+    //              info_node; info_node = info_node->next_sibling()) {
+    //           auto infos = collect_attributes(info_node);
+
+    //           if (infos["key"] == "sizeX") {
+    //             info.size_x = std::stoi(info_node->value());
+    //           } else if (infos["key"] == "sizeY") {
+    //             info.size_y = std::stoi(info_node->value());
+    //           }
+    //         }
+    //       }
+    //     }
+    //     outinfos.push_back(info);
+    //   }
+    // }
+
+    // TODO: Re-introduce XML parsing
+
+    // we have to treat each packet according the compression method used,
+    // which can be found in ioheader->compression()
+    // assume LZ4 compression for now
+    LZ4F_errorCode_t lz4_error =
+        LZ4F_createDecompressionContext(&ctx, LZ4F_VERSION);
+
+    if (LZ4F_isError(lz4_error)) {
+      const auto message = "Error creating LZ4 decompression context: " +
+                           std::string(LZ4F_getErrorName(lz4_error));
+      throw std::runtime_error(message);
+    }
+
+    // Load data table
+    fseek(fp.get(), data_table_position, SEEK_SET);
+    size_t data_table_size = stat_info.st_size - data_table_position;
+    size_t table_ret = fread(data, 1, data_table_size, fp.get());
+    if (table_ret != data_table_size) {
+      throw std::runtime_error("Failed to read AEDAT4 data table");
+    }
+    auto ret = LZ4F_decompress(ctx, &dst_buffer[0], &dst_size, data,
+                               &data_table_size, nullptr);
+    if (LZ4F_isError(ret)) {
+      std::string message = "Error decompressing AEDAT4 DataTable:" +
+                            std::string(LZ4F_getErrorName(ret));
+      throw std::runtime_error(message);
+    }
+    const auto table = GetSizePrefixedFileDataTable(&dst_buffer[0]);
+
+    // Record offsets of event packets
+    // TODO: add IMU + frames
+    auto packets = table->table();
+    for (size_t i = 0; i < packets->size(); ++i) {
+      const auto *definition = packets->Get(i);
+      const auto stream_id = definition->packet_info()->stream_id();
+      const size_t offset = definition->byte_offset();
+      switch (stream_id) {
+      case 0: {
+        event_packet_offsets.push_back(offset - 8); // Include 8 byte header
+        total_number_of_events += definition->num_elements();
+      }
+      // case OutInfo::Type::FRME: {
+      //   auto frame_packet = GetSizePrefixedFrame(&dst_buffer[0]);
+      //   break;
+      // }
+      // case OutInfo::Type::IMUS: {
+      //   auto imu_packet = GetSizePrefixedImuPacket(&dst_buffer[0]);
+      //   break;
+      // }
+      // case OutInfo::Type::TRIG: {
+      //   auto trigger_packet = GetSizePrefixedTriggerPacket(&dst_buffer[0]);
+      //   break;
+      // }
+      default: {
+        break;
+      }
+      }
+    }
+  }
+
+  bool get_packet() {
+    // Test for end of current packet
+    if (event_vector) {
+      if (packet_events_read >= event_vector->size()) {
+        packet_index++; // Move to next packet
+        event_vector = nullptr;
+      } else {
+        return true; // Continue reading current packet
+      }
+    }
+
+    // Test for end of packets
+    if (packet_index >= event_packet_offsets.size()) {
+      return false;
+    }
+
+    // Load new packet
+    packet_events_read = 0;
+    // Read packet header
+    fseek(fp.get(), event_packet_offsets[packet_index], SEEK_SET);
+    int32_t id, size;
+    auto id_ret = fread(&id, 4, 1, fp.get());
+    auto size_ret = fread(&size, 4, 1, fp.get());
+    if (id_ret == 0 || size_ret == 0) { // Error or EOF
+      return false;
+    }
+    if (size == 0) { // Continue if packet is empty
+      packet_index++;
+      event_vector = nullptr;
+      return get_packet();
+    }
+    if (packet_buffer.size() < size) { // Resize buffer if needed
+      packet_buffer.resize(size);
+      dst_buffer.resize(size * 4); // x4 ensures buffer is large enough
+    }
+
+    // Read packet bytes
+    auto packet_ret = fread(&packet_buffer[0], 1, size, fp.get());
+    if (packet_ret == 0) { // Error or EOF
+      return false;
+    }
+
+    // Decompress packet
+    size_t dst_size = dst_buffer.size();
+    size_t decomp_size = size;
+    auto ret = LZ4F_decompress(ctx, &dst_buffer[0], &dst_size,
+                               &packet_buffer[0], &decomp_size, nullptr);
+    if (LZ4F_isError(ret)) {
+      printf("Decompression package error: %s\n", LZ4F_getErrorName(ret));
+      return false;
+    }
+    const auto events = GetSizePrefixedEventPacket(&dst_buffer[0]);
+    event_vector = events->elements();
+    return true;
+  }
 };

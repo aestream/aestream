@@ -1,18 +1,13 @@
 #include "file.hpp"
 
-Generator<AER::Event> file_event_generator(const std::string filename,
-                                           const std::atomic<bool> &runFlag) {
-  try {
-    const auto fp = open_file(filename); // TODO: Use pointer in functions below
-  } catch (std::exception e) {
-    throw e;
-  }
+std::unique_ptr<FileBase> open_event_file(const std::string &filename) {
+  auto fp = open_file(filename);
 
   if (ends_with(filename, ".dat")) {
-    return dat_stream_events(filename);
+    return std::unique_ptr<FileBase>(new DAT(std::move(fp)));
   } else if (ends_with(filename, ".aedat4")) {
-    return AEDAT4::aedat_to_stream(filename);
+    return std::unique_ptr<FileBase>(new AEDAT4(std::move(fp)));
   } else {
-    throw std::invalid_argument("Unknown file ending for file " + filename);
+    throw std::invalid_argument("Unknown file type " + filename);
   }
 }

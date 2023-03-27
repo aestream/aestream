@@ -1,5 +1,5 @@
 set(input_definitions "")
-set(input_sources aedat.hpp aedat4.hpp utils.hpp utils.cpp dat.hpp dat.cpp )
+set(input_sources aedat.hpp aedat4.hpp dat.hpp utils.hpp )
 set(input_libraries aer)
 set(input_include_directories "")
 

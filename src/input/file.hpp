@@ -15,15 +15,10 @@
 #include "../file/utils.hpp"
 
 /**
- * Reads AEDAT events from a file and replays them either in real-time
- * (ignore_time = false) or as fast as possible (ignore_time = true).
+ * Attempts to open a file containing address-event representations.
  *
- * @param filename  The path to the file
- * @param run_flag  A flag to stop the reading
- * @param ignore_time  Whether to ignore the timestamps and replay the events as
- * fast as possible (true) or enforce that the events are replayed in real-time
- * (false, default).
- * @return A Generator of Events
+ * @param filename The path to the file
+ * @return A FileBase pointer
+ * @throws std::invalid_argument if the file could not be found or opened
  */
-Generator<AER::Event> file_event_generator(const std::string filename,
-                                           const std::atomic<bool> &run_flag);
+std::unique_ptr<FileBase> open_event_file(const std::string &filename);
