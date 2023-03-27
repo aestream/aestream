@@ -30,8 +30,7 @@ jobs:
           CIBW_BUILD_FRONTEND: "pip"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
           CIBW_BEFORE_BUILD: "rm -rf {project}/_skbuild"
-          CIBW_BEFORE_ALL_LINUX: '.github/deps/manylinux_dependencies.sh'
-          CIBW_ENVIRONMENT: PIP_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu
+          CIBW_BEFORE_ALL_LINUX: 'yum install -y lz4-devel ninja-build libgusb-devel gcc-10'
           CIBW_REPAIR_WHEEL_COMMAND: 'source .github/deps/fix_path.sh && auditwheel repair -w {dest_dir} {wheel}'
 
       - uses: actions/upload-artifact@v3
