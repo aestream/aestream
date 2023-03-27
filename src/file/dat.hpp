@@ -32,7 +32,7 @@ struct DAT : FileBase {
         throw std::runtime_error("Error when processing .dat file");
       }
 
-      for (int i = 0; i < size; i++) {
+      for (int i = 0; i < size; ++i) {
         AER::Event event = dat_decode_event(buffer[i], overflows);
         if (event.timestamp < timestep) { // Timestep overflow occurred
           overflows++;
@@ -64,7 +64,7 @@ struct DAT : FileBase {
         size = n_events - index;
       }
 
-      for (size_t i = 0; i < size; i++) {
+      for (size_t i = 0; i < size; ++i) {
         AER::Event event = dat_decode_event(buffer[i], overflows);
         if (event.timestamp < timestep) { // Timestep overflow occurred
           overflows++;

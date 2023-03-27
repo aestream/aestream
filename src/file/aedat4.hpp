@@ -171,7 +171,7 @@ struct AEDAT4 : FileBase {
 
     int64_t count = 0;
     while (get_packet()) {
-      for (; packet_events_read < event_vector->size(); packet_events_read++) {
+      for (; packet_events_read < event_vector->size(); ++packet_events_read) {
         const Event *event = event_vector->Get(packet_events_read);
         if (n_events > 0 && n_events - count <= 0) {
           return {events, count};
@@ -357,7 +357,7 @@ private:
     // Record offsets of event packets
     // TODO: add IMU + frames
     auto packets = table->table();
-    for (size_t i = 0; i < packets->size(); i++) {
+    for (size_t i = 0; i < packets->size(); ++i) {
       const auto *definition = packets->Get(i);
       const auto stream_id = definition->packet_info()->stream_id();
       const size_t offset = definition->byte_offset();
