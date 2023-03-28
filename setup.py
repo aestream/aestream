@@ -28,7 +28,7 @@ except:
 # Setuptools entrypoint
 setup(
     name="aestream",
-    version="0.5.0",
+    version="0.5.1",
     author="Jens E. Pedersen, Christian Pehle",
     author_email="jens@jepedersen.dk, christian.pehle@gmail.com",
     url="https://github.com/norse/aestream",
