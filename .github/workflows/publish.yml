@@ -1,6 +1,6 @@
 name: Publish to PyPi
 
-on: [pull_request, release]
+on: [pull_request, release, workflow_dispatch]
 
 # Thanks to https://github.com/pypa/cibuildwheel/blob/main/examples/github-deploy.yml
 jobs:
@@ -105,7 +105,7 @@ jobs:
           name: artifact
           path: dist
 
-      - uses: pypa/gh-action-pypi-publish@v1
+      - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
