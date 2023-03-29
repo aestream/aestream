@@ -3,7 +3,7 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
 
-#include "../aer.hpp"
+#include "aestream/aer.hpp"
 
 #include "file.hpp"
 // #include "iterator.cpp"

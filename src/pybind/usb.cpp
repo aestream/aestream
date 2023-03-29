@@ -1,6 +1,6 @@
-#include "../aer.hpp"
-#include "../generator.hpp"
-#include "../input/inivation.hpp"
+#include "aestream/aer.hpp"
+#include "aestream/generator.hpp"
+#include "aestream/input/inivation.hpp"
 
 #include "types.hpp"
 

@@ -5,8 +5,8 @@
 #include <torch/extension.h>
 #endif
 
-#include "aedat.hpp"
-#include "aedat4.hpp"
+#include "aestream/aedat.hpp"
+#include "aestream/aedat4.hpp"
 
 // torch::Tensor convert_polarity_events(
 //     std::vector<AEDAT::PolarityEvent> &polarity_events,

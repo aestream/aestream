@@ -1,5 +1,5 @@
 set(input_definitions "")
-set(input_sources file.hpp file.cpp )
+set(input_sources file.cpp )
 set(input_libraries aer aestream_file)
 set(input_include_directories "")
 

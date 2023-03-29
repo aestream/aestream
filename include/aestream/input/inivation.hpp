@@ -11,8 +11,8 @@
 #include <libcaercpp/devices/davis.hpp>
 #include <libcaercpp/devices/dvxplorer.hpp>
 
-#include "../aer.hpp"
-#include "../generator.hpp"
+#include "aestream/aer.hpp"
+#include "aestream/generator.hpp"
 
 struct InivationDeviceAddress {
   const std::string camera;

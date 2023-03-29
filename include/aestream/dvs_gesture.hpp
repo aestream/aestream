@@ -5,7 +5,7 @@
 #include <ostream>
 #include <vector>
 
-#include "aedat.hpp"
+#include "aestream/aedat.hpp"
 
 namespace dvs_gesture {
 struct DataSet {

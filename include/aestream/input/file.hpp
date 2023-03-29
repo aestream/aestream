@@ -7,12 +7,12 @@
 #include <string>
 #include <thread>
 
-#include "../aer.hpp"
-#include "../generator.hpp"
+#include "aestream/aer.hpp"
+#include "aestream/generator.hpp"
 
-#include "../file/aedat4.hpp"
-#include "../file/dat.hpp"
-#include "../file/utils.hpp"
+#include "aestream/file/aedat4.hpp"
+#include "aestream/file/dat.hpp"
+#include "aestream/file/utils.hpp"
 
 /**
  * Attempts to open a file containing address-event representations.

@@ -1,10 +1,10 @@
 #pragma once
 #include <algorithm>
 
-#include "../aer.hpp"
-#include "../file/aedat4.hpp"
-#include "../generator.hpp"
-#include "../input/file.hpp"
+#include "aestream/aer.hpp"
+#include "aestream/file/aedat4.hpp"
+#include "aestream/generator.hpp"
+#include "aestream/input/file.hpp"
 
 #include "tensor_buffer.hpp"
 #include "tensor_iterator.hpp"

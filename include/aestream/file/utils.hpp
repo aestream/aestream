@@ -4,8 +4,8 @@
 #include <queue>
 #include <string>
 
-#include "../aer.hpp"
-#include "../generator.hpp"
+#include "aestream/aer.hpp"
+#include "aestream/generator.hpp"
 
 #define HEADER_START 0x25
 #define HEADER_END 0x0A

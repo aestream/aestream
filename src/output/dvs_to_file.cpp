@@ -1,5 +1,5 @@
 
-#include "dvs_to_file.hpp"
+#include "aestream/output/dvs_to_file.hpp"
 
 void dvs_to_file_aedat(Generator<AER::Event> &input_generator,
                        const std::string &filename, size_t bufferSize) {

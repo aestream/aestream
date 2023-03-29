@@ -1,4 +1,4 @@
-#include "dvs_to_tensor.hpp"
+#include "aestream/file/dvs_to_tensor.hpp"
 
 torch::Tensor
 convert_polarity_events(std::vector<AER::Event> &polarity_events,

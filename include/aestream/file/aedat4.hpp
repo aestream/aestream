@@ -21,7 +21,7 @@
 #include "utils.hpp"
 #include <aer.hpp>
 
-#include "aedat.hpp"
+#include "aestream/file/aedat.hpp"
 #include "events_generated.h"
 #include "file_data_table_generated.h"
 #include "frame_generated.h"

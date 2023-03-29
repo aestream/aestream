@@ -7,20 +7,20 @@
 #include "CLI11.hpp"
 
 // AER imports
-#include "aer.hpp"
+#include "aestream/aer.hpp"
 
 // Input
-#include "input/file.hpp"
+#include "aestream/input/file.hpp"
 #ifdef WITH_CAER
-#include "input/inivation.hpp"
+#include "aestream/input/inivation.hpp"
 #endif
 #ifdef WITH_METAVISION
-#include "input/prophesee.hpp"
+#include "aestream/input/prophesee.hpp"
 #endif
 
 // Output
-#include "output/dvs_to_file.hpp"
-#include "output/dvs_to_udp.hpp"
+#include "aestream/output/dvs_to_file.hpp"
+#include "aestream/output/dvs_to_udp.hpp"
 
 // Interrupt
 auto runFlag = std::atomic<bool>(true);
