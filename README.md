@@ -108,7 +108,7 @@ aestream input <input source> [output <output sink>]
 
 ## Custom installation (C++)
 
-[Metavision SDK](https://docs.prophesee.ai/stable/metavision_sdk/index.html) and [libcaer](https://github.com/inivation/libcaer) are optional dependencies, but are needed for connecting to Prophesee and Inivation cameras respectively.
+[Metavision SDK](https://docs.prophesee.ai/stable/metavision_sdk/index.html) and [libcaer](https://gitlab.com/inivation/dv/libcaer/) are optional dependencies, but are needed for connecting to Prophesee and Inivation cameras respectively.
 
 AEStream is based on [C++20](https://en.cppreference.com/w/cpp/20). Since C++20 is not yet fully supported by all compilers, we recommend using `GCC >= 10.2`. 
 
