@@ -29,7 +29,7 @@ AEStream is usable both as a command-line binary or Python tool.
 
 | **Source** | **Installation** |
 | -------------------- | --- |
-| [pip](https://pypi.org/) | <code>pip install aestream <br/> pip install aestream[torch]</code> ([PyTorch support](https://pytorch.com)) |
+| [pip](https://pypi.org/) | <code>pip install aestream</code> <br/> <code>pip install aestream[torch]</code> ([PyTorch support](https://pytorch.com)) |
 | [nix](https://nixos.org/) | <code>nix run github:norse/aestream</code> (CLI) <br/> <code>nix develop github:norse/aestream</code> (Python environment) |
 | [docker](https://docker.com/) | See [Installation documentation](https://norse.github.io/aestream/install.html) |
 
@@ -140,7 +140,9 @@ Otherwise, you can point to it using the `-DCMAKE_PREFIX_PATH` option in `cmake`
 AEStream is developed by (in alphabetical order):
 
 * Cameron Barker (@GitHub [cameron-git](https://github.com/cameron-git/))
+* [Juan Pablo Romero Bermudez](https://www.kth.se/profile/jprb) (@GitHub [jpromerob](https://github.com/jpromerob/))
 * Alexander Hadjivanov (@Github [cantordust](https://github.com/cantordust))
+* Emil Jansson (@GitHub [emijan-kth](https://github.com/emijan-kth))
 * [Jens E. Pedersen](https://www.kth.se/profile/jeped) (@GitHub [jegp](https://github.com/jegp/))
 * [Christian Pehle](https://www.kip.uni-heidelberg.de/people/10110) (@GitHub [cpehle](https://github.com/cpehle/))
 

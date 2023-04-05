@@ -43,6 +43,7 @@ AEStream supports reading from files, USB cameras, as well as network via UDP an
 [Read more in the publication](https://jegp.github.io/aestream-paper/).
 
 <img src="https://jegp.github.io/aestream-paper/2212_aestream.svg" />
+
 ## Installation
 
 AEStream is usable both as a command-line binary or Python tool.
@@ -160,7 +161,9 @@ Otherwise, you can point to it using the `-DCMAKE_PREFIX_PATH` option in `cmake`
 AEStream is developed by (in alphabetical order):
 
 * Cameron Barker (@GitHub [cameron-git](https://github.com/cameron-git/))
+* [Juan Pablo Romero Bermudez](https://www.kth.se/profile/jprb) (@GitHub [jpromerob](https://github.com/jpromerob/))
 * Alexander Hadjivanov (@Github [cantordust](https://github.com/cantordust))
+* Emil Jansson (@GitHub [emijan-kth](https://github.com/emijan-kth))
 * [Jens E. Pedersen](https://www.kth.se/profile/jeped) (@GitHub [jegp](https://github.com/jegp/))
 * [Christian Pehle](https://www.kip.uni-heidelberg.de/people/10110) (@GitHub [cpehle](https://github.com/cpehle/))
 
