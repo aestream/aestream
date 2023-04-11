@@ -24,4 +24,4 @@ RUN apt-get install -y cuda-toolkit-12-0
 ENV PATH="/usr/local/cuda/bin:$PATH"
 
 # AEStream
-RUN CC=gcc-10 CXX=g++-10 pip install git+https://github.com/norse/aestream.git@feature-torch
+RUN CC=gcc-10 CXX=g++-10 pip install git+https://github.com/aestream/aestream.git@feature-torch

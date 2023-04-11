@@ -31,7 +31,7 @@ setup(
     version="0.5.1",
     author="Jens E. Pedersen, Christian Pehle",
     author_email="jens@jepedersen.dk, christian.pehle@gmail.com",
-    url="https://github.com/norse/aestream",
+    url="https://github.com/aestream/aestream",
     description="Streaming library for Address-Event Representation (AER) data",
     license="MIT",
     long_description=readme_text,

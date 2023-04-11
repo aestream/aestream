@@ -1,7 +1,7 @@
 # Getting Started
 
 AEStream is a powerful C++ library that can be used either directly in the command-line (CLI) or via Python.
-You can install it directly via pip or nix: `pip install aestream` ([find more options here](https://norse.github.io/aestream/install.html)).
+You can install it directly via pip or nix: `pip install aestream` ([find more options here](https://aestream.github.io/aestream/install.html)).
 
 
 AEStream wires arbitrary inputs to arbitrary outputs, allowing you to flexibly move events from files, cameras, and networks to files, networks, or even data types (such as [numpy](https://numpy.org) or [PyTorch](https://pytorch.com)) for further processing.
@@ -35,7 +35,7 @@ TBD
 ### Example: detect edges in real-time with biological neural networks
 We stream events from a camera connected via USB and process them on a GPU in real-time using the [spiking neural network library, Norse](https://github.com/norse/norse).
 The left panel in the video above shows the raw signal, while the middle and right panels show horizontal and vertical edge detection respectively.
-![](https://github.com/norse/aestream/raw/main/example/usb_edgedetection.gif)
+![](https://github.com/aestream/aestream/raw/main/example/usb_edgedetection.gif)
 To solve this problem, we need to (1) prepare the neural network, (2) access the camera, (3) inject event "frames" to the neural network, and (4) visualize the results.
 
 ```python
@@ -79,4 +79,4 @@ try:
 finally:
     window.close()
 ```
-The example can also be found in [`example/usb_edgedetection.py`](https://github.com/norse/aestream/blob/main/example/usb_edgedetection.py)
+The example can also be found in [`example/usb_edgedetection.py`](https://github.com/aestream/aestream/blob/main/example/usb_edgedetection.py)

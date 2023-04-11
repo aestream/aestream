@@ -1,7 +1,7 @@
 """
 AEStream library for streaming address-event representations.
 
-Please refer to https://github.com/norse/aestream for usage
+Please refer to https://github.com/aestream/aestream for usage
 """
 try:
     import torch
