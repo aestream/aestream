@@ -1,18 +1,18 @@
 # AEStream - Address Event streaming library
 
 <p align="center">
-    <a href="https://github.com/norse/aestream/actions">
-        <img src="https://github.com/norse/aestream/workflows/Build%20and%20test/badge.svg" alt="Test status"></a>
+    <a href="https://github.com/aestream/aestream/actions">
+        <img src="https://github.com/aestream/aestream/workflows/Build%20and%20test/badge.svg" alt="Test status"></a>
     <a href="https://pypi.org/project/aestream/" alt="PyPi">
         <img src="https://img.shields.io/pypi/v/aestream" />
     </a>
-    <a href="https://github.com/norse/aestream/pulse" alt="Activity">
-        <img src="https://img.shields.io/github/last-commit/norse/aestream" />
+    <a href="https://github.com/aestream/aestream/pulse" alt="Activity">
+        <img src="https://img.shields.io/github/last-commit/aestream/aestream" />
     </a>
     <a href="https://discord.gg/7fGN359">
         <img src="https://img.shields.io/discord/723215296399147089"
             alt="chat on Discord"></a>
-    <a href="https://www.codacy.com/gh/norse/aestream/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=norse/aestream&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/0a04a852daf540a9b9bbe9d78df9eea7"/></a>
+    <a href="https://www.codacy.com/gh/aestream/aestream/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=aestream/aestream&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/0a04a852daf540a9b9bbe9d78df9eea7"/></a>
     <a href="https://doi.org/10.5281/zenodo.6322829"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6322829.svg" alt="DOI"></a>
 </p>
 
@@ -30,8 +30,8 @@ AEStream is usable both as a command-line binary or Python tool.
 | **Source** | **Installation** |
 | -------------------- | --- |
 | [pip](https://pypi.org/) | <code>pip install aestream</code> <br/> <code>pip install aestream[torch]</code> ([PyTorch support](https://pytorch.com)) |
-| [nix](https://nixos.org/) | <code>nix run github:norse/aestream</code> (CLI) <br/> <code>nix develop github:norse/aestream</code> (Python environment) |
-| [docker](https://docker.com/) | See [Installation documentation](https://norse.github.io/aestream/install.html) |
+| [nix](https://nixos.org/) | <code>nix run github:aestream/aestream</code> (CLI) <br/> <code>nix develop github:aestream/aestream</code> (Python environment) |
+| [docker](https://docker.com/) | See [Installation documentation](https://aestream.github.io/aestream/install.html) |
 
 Contributions to support AEStream on additional platforms are always welcome.
 
@@ -63,7 +63,7 @@ with UDPInput((640, 480), port=3333) as stream:
         ...
 ```
 
-More examples can be found in [our example folder](https://github.com/norse/aestream/tree/master/example).
+More examples can be found in [our example folder](https://github.com/aestream/aestream/tree/master/example).
 Please note the examples may require additional dependencies (such as [Norse](https://github.com/norse/norse) for spiking networks or [PySDL](https://github.com/py-sdl/py-sdl2) for rendering). To install all the requirements, simply stand in the `aestream` root directory and run `pip install -r example/requirements.txt`
 
 ### Example: real-time edge detection with spiking neural networks
@@ -72,7 +72,7 @@ Please note the examples may require additional dependencies (such as [Norse](ht
 
 We stream events from a camera connected via USB and process them on a GPU in real-time using the [spiking neural network library, Norse](https://github.com/norse/norse) using fewer than 50 lines of Python.
 The left panel in the video shows the raw signal, while the middle and right panels show horizontal and vertical edge detection respectively.
-The full example can be found in [`example/usb_edgedetection.py`](https://github.com/norse/aestream/blob/main/example/usb_edgedetection.py)
+The full example can be found in [`example/usb_edgedetection.py`](https://github.com/aestream/aestream/blob/main/example/usb_edgedetection.py)
 
 ## Usage (CLI)
 
@@ -150,8 +150,8 @@ The work has received funding from the EC Horizon 2020 Framework Programme under
 
 Thanks to [Philipp Mondorf](https://github.com/PMMon) for interfacing with Metavision SDK and preliminary network code.
 
-<a href="https://github.com/norse/aestream/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=norse/aestream" />
+<a href="https://github.com/aestream/aestream/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=aestream/aestream" />
 </a>
 
 
