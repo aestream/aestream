@@ -1,5 +1,5 @@
-#include "aedat.hpp"
-#include "dvs_gesture.hpp"
+#include "aestream/aedat.hpp"
+#include "aestream/dvs_gesture.hpp"
 
 #include <SDL.h>
 #include <fstream>

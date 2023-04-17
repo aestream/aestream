@@ -3,10 +3,10 @@
 #include <fstream>
 #include <string>
 
-#include "../aer.hpp"
-#include "../file/aedat.hpp"
-#include "../file/aedat4.hpp"
-#include "../generator.hpp"
+#include "aestream/aer.hpp"
+#include "aestream/file/aedat.hpp"
+#include "aestream/file/aedat4.hpp"
+#include "aestream/generator.hpp"
 
 void dvs_to_file_aedat(Generator<AER::Event> &input_generator,
                        const std::string &filename,

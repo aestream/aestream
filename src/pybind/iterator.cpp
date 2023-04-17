@@ -1,7 +1,6 @@
-
-#include "../aer.hpp"
-#include "../generator.hpp"
-#include "../input/file.hpp"
+#include "aestream/aer.hpp"
+#include "aestream/generator.hpp"
+#include "aestream/input/file.hpp"
 #include "file.hpp"
 #include "tensor_buffer.hpp"
 #include "types.hpp"

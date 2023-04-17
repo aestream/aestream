@@ -1,7 +1,7 @@
 #include <cstring>
 #include <string>
 
-#include "./udp_client.hpp"
+#include "udp_client.hpp"
 
 int udp_client(std::string port) {
   // socket variables

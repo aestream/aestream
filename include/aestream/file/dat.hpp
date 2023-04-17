@@ -5,8 +5,8 @@
 #include <chrono>
 #include <thread>
 
-#include "../aer.hpp"
-#include "../generator.hpp"
+#include "aestream/aer.hpp"
+#include "aestream/generator.hpp"
 
 #include "utils.hpp"
 

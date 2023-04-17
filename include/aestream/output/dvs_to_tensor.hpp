@@ -3,8 +3,8 @@
 #include <chrono>
 #include <torch/torch.h>
 
-#include "../aer.hpp"
-#include "../generator.hpp"
+#include "aestream/aer.hpp"
+#include "aestream/generator.hpp"
 
 torch::Tensor
 convert_polarity_events(std::vector<AER::Event> &polarity_events,

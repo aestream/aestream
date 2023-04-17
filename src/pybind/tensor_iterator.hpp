@@ -3,8 +3,8 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/ndarray.h>
 
-#include "../aer.hpp"
-#include "../generator.hpp"
+#include "aestream/aer.hpp"
+#include "aestream/generator.hpp"
 
 #include "tensor_buffer.hpp"
 
