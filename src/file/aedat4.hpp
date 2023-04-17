@@ -242,29 +242,28 @@ private:
 
   void read_file_header() {
     static const uint32_t VERSION_STRING_SIZE = 14;
-    char data[BUFFER_SIZE];
-    size_t dst_size = dst_buffer.size();
+    std::vector<char> data_buffer(BUFFER_SIZE);
 
     struct stat stat_info;
     if (fstat(fileno(fp.get()), &stat_info)) {
       throw std::runtime_error("Failed to stat file");
     }
 
-    auto header_ret = fread(data, 1, dst_size, fp.get());
+    auto header_ret = fread(data_buffer.data(), 1, dst_buffer.size(), fp.get());
     if (header_ret <= 0) {
       throw std::runtime_error("Failed to read file version number");
     }
 
-    auto header = std::string(data, VERSION_STRING_SIZE);
+    auto header = std::string(data_buffer.data(), VERSION_STRING_SIZE);
     if (header != "#!AER-DAT4.0\r\n") {
       throw std::runtime_error("Invalid AEDAT version");
     }
 
     // find size of IOHeader (it is variable)
     flatbuffers::uoffset_t ioheader_offset =
-        *reinterpret_cast<flatbuffers::uoffset_t *>(data + VERSION_STRING_SIZE);
+        *reinterpret_cast<flatbuffers::uoffset_t *>(data_buffer.data() + VERSION_STRING_SIZE);
     const IOHeader *ioheader =
-        GetSizePrefixedIOHeader(data + VERSION_STRING_SIZE);
+        GetSizePrefixedIOHeader(data_buffer.data() + VERSION_STRING_SIZE);
 
     // TODO: We currently only support LZ4 compression
     if (ioheader->compression() != CompressionType_LZ4 &&
@@ -272,7 +271,7 @@ private:
       throw std::runtime_error("Only LZ4 compression is supported");
     }
 
-    const auto data_table_position = ioheader->data_table_position();
+    const size_t data_table_position = ioheader->data_table_position();
     if (data_table_position < 0) {
       throw std::runtime_error(
           "AEDAT files without datatables are currently not supported");
@@ -339,26 +338,35 @@ private:
     }
 
     // Load data table
-    fseek(fp.get(), data_table_position, SEEK_SET);
+    if (fseek(fp.get(), data_table_position, SEEK_SET) != 0) {
+      throw std::runtime_error("Failed to locate AEDAT4 data table");
+    }
     size_t data_table_size = stat_info.st_size - data_table_position;
-    size_t table_ret = fread(data, 1, data_table_size, fp.get());
-    if (table_ret != data_table_size) {
+    // Ensure buffer is large enough
+    if (data_buffer.size() < data_table_size) {
+      data_buffer.resize(data_table_size);
+      dst_buffer.resize(data_table_size * 2); // Ensure sufficient capacity
+    }
+    if (fread(data_buffer.data(), sizeof(char), data_table_size, fp.get()) != data_table_size) {
       throw std::runtime_error("Failed to read AEDAT4 data table");
     }
-    auto ret = LZ4F_decompress(ctx, &dst_buffer[0], &dst_size, data,
-                               &data_table_size, nullptr);
+    size_t dst_capacity = dst_buffer.capacity();
+    int ret = LZ4F_decompress(ctx, dst_buffer.data(), &dst_capacity, data_buffer.data(), &data_table_size, nullptr);
     if (LZ4F_isError(ret)) {
       std::string message = "Error decompressing AEDAT4 DataTable:" +
                             std::string(LZ4F_getErrorName(ret));
       throw std::runtime_error(message);
     }
-    const auto table = GetSizePrefixedFileDataTable(&dst_buffer[0]);
+    auto root = GetSizePrefixedFileDataTable(dst_buffer.data());
 
     // Record offsets of event packets
     // TODO: add IMU + frames
-    auto packets = table->table();
+    auto packets = root->table();
     for (size_t i = 0; i < packets->size(); ++i) {
-      const auto *definition = packets->Get(i);
+      auto definition = packets->Get(i);
+      if (definition->num_elements() == 0) {
+        continue;
+      }
       const auto stream_id = definition->packet_info()->stream_id();
       const size_t offset = definition->byte_offset();
       switch (stream_id) {
@@ -428,9 +436,9 @@ private:
     }
 
     // Decompress packet
-    size_t dst_size = dst_buffer.size();
     size_t decomp_size = size;
-    auto ret = LZ4F_decompress(ctx, &dst_buffer[0], &dst_size,
+    size_t dst_capacity = dst_buffer.capacity();
+    auto ret = LZ4F_decompress(ctx, &dst_buffer[0], &dst_capacity,
                                &packet_buffer[0], &decomp_size, nullptr);
     if (LZ4F_isError(ret)) {
       printf("Decompression package error: %s\n", LZ4F_getErrorName(ret));
