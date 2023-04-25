@@ -13,7 +13,7 @@ table FileDataDefinition {
 }
 
 table FileDataTable {
-	table: [FileDataDefinition];
+	table: [FileDataDefinition] (native_inline);
 }
 
 root_type FileDataTable;

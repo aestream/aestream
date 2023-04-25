@@ -98,10 +98,11 @@
             pkgs.makeWrapper
           ];
           buildInputs = parent.buildInputs ++ [
+            pkgs.gdb
             pkgs.gtest
           ];
           cmakeFlags = parent.cmakeFlags ++ [
-            "-DCMAKE_BUILD_TYPE=Debug"  
+            "-DCMAKE_BUILD_TYPE=Debug"
             "-DCMAKE_PREFIX_PATH=${pkgs.gtest}"
             # "-DCMAKE_MODULE_PATH=${openeb}/sdk/modules/"
           ];
@@ -130,6 +131,7 @@
       rec {
         devShells = flake-utils.lib.flattenTree {
           default = aestream;
+          test = aestream-test;
           python = aestream-python;
         };
         packages = flake-utils.lib.flattenTree {
