@@ -35,3 +35,13 @@ class UDPInput(ext.UDPInput):
             return t.to_torch()
         else:
             return t.to_numpy()
+try:
+    class USBInput(ext.USBInput):
+        def read(self):
+            t = self.read_buffer()
+            if USE_TORCH:
+                return t.to_torch()
+            else:
+                return t.to_numpy()
+except:
+    pass # Ignore if drivers are not installed

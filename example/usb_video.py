@@ -9,10 +9,10 @@ resolution = (640, 480)
 window, pixels = sdl.create_sdl_surface(*resolution)
 
 # Start streaming from a DVS camera on USB 2:2
-with USBInput(resolution, device="cuda") as stream:
+with USBInput(resolution) as stream:
     while True:
         # Read a tensor (640, 480) tensor from the camera
-        tensor = stream.read().cpu()
+        tensor = stream.read()
         # 1tensor = torch.randn(640, 480).float() + 2
 
         # Render pixels

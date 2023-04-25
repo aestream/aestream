@@ -8,6 +8,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 option(USE_PYTHON "Buid Python lib" OFF)
 option(USE_CUDA "Build CUDA tensor export" OFF)
+option(USE_CAMERA "Build and include camera drivers" ON)
 
 set(default_build_type Release)
 add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})

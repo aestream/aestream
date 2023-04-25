@@ -10,7 +10,7 @@
 #include "types.hpp"
 #include "udp.cpp"
 
-#ifdef USE_INIVATION
+#ifdef WITH_CAER
 #include "usb.cpp"
 #endif
 
@@ -97,9 +97,9 @@ NB_MODULE(aestream_ext, m) {
            nb::arg("b").none(), nb::arg("c").none())
       .def("read_buffer", &UDPInput::read);
 
-#ifdef USE_INIVATION
+#ifdef WITH_CAER
   nb::class_<USBInput>(m, "USBInput")
-      .def(nb::init<py_size_t, device_t, int, int>(), nb::arg("shape"),
+      .def(nb::init<py_size_t, std::string, int, int>(), nb::arg("shape"),
            nb::arg("device") = "cpu", nb::arg("device_id") = 0,
            nb::arg("device_address") = 0)
       .def("__enter__", &USBInput::start_stream)
@@ -110,6 +110,6 @@ NB_MODULE(aestream_ext, m) {
            })
       .def("start_stream", &USBInput::start_stream)
       .def("stop_stream", &USBInput::stop_stream)
-      .def("read", &USBInput::read);
+      .def("read_buffer", &USBInput::read);
 #endif
 }
