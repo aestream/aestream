@@ -10,15 +10,15 @@ if (USE_CUDA)
   find_package(CUDAToolkit REQUIRED)
 
   enable_language(CUDA)
-  set(module_source_files "${module_source_files}" tensor_buffer_kernel.cu)
+  list(APPEND module_source_files "${module_source_files}" tensor_buffer_kernel.cu)
   set(module_link_libraries CUDA::cudart)
   set(module_compile_definitions USE_CUDA)
 endif()
 
 # Configure Inivation
-if (libcaer_FOUND) 
+if (WITH_CAER) 
   set(module_compile_definitions WITH_CAER)
-  set(module_source_files "${module_source_files}" usb.cpp)
+  list(APPEND module_source_files "${module_source_files}" usb.cpp)
 endif()
 
 # find_library(MetavisionSDK NAMES metavision_sdk_core REQUIRED)

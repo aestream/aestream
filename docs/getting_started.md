@@ -9,8 +9,13 @@ Here's a visualization of the inputs and outputs.
 
 <img src="https://jegp.github.io/aestream-paper/2212_aestream.svg" />
 
-## CLI usage
-Generally, AEStream commands take the following form:
+## Command-line interface (CLI)
+
+> Read more in the [CLI guide](cli.md)
+
+The AEStream CLI is a console interface that avoids the overhead of Python or graphical frontends, and it even works on resource-constrained systems.
+
+AEStream CLI requires a *mandatory* input, but an *optional* output and takes the following form:
 ```bash
 aestream input <input source> [output <output sink>]
 ```
@@ -26,7 +31,9 @@ More information about inputs/outputs can be found with a `--help` flag:
 aestream --help
 ```
 
-## Python usage
+## Python API
+
+> Read more in the [Python usage guide](python_usage.md)
 
 The aim of the Python API is to export tensors for further processing with libraries like [Norse](https://github.com/norse/norse) or [Tonic](https://github.com/neuromorphs/tonic).
 

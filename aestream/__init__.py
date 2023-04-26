@@ -17,7 +17,7 @@ from aestream._input import FileInput, UDPInput
 
 modules = []
 try:
-    from aestream.aestream_ext import USBInput
+    from aestream._input import USBInput
 
     modules.append("USBInput")
 except ImportError:

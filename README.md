@@ -25,17 +25,25 @@ Read more in [the AEStream publication](https://jegp.github.io/aestream-paper/).
 
 ## Installation
 
+> Read more in our [installation guide](https://aestream.github.io/aestream/install.html)
+
 AEStream is usable both as a command-line binary or Python tool.
 
 | **Source** | **Installation** |
 | -------------------- | --- |
-| [pip](https://pypi.org/) | <code>pip install aestream</code> <br/> <code>pip install aestream[torch]</code> ([PyTorch support](https://pytorch.com)) |
+| [pip](https://pypi.org/) | <code>pip install aestream</code> <br/> <code>pip install aestream[torch]</code> ([PyTorch support](https://pytorch.com)) <br/> <code>pip install aestream --no-binary</code> (<a href="https://aestream.github.io/aestream/install.html#Event-camera-support">Event camera support *</a>) |
 | [nix](https://nixos.org/) | <code>nix run github:aestream/aestream</code> (CLI) <br/> <code>nix develop github:aestream/aestream</code> (Python environment) |
-| [docker](https://docker.com/) | See [Installation documentation](https://aestream.github.io/aestream/install.html) |
+| [docker](https://docker.com/) | See <a href="https://aestream.github.io/aestream/install.html">Installation documentation</a> |
+
+<span style="font-size: 80%">
+* Event camera support requires available drivers. <a href="https://aestream.github.io/aestream/install.html">A step-by-step guide is available in our documentation</a>.
+</span>
 
 Contributions to support AEStream on additional platforms are always welcome.
 
-## Usage: read event-address files in Python
+## Usage (Python)
+
+> Read more in our [Python usage guide](https://aestream.github.io/aestream/python_usage.html)
 
 AEStream can process fixed input sources like files like so:
 
@@ -68,13 +76,14 @@ Please note the examples may require additional dependencies (such as [Norse](ht
 
 ### Example: real-time edge detection with spiking neural networks
 
-![](example/usb_edgedetection.gif)
+![](https://media.githubusercontent.com/media/aestream/aestream/main/example/usb_edgedetection.gif)
 
 We stream events from a camera connected via USB and process them on a GPU in real-time using the [spiking neural network library, Norse](https://github.com/norse/norse) using fewer than 50 lines of Python.
 The left panel in the video shows the raw signal, while the middle and right panels show horizontal and vertical edge detection respectively.
 The full example can be found in [`example/usb_edgedetection.py`](https://github.com/aestream/aestream/blob/main/example/usb_edgedetection.py)
 
 ## Usage (CLI)
+> Read more in our [CLI usage documentation page](https://aestream.github.io/aestream/install.html)
 
 Installing AEStream also gives access to the command-line interface (CLI) `aestream`.
 To use `aestraem`, simply provide an `input` source and an optional `output` sink (defaulting to STDOUT):
@@ -106,34 +115,10 @@ aestream input <input source> [output <output sink>]
 | Stream DVS camera from Prophesee to STDOUT (Note, requires Metavision SDK) | `aestream input output stdout` |
 | Read file to remote IP X.X.X.X | `aestream input file example/sample.aedat4 output udp X.X.X.X` |
 
-## Custom installation (C++)
+## Installation
 
-[Metavision SDK](https://docs.prophesee.ai/stable/metavision_sdk/index.html) and [libcaer](https://gitlab.com/inivation/dv/libcaer/) are optional dependencies, but are needed for connecting to Prophesee and Inivation cameras respectively.
+> Read more in our [Installation guide](https://aestream.github.io/aestream)
 
-AEStream is based on [C++20](https://en.cppreference.com/w/cpp/20). Since C++20 is not yet fully supported by all compilers, we recommend using `GCC >= 10.2`. 
-
-To build the binaries of this repository, run the following code:
-```
-# Optional: Ensure paths to libcaer or Metavision are in place
-mkdir build/
-cd build/
-cmake -GNinja ..
-ninja
-```
-
-If your default C++ compiler doesn't support C++ 20, you will have to install an up-to-date compiler and provide the environmental variable `CXX`.
-For instance like this: `CXX=/path/to/g++-10 cmake -GNinja ..`
-
-### Inivation cameras
-For [Inivation](https://inivation.com/) cameras, the [libcaer](https://gitlab.com/inivation/dv/libcaer/) library needs to be available, either by a `-DCMAKE_PREFIX_PATH` flag to `cmake` or included in the `PATH` environmental variable.
-For examble: `cmake -GNinja -DCMAKE_PREFIX_PATH=/path/to/libcaer`.
-Inivation made the library available for most operating systems, but you may have to build it yourself.
-
-### Prophesee cameras
-For [Prophesee](https://www.prophesee.ai/) cameras, a version of the [Metavision SDK](https://www.prophesee.ai/metavision-intelligence/) needs to be present.
-The open-source version the SDK `openeb` is available with installation instructions at https://github.com/prophesee-ai/openeb.
-Using `openeb`, it should be sufficient to install it using `cmake && make && make install` to put it in your path.
-Otherwise, you can point to it using the `-DCMAKE_PREFIX_PATH` option in `cmake`.
 
 ## Acknowledgments
 

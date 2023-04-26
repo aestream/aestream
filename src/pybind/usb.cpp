@@ -3,7 +3,6 @@
 #include "../input/inivation.hpp"
 
 #include "types.hpp"
-
 #include "tensor_buffer.hpp"
 
 class USBInput {
@@ -48,7 +47,7 @@ public:
     }
   }
 
-  tensor_t read() { return buffer.read(); }
+  BufferPointer read() { return buffer.read(); }
 
   USBInput *start_stream() {
     std::thread socket_thread(&USBInput::stream_synchronous, this);

@@ -17,4 +17,4 @@ def create_sdl_surface(*shape):
 
 
 def events_to_bw(events):
-    return events.int() * (255 << 16)
+    return events * (255 << 16)
