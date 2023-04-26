@@ -3,10 +3,6 @@ set(input_sources file.hpp file.cpp )
 set(input_libraries aer aestream_file)
 set(input_include_directories "")
 
-include(CMakePackageConfigHelpers)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(libusb REQUIRED libusb-1.0)
-
 include(FetchContent)
 include(GNUInstallDirs)
 
@@ -21,8 +17,12 @@ if (${USE_CAMERA})
     set(input_sources ${input_sources} inivation.hpp inivation.cpp )
     set(input_libraries ${input_libraries} libcaer::caer)
     message(STATUS "Inivation dependencies (libcaer) found at ${libcaer_DIR}")
-    
+
     # message(DEBUG "Libcaer not found, fetching...")
+
+    # include(CMakePackageConfigHelpers)
+    # find_package(PkgConfig REQUIRED)
+    # pkg_check_modules(libusb REQUIRED libusb-1.0)
     # CPMFindPackage(NAME libcaer
     #   GIT_REPOSITORY https://gitlab.com/inivation/dv/libcaer
     #   GIT_TAG 8710e73ceb21d9fb4f74ead62ca3fae42d828997
