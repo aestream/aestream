@@ -14,16 +14,21 @@ if (${USE_CAMERA})
   message(DEBUG "Camera option set to ON, building...")
 
   # Include libcaer
-  find_package(libcaer QUIET)
-  if (NOT ${libcaer_FOUND})
-    message(DEBUG "Libcaer not found, fetching...")
-    CPMFindPackage(NAME libcaer
-      GIT_REPOSITORY https://gitlab.com/inivation/dv/libcaer
-      GIT_TAG 8710e73ceb21d9fb4f74ead62ca3fae42d828997
-      SOURCE_SUBDIR build/cmake
-      DOWNLOAD_ONLY True
-    )
-
+  find_package(libcaer CONFIG QUIET)
+  if (${libcaer_FOUND})
+    set(WITH_CAER ON PARENT_SCOPE)
+    set(input_definitions ${input_definitions} WITH_CAER)
+    set(input_sources ${input_sources} inivation.hpp inivation.cpp )
+    set(input_libraries ${input_libraries} libcaer::caer)
+    message(STATUS "Inivation dependencies (libcaer) found at ${libcaer_DIR}")
+    
+    # message(DEBUG "Libcaer not found, fetching...")
+    # CPMFindPackage(NAME libcaer
+    #   GIT_REPOSITORY https://gitlab.com/inivation/dv/libcaer
+    #   GIT_TAG 8710e73ceb21d9fb4f74ead62ca3fae42d828997
+    #   SOURCE_SUBDIR build/cmake
+    #   DOWNLOAD_ONLY True
+    # )
     # set(CMAKE_CURRENT_LIST_DIR "${CMAKE_CURRENT_LIST_DIR}:${libcaer_SOURCE_DIR}/cmakemod")
     # # list(APPEND CMAKE_MODULE_PATH ${libcaer_SOURCE_DIR}/cmakemod)
     # add_subdirectory(${libcaer_SOURCE_DIR} ${libcaer_BINARY_DIR})
@@ -32,13 +37,6 @@ if (${USE_CAMERA})
 
     # message(DEBUG " Successfully downloaded and initialized libcaer")
   endif()
-  
-  find_package(libcaer CONFIG REQUIRED)
-  set(WITH_CAER ON PARENT_SCOPE)
-  set(input_definitions ${input_definitions} WITH_CAER)
-  set(input_sources ${input_sources} inivation.hpp inivation.cpp )
-  set(input_libraries ${input_libraries} libcaer::caer)
-  message(STATUS "Inivation dependencies (libcaer) found at ${libcaer_DIR}")
 
   # Include MetavisionSDK
   # find_package(MetavisionSDK COMPONENTS core driver QUIET)
