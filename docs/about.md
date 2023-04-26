@@ -1,6 +1,6 @@
 # About AEStream
 
-AEStream aims to **simplify access to neuromorphic technologies**, motivated by two problems:
+AEStream aims to **simplify access to event-based neuromorphic technologies**, motivated by two problems:
 1. the overhead to interact with any neuromorphic technologies (event cameras, neuromorphic chips, machine learning models, etc.) and
 2. incompatibilities between neuromorphic systems (e. g. streaming cameras to [SpiNNaker](https://spinnakermanchester.github.io/)).
 
