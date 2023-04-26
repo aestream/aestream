@@ -21,8 +21,9 @@ FileInput("file", (640, 480)).load()
 
 ## `USBInput`
 
-AEStream also supports streaming data in real-time *without strict guarantees on orders*. 
-This is particularly useful in real-time scenarios, for instance when operating with `USBInput` or `UDPInput`
+> Note: This requires installed drivers for Inivation or Prophesee cameras. Read more in our [installation guide](install).
+
+AEStream also supports streaming data from event cameras in real-time. This is particularly useful to feed data directly into an algorithm, PyTorch model, or even a live, running neuromorphic system. 
 
 ```python
 # Stream events from a DVS camera over USB
