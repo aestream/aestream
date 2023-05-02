@@ -110,6 +110,11 @@ NB_MODULE(aestream_ext, m) {
            })
       .def("start_stream", &USBInput::start_stream)
       .def("stop_stream", &USBInput::stop_stream)
-      .def("read_buffer", &USBInput::read);
+      .def("read_buffer", &USBInput::read)
+      .def("read_genn", [](const USBInput &usb, nb::ndarray<uint32_t, nb::shape<nb::any>,
+                                                            nb::c_contig, nb::device::cpu> buffer)
+                           {
+                               usb.read_genn(buffer.data());
+                           });
 #endif
 }

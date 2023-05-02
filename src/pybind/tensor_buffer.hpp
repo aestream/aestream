@@ -58,6 +58,8 @@ private:
   std::vector<int> offset_buffer;
   index_t cuda_buffer;
 #endif
+  std::vector<AER::Event> genn_events;
+  const size_t bitmask_words;
 public:
   TensorBuffer(py_size_t size, std::string device, size_t buffer_size);
   ~TensorBuffer();
@@ -65,4 +67,5 @@ public:
   void set_buffer(uint16_t data[], int numbytes);
   void set_vector(std::vector<AER::Event> events);
   BufferPointer read();
+  void read_genn(uint32_t *bitmask) const;
 };

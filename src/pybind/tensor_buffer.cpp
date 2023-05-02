@@ -21,7 +21,7 @@ allocate_buffer(const size_t &length, std::string device) {
 // TensorBuffer constructor
 TensorBuffer::TensorBuffer(py_size_t size, std::string device,
                            size_t buffer_size)
-    : shape(size), device(device) {
+    : shape(size), device(device), bitmask_words(((shape[0] * shape[1]) + 31) / 32) {
 #ifdef USE_CUDA
   if (device == "cuda") {
     cuda_buffer = allocate_buffer<int>(buffer_size, device);
@@ -51,7 +51,19 @@ void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
                          offset_buffer.size(), cuda_buffer.get());
     return;
   }
+  else
 #endif
+  if(device == "genn") {
+    genn_events.clear();
+    genn_events.reserve(length);
+    
+    for (int i = 0; i < length; i = i + 2) {
+      // Decode x, y
+      const uint16_t y_coord = data[i] & 0x7FFF;
+      const uint16_t x_coord = data[i + 1] & 0x7FFF;
+      genn_events.emplace_back(x_coord, y_coord);
+    }
+  }
   for (int i = 0; i < length; i = i + 2) {
     // Decode x, y
     const int16_t y_coord = data[i] & 0x7FFF;
@@ -73,7 +85,12 @@ void TensorBuffer::set_vector(std::vector<AER::Event> events) {
                          offset_buffer.size(), cuda_buffer.get());
     return;
   }
+  else
 #endif
+  if(device == "genn") {
+    // **THINK** should be a move!
+    genn_events = events;
+  }
   for (auto event : events) {
     assign_event(buffer1.get(), event.x, event.y);
   }
@@ -95,6 +112,18 @@ BufferPointer TensorBuffer::read() {
   buffer2.swap(buffer3);
   // Return pointer
   return BufferPointer(std::move(buffer3), shape, device);
+}
+
+void TensorBuffer::read_genn(uint32_t *bitmask) const
+{
+  // Zero bitmask
+  std::fill_n(bitmask, bitmask_words, 0);
+  
+  // Loop through events and set bit
+  for (const auto &event : genn_events) {
+    const size_t idx = (shape[1] * event.x) + event.y;
+    bitmask[idx / 32] |= (1 << (idx % 32));
+  }
 }
 
 BufferPointer::BufferPointer(buffer_t data, const std::vector<int64_t> &shape,
