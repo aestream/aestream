@@ -2,17 +2,20 @@ include(GNUInstallDirs)
 include(FetchContent)
 
 # AER processing
-add_library(aer SHARED aer.hpp generator.hpp)
+add_library(aer INTERFACE aer.hpp generator.hpp)
 target_include_directories(aer INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-set_target_properties(aer PROPERTIES LINKER_LANGUAGE CXX)
+# set_target_properties(aer PROPERTIES LINKER_LANGUAGE CXX)
 # set coroutine flags for clang appropriately
 # thanks to https://stackoverflow.com/questions/64703866/is-clang-11s-invocation-of-coroutine-headers-via-fcoroutines-flag
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  target_compile_options(aer PUBLIC "-fcoroutines-ts")
+  target_compile_options(aer INTERFACE "-fcoroutines-ts")
   add_compile_definitions(USE_CLANG)
   message(STATUS "detected clang, set -ts flag")
-else()
-  target_compile_options(aer PUBLIC "-fcoroutines")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  target_compile_options(aer INTERFACE "-fcoroutines")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  target_compile_options(aer INTERFACE /await:strict)
+  message("MSVC")
 endif()
 
 # Add subdirectories
@@ -28,7 +31,7 @@ endif()
 # AEStream executable
 add_executable(aestream aestream.cpp)
 target_include_directories(aestream PRIVATE ${CMAKE_INSTALL_LIBDIR})
-target_link_libraries(aestream PRIVATE aer aestream_file aestream_input aestream_output)
+target_link_libraries(aestream INTERFACE aer PRIVATE aestream_file aestream_input aestream_output)
 
 # Install targets
 if (${USE_CAMERA})

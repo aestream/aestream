@@ -76,6 +76,6 @@ else()
 endif()
 target_compile_definitions(aestream_ext PRIVATE ${module_compile_definitions})
 target_include_directories(aestream_ext PRIVATE "${CMAKE_INSTALL_LIBDIR}" "${CUDA_INCLUDE_DIRS}" "${CudaToolkitLibDir}" "${PYTHON_SITE_PACKAGES_DIR}/aestream")
-target_link_libraries(aestream_ext PRIVATE ${module_link_libraries} aer aestream_file aestream_input aestream_output)
+target_link_libraries(aestream_ext INTERFACE aer PRIVATE ${module_link_libraries} aestream_file aestream_input aestream_output)
 
 install(TARGETS aestream_ext LIBRARY DESTINATION aestream)

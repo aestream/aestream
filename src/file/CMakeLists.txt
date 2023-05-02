@@ -45,7 +45,7 @@ else()
 endif()
 
 # Create the file library
-add_library(aestream_file SHARED ${input_sources})
-target_link_libraries(aestream_file PUBLIC fb_headers ${input_libraries})
-target_compile_definitions(aestream_file PUBLIC ${input_definitions})
-target_include_directories(aestream_file PUBLIC ${input_include_directories})
+add_library(aestream_file INTERFACE ${input_sources})
+target_link_libraries(aestream_file INTERFACE fb_headers ${input_libraries})
+target_compile_definitions(aestream_file INTERFACE ${input_definitions})
+target_include_directories(aestream_file INTERFACE ${input_include_directories})
