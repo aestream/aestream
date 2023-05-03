@@ -29,7 +29,7 @@ endif()
 # AEStream executable
 add_executable(aestream aestream.cpp)
 target_include_directories(aestream PRIVATE ${CMAKE_INSTALL_LIBDIR})
-target_link_libraries(aestream PRIVATE aer aestream_file aestream_input aestream_output)
+target_link_libraries(aestream PRIVATE aer aestream_file aestream_input aestream_output aestream_process)
 
 # Install targets
 # if (${USE_CAMERA})
