@@ -121,7 +121,7 @@ void TensorBuffer::read_genn(uint32_t *bitmask) const
   
   // Loop through events and set bit
   for (const auto &event : genn_events) {
-    const size_t idx = (shape[1] * event.x) + event.y;
+    const size_t idx = (shape[0] * event.y) + event.x;
     bitmask[idx / 32] |= (1 << (idx % 32));
   }
 }
