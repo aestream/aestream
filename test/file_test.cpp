@@ -7,6 +7,15 @@
 TEST(FileTest, FailEmptyFile) {
   EXPECT_THROW(open_event_file("idonotexist.aedat4"), std::invalid_argument);
   EXPECT_THROW(open_event_file("idonotexist.dat"), std::invalid_argument);
+  EXPECT_THROW(open_event_file("idonotexist.csv"), std::invalid_argument);
+}
+
+TEST(FileTest, ReadCSVFile) {
+  auto file = open_event_file("example/sample.csv");
+  auto [events, size] = file->read_events(-1);
+  const size_t expected = 100;
+  ASSERT_EQ(size, expected);
+  ASSERT_EQ(events[99].timestamp, 99);
 }
 TEST(FileTest, ReadDATFile) {
   auto file = open_event_file("example/sample.dat");

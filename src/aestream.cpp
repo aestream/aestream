@@ -230,8 +230,9 @@ int main(int argc, char *argv[]) {
       uint64_t count = 0;
       for (AER::Event event : *ptr_processed_generator) {
         count += 1;
-        std::cout << event.x << "," << event.y << ","
-                  << std::to_string(event.timestamp) << std::endl;
+        std::cout << std::to_string(event.timestamp) 
+                  << event.x << "," << event.y << ","
+                  << std::endl;
       }
       std::cout << "Sent a total of " << count << " events" << std::endl;
     }
