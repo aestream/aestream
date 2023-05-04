@@ -11,6 +11,7 @@
 #include "../generator.hpp"
 
 #include "../file/aedat4.hpp"
+#include "../file/csv.hpp"
 #include "../file/dat.hpp"
 #include "../file/utils.hpp"
 
