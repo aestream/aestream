@@ -30,7 +30,7 @@ public:
   }
 
   BufferPointer read() { return buffer.read(); }
-
+  void read_genn(uint32_t *bitmask, size_t size){ buffer.read_genn(bitmask, size); }
   void serve_synchronous() {
     int sockfd;
     int numbytes;

@@ -65,7 +65,12 @@ NB_MODULE(aestream_ext, m) {
       .def("is_streaming", &FileInput::get_is_streaming)
       .def("start_stream", &FileInput::start_stream)
       .def("stop_stream", &FileInput::stop_stream)
-      .def("read_buffer", &FileInput::read);
+      .def("read_buffer", &FileInput::read)
+      .def("read_genn", [](FileInput &file, nb::ndarray<uint32_t, nb::shape<nb::any>,
+                                                        nb::c_contig, nb::device::cpu> buffer)
+                           {
+                               file.read_genn(buffer.data(), buffer.size());
+                           });
   //  .def("parts",
   //       [](nb::object fobj, size_t n_events_per_part) {
   //         //    std::cout << i.filename << std::endl;
@@ -95,7 +100,12 @@ NB_MODULE(aestream_ext, m) {
       .def("start_stream", &UDPInput::start_stream)
       .def("stop_stream", &UDPInput::stop_stream, nb::arg("a").none(),
            nb::arg("b").none(), nb::arg("c").none())
-      .def("read_buffer", &UDPInput::read);
+      .def("read_buffer", &UDPInput::read)
+      .def("read_genn", [](UDPInput &udp, nb::ndarray<uint32_t, nb::shape<nb::any>,
+                                                      nb::c_contig, nb::device::cpu> buffer)
+                          {
+                              udp.read_genn(buffer.data(), buffer.size());
+                          });
 
 #ifdef WITH_CAER
   nb::class_<USBInput>(m, "USBInput")
@@ -111,10 +121,10 @@ NB_MODULE(aestream_ext, m) {
       .def("start_stream", &USBInput::start_stream)
       .def("stop_stream", &USBInput::stop_stream)
       .def("read_buffer", &USBInput::read)
-      .def("read_genn", [](const USBInput &usb, nb::ndarray<uint32_t, nb::shape<nb::any>,
-                                                            nb::c_contig, nb::device::cpu> buffer)
+      .def("read_genn", [](USBInput &usb, nb::ndarray<uint32_t, nb::shape<nb::any>,
+                                                      nb::c_contig, nb::device::cpu> buffer)
                            {
-                               usb.read_genn(buffer.data());
+                               usb.read_genn(buffer.data(), buffer.size());
                            });
 #endif
 }

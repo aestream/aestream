@@ -48,7 +48,7 @@ public:
   }
 
   BufferPointer read() { return buffer.read(); }
-  void read_genn(uint32_t *bitmask) const{ buffer.read_genn(bitmask); }
+  void read_genn(uint32_t *bitmask, size_t size){ buffer.read_genn(bitmask, size); }
 
   USBInput *start_stream() {
     std::thread socket_thread(&USBInput::stream_synchronous, this);
