@@ -35,7 +35,7 @@ struct CSV : FileBase {
   }
   
   explicit CSV(const std::string &filename) : file_stream(filename), 
-    csv_regex("(?> *(\\d*) *),(?> *(\\d*) *),(?> *(\\d*) *),(?> *(\\d*) *)") {}
+    csv_regex("(\\d+),(\\d+),(\\d+),(\\d+)") {}
 
 private:
   std::ifstream file_stream;
