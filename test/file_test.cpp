@@ -22,6 +22,9 @@ TEST(FileTest, ReadDATFile) {
   auto [events, size] = file->read_events(-1);
   const size_t expected = 539481;
   ASSERT_EQ(size, expected);
+  ASSERT_EQ(events[0].timestamp, 0);
+  ASSERT_EQ(events[0].x, 237);
+  ASSERT_EQ(events[0].y, 121);
 }
 TEST(FileTest, ReadDATFilePart) {
   auto file = open_event_file("example/sample.dat");
@@ -43,6 +46,9 @@ TEST(FileTest, ReadAEDAT4File) {
   auto [events, size] = file->read_events(-1);
   const size_t expected = 117667;
   ASSERT_EQ(size, expected);
+  ASSERT_EQ(events[0].timestamp, 1633953690975950);
+  ASSERT_EQ(events[0].x, 218);
+  ASSERT_EQ(events[0].y, 15);
 }
 TEST(FileTest, ReadAEDAT4FilePart) {
   auto file = open_event_file("example/sample.aedat4");

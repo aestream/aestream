@@ -167,8 +167,8 @@ int main(int argc, char *argv[]) {
       uint64_t count = 0;
       for (AER::Event event : input_generator) {
         count += 1;
-        std::cout << std::to_string(event.timestamp) 
-                  << event.x << "," << event.y << ","
+        std::cout << std::to_string(event.timestamp) << ","
+                  << event.x << "," << event.y
                   << std::endl;
       }
       std::cout << "Sent a total of " << count << " events" << std::endl;
