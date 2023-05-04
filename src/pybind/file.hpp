@@ -37,7 +37,7 @@ public:
             const std::string &device, bool ignore_time = false);
 
   BufferPointer read();
-
+  void read_genn(uint32_t *bitmask, size_t size){ buffer.read_genn(bitmask, size); }
   Generator<AER::Event>::Iter begin();
   std::default_sentinel_t end();
 
