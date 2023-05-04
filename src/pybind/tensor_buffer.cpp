@@ -26,8 +26,13 @@ TensorBuffer::TensorBuffer(py_size_t size, std::string device,
   if (device == "cuda") {
     cuda_buffer = allocate_buffer<int>(buffer_size, device);
     offset_buffer = std::vector<int>(buffer_size);
-  }
+  } else
 #endif
+  // If device is GeNN, allocate suitably sized bitmask
+  if (device == "genn") {
+    const size_t bitmask_words = ((shape[0] * shape[1]) + 31) / 32;
+    genn_events.resize(bitmask_words, 0);
+  }
   buffer1 = allocate_buffer<float>(size[0] * size[1], device);
   buffer2 = allocate_buffer<float>(size[0] * size[1], device);
 }
@@ -51,7 +56,18 @@ void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
                          offset_buffer.size(), cuda_buffer.get());
     return;
   }
+  else
 #endif
+  if(device == "genn") {
+    // Loop through events
+    // **THINK** else out buffer
+    for (int i = 0; i < length; i = i + 2) {
+      // Decode x, y coordinates and set event in GeNN format
+      const int y_coord = data[i] & 0x7FFF;
+      const int x_coord = data[i + 1] & 0x7FFF;
+      set_genn_event(x_coord, y_coord);
+    }
+  }
   for (int i = 0; i < length; i = i + 2) {
     // Decode x, y
     const int16_t y_coord = data[i] & 0x7FFF;
@@ -73,7 +89,14 @@ void TensorBuffer::set_vector(std::vector<AER::Event> events) {
                          offset_buffer.size(), cuda_buffer.get());
     return;
   }
+  else
 #endif
+  if(device == "genn") {
+    // Loop through events
+    for (const auto &event : events) {
+      set_genn_event(event.x, event.y);
+    }
+  }
   for (auto event : events) {
     assign_event(buffer1.get(), event.x, event.y);
   }
@@ -95,6 +118,22 @@ BufferPointer TensorBuffer::read() {
   buffer2.swap(buffer3);
   // Return pointer
   return BufferPointer(std::move(buffer3), shape, device);
+}
+
+void TensorBuffer::read_genn(uint32_t *bitmask, size_t size)
+{
+  // Check size
+  assert(size == genn_events.size());
+  
+  // Lock
+  // **THINK** we COULD double-buffer but I suspect not worth it
+  std::lock_guard lock{buffer_lock};
+  
+  // Copy bitmask to GeNN-owned pointer
+  std::copy(genn_events.cbegin(), genn_events.cend(), bitmask);
+  
+  // Zero bitmask
+  std::fill(genn_events.begin(), genn_events.end(), 0);
 }
 
 BufferPointer::BufferPointer(buffer_t data, const std::vector<int64_t> &shape,
