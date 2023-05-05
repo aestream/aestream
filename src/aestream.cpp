@@ -192,11 +192,13 @@ int main(int argc, char *argv[]) {
   if(undistortion_filename.length() > 0){
     processing = true;
   }
-  
-  Generator<AEDAT::PolarityEvent> processed_generator;
-  Generator<AEDAT::PolarityEvent> * ptr_processed_generator;
-  if(processing){
-    processed_generator = undistortion_event_generator(input_generator, undistortion_filename, width, height);
+  trans transformation = from_string_to_trans(requested_trans);
+
+  Generator<AER::Event> processed_generator;
+  Generator<AER::Event> * ptr_processed_generator;
+  // if(undistortion || transformation != no_trans){
+  if(undistortion + transformation + t_sample + s_sample > 2){
+    processed_generator = transformation_event_generator(input_generator, undistortion_filename, transformation, width, height, t_sample, s_sample);
     ptr_processed_generator = &processed_generator;
   } else {    
     ptr_processed_generator = &input_generator;
