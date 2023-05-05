@@ -86,9 +86,10 @@
             addAutoPatchelfSearchPath src/file
             addAutoPatchelfSearchPath src/input
             addAutoPatchelfSearchPath src/output
+            addAutoPatchelfSearchPath src/process
           '';
           installPhase = ''
-            install -m555 -D -t $out/lib/ src/*.so src/file/*.so src/input/*.so src/output/*.so
+            install -m555 -D -t $out/lib/ src/*.so src/file/*.so src/input/*.so src/output/*.so src/process/*.so
             install -m755 -D src/aestream $out/bin/aestream
           '';
         };

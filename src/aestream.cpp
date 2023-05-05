@@ -18,6 +18,9 @@
 #include "input/prophesee.hpp"
 #endif
 
+// Processing
+#include "process/transformation.hpp"
+
 // Output
 #include "output/dvs_to_file.hpp"
 #include "output/dvs_to_udp.hpp"
@@ -26,8 +29,10 @@
 auto runFlag = std::atomic<bool>(true);
 void signalHandler(int signum) { runFlag.store(false); }
 
+
 // Main
 int main(int argc, char *argv[]) {
+
   signal(SIGINT, signalHandler); // Register interrupt
 
   CLI::App app{"Streams DVS data from a USB camera or AEDAT file to a file or "
@@ -72,6 +77,43 @@ int main(int argc, char *argv[]) {
   // app_input_file->add_flag(
   //     "--ignore-time", input_ignore_time,
   //     "Playback in real-time (false, default) or ignore timestamps (true).");
+
+
+  //
+  // Processing
+  //
+  // Undistortion
+  //
+  auto app_undistortion = app.add_subcommand("undistortion", "Performs Undistortion");
+  std::string undistortion_filename = "";
+  app_undistortion->add_option("undistortion-filename", undistortion_filename,
+                              "Undistortion Filename. Supports .csv");
+  //
+  // Transformation
+  //
+  auto app_transformation = app.add_subcommand("transformation", "Performs Transformation");
+  std::string requested_trans = "";
+  app_transformation->add_option("transformation-type", requested_trans,
+                              "no_trans, rot_90, rot_180, rot_270, flip_ud, flip_lr");
+ 
+  //
+  // Spatio-Temporal Sampling
+  //
+  auto app_sampling = app.add_subcommand("sampling", "Spatio-Temporal Sampling");
+  std::uint8_t t_sample = 1;
+  std::uint8_t s_sample = 1;
+  app_sampling->add_option("t", t_sample, "1 out of <t> events are sent");
+  app_sampling->add_option("s", s_sample, "<s>x<s> pixels become 1 pixel");
+
+  //
+  // Resolution
+  //
+  auto app_resolution = app.add_subcommand("resolution", "Provides resolution");
+  std::uint16_t width;
+  std::uint16_t height;
+  app_resolution->add_option("w", width, "Camera width (in pixels)");
+  app_resolution->add_option("h", height, "Camera height (in pixels)");
+
 
   //
   // Output
@@ -144,6 +186,24 @@ int main(int argc, char *argv[]) {
   }
 
   //
+  // Processing (Undistort, Mirror, Flip, Turn)
+  //
+  bool undistortion = false;
+  if(undistortion_filename.length() > 0){
+    undistortion = true;
+  }
+  trans transformation = from_string_to_trans(requested_trans);
+
+  Generator<AER::Event> processed_generator;
+  Generator<AER::Event> * ptr_processed_generator;
+  if(undistortion + transformation + t_sample + s_sample > 2){
+    processed_generator = transformation_event_generator(input_generator, undistortion_filename, transformation, width, height, t_sample, s_sample);
+    ptr_processed_generator = &processed_generator;
+  } else {    
+    ptr_processed_generator = &input_generator;
+  }
+
+  //
   // Handle output
   //
   try {
@@ -151,13 +211,13 @@ int main(int argc, char *argv[]) {
       std::cout << "Sending events to: " << ipAddress << " on port: " << port
                 << std::endl;
       DVSToUDP<AER::Event> client(bufferSize, port, ipAddress);
-      client.stream(input_generator, include_timestamp);
+      client.stream(*ptr_processed_generator, include_timestamp);
     } else if (app_output_file->parsed()) {
       std::cout << "Sending events to file " << output_filename << std::endl;
       if (output_filename.ends_with(".txt")) {
-        dvs_to_file_txt(input_generator, output_filename);
+        dvs_to_file_txt(*ptr_processed_generator, output_filename);
       } else if (output_filename.ends_with(".aedat4")) {
-        dvs_to_file_aedat(input_generator, output_filename);
+        dvs_to_file_aedat(*ptr_processed_generator, output_filename);
       } else {
         std::stringstream error;
         error << "Unsupported file ending" << output_filename;
@@ -165,7 +225,7 @@ int main(int argc, char *argv[]) {
       }
     } else { // Default to STDOUT
       uint64_t count = 0;
-      for (AER::Event event : input_generator) {
+      for (AER::Event event : *ptr_processed_generator) {
         count += 1;
         std::cout << std::to_string(event.timestamp) << ","
                   << event.x << "," << event.y

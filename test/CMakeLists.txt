@@ -21,12 +21,14 @@ add_executable(
   aestream_test
   main_test.cpp
   file_test.cpp
+  process_test.cpp
 )
 target_link_libraries(
   aestream_test
   aer
   aestream_input
   aestream_output
+  aestream_process
   gtest
   ${LZ4_LIBRARY}
 )
