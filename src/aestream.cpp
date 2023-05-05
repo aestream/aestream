@@ -188,15 +188,14 @@ int main(int argc, char *argv[]) {
   //
   // Processing (Undistort, Mirror, Flip, Turn)
   //
-  bool processing = false;
+  bool undistortion = false;
   if(undistortion_filename.length() > 0){
-    processing = true;
+    undistortion = true;
   }
   trans transformation = from_string_to_trans(requested_trans);
 
   Generator<AER::Event> processed_generator;
   Generator<AER::Event> * ptr_processed_generator;
-  // if(undistortion || transformation != no_trans){
   if(undistortion + transformation + t_sample + s_sample > 2){
     processed_generator = transformation_event_generator(input_generator, undistortion_filename, transformation, width, height, t_sample, s_sample);
     ptr_processed_generator = &processed_generator;
