@@ -70,7 +70,6 @@ private:
   }
 public:
   TensorBuffer(py_size_t size, std::string device, size_t buffer_size);
-  ~TensorBuffer();
   template <typename R> void assign_event(R *array, int16_t x, int16_t y);
   void set_buffer(uint16_t data[], int numbytes);
   void set_vector(std::vector<AER::Event> events);

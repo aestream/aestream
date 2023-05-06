@@ -111,13 +111,12 @@ NB_MODULE(aestream_ext, m) {
   nb::class_<USBInput>(m, "USBInput")
       .def(nb::init<py_size_t, std::string, int, int>(), nb::arg("shape"),
            nb::arg("device") = "cpu", nb::arg("device_id") = 0,
-           nb::arg("device_address") = 0)
+           nb::arg("") = 0)
       .def("__enter__", &USBInput::start_stream)
-      .def("__exit__",
-           [&](USBInput &i, nb::object &t, nb::object &v, nb::object &trace) {
-             i.stop_stream();
-             return false;
-           })
+      .def("__exit__", [](USBInput &i, nb::object t, nb::object v, nb::object trace) {
+          i.stop_stream();
+          return false;
+          })
       .def("start_stream", &USBInput::start_stream)
       .def("stop_stream", &USBInput::stop_stream)
       .def("read_buffer", &USBInput::read)

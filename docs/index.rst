@@ -20,6 +20,7 @@
     :hidden:
     :maxdepth: 2
 
+    development
     rfc_api
     stubs_api
 
