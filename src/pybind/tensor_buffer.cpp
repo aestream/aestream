@@ -21,7 +21,8 @@ allocate_buffer(const size_t &length, std::string device) {
 // TensorBuffer constructor
 TensorBuffer::TensorBuffer(py_size_t size, std::string device,
                            size_t buffer_size)
-    : shape(size), device(device) {
+    : shape(size), device(device) 
+{
 #ifdef USE_CUDA
   if (device == "cuda") {
     cuda_buffer = allocate_buffer<int>(buffer_size, device);
@@ -30,7 +31,9 @@ TensorBuffer::TensorBuffer(py_size_t size, std::string device,
 #endif
   // If device is GeNN, allocate suitably sized bitmask
   if (device == "genn") {
-    const size_t bitmask_words = ((shape[0] * shape[1]) + 31) / 32;
+    assert(shape.size() == 3);
+    assert(shape[2] == 2);
+    const size_t bitmask_words = ((shape[0] * shape[1] * shape[2]) + 31) / 32;
     genn_events.resize(bitmask_words, 0);
   }
   buffer1 = allocate_buffer<float>(size[0] * size[1], device);
@@ -65,7 +68,7 @@ void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
       // Decode x, y coordinates and set event in GeNN format
       const int y_coord = data[i] & 0x7FFF;
       const int x_coord = data[i + 1] & 0x7FFF;
-      set_genn_event(x_coord, y_coord);
+      set_genn_event(x_coord, y_coord, true);
     }
   }
   for (int i = 0; i < length; i = i + 2) {
@@ -94,7 +97,7 @@ void TensorBuffer::set_vector(std::vector<AER::Event> events) {
   if(device == "genn") {
     // Loop through events
     for (const auto &event : events) {
-      set_genn_event(event.x, event.y);
+      set_genn_event(event.x, event.y, event.polarity);
     }
   }
   for (auto event : events) {
@@ -122,17 +125,16 @@ BufferPointer TensorBuffer::read() {
 
 void TensorBuffer::read_genn(uint32_t *bitmask, size_t size)
 {
-  // Check size
   assert(size == genn_events.size());
   
   // Lock
   // **THINK** we COULD double-buffer but I suspect not worth it
   std::lock_guard lock{buffer_lock};
-  
+
   // Copy bitmask to GeNN-owned pointer
   std::copy(genn_events.cbegin(), genn_events.cend(), bitmask);
   
-  // Zero bitmask
+  // Zero counts
   std::fill(genn_events.begin(), genn_events.end(), 0);
 }
 
