@@ -62,8 +62,15 @@ private:
 
   void set_genn_event(int x, int y, bool polarity)
   {
+    if(shape.size() == 2 || shape[2] == 1) {
+      const int idx = x + (y * shape[0]);
+      genn_events[idx / 32] |= (1 << (idx % 32));
+    }
+    else {
       const int idx = (polarity ? 1 : 0) + (x * shape[2]) + (y * shape[0] * shape[2]);
       genn_events[idx / 32] |= (1 << (idx % 32));
+    }
+      
   }
 public:
   TensorBuffer(py_size_t size, std::string device, size_t buffer_size);
