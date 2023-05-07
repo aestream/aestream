@@ -29,7 +29,7 @@ class CAERUSBConnection {
 
   //   static void signalHandler(int signal) { close(); }
   static void shutdownHandler(void *ptr) {
-    // Unused
+    // close();
   }
 
 public:
@@ -39,7 +39,13 @@ public:
   std::unique_ptr<libcaer::events::EventPacketContainer> getPacket() {
     return handle->dataGet();
   }
-  void close() { handle->dataStop(); }
+  void close() { 
+    try {
+      handle->dataStop();
+    } catch (const std::runtime_error &e) {
+      // Ignore exceptions
+    }
+  }
 };
 
 Generator<AER::Event>

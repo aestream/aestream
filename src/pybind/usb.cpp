@@ -13,6 +13,7 @@ private:
   static const uint32_t EVENT_BUFFER_SIZE = 128;
   TensorBuffer buffer;
   std::atomic<bool> is_streaming = {true};
+  std::atomic<bool> done_streaming = {false};
 
   void stream_synchronous() {
     while (is_streaming.load()) {
@@ -28,6 +29,7 @@ private:
         }
       }
     }
+    done_streaming.store(true);
   };
 
 public:
@@ -47,7 +49,9 @@ public:
     }
   }
 
-  BufferPointer read() { return buffer.read(); }
+  BufferPointer read() { 
+    return buffer.read(); 
+  }
   void read_genn(uint32_t *bitmask, size_t size){ buffer.read_genn(bitmask, size); }
 
   USBInput *start_stream() {
@@ -58,6 +62,8 @@ public:
 
   void stop_stream() {
     is_streaming.store(false);
-    socket_thread.join();
+    while (!done_streaming.load()) {
+      // Wait until the thread is done streaming to avoid freeing memory too early
+    }
   }
 };

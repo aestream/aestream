@@ -37,8 +37,6 @@ TensorBuffer::TensorBuffer(py_size_t size, std::string device,
   buffer2 = allocate_buffer<float>(size[0] * size[1], device);
 }
 
-TensorBuffer::~TensorBuffer() {}
-
 void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
   const auto length = numbytes >> 1;
   const std::lock_guard lock{buffer_lock};
@@ -54,7 +52,6 @@ void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
     }
     index_increment_cuda(buffer1.get(), offset_buffer.data(),
                          offset_buffer.size(), cuda_buffer.get());
-    return;
   }
   else
 #endif
@@ -67,12 +64,13 @@ void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
       const int x_coord = data[i + 1] & 0x7FFF;
       set_genn_event(x_coord, y_coord);
     }
-  }
-  for (int i = 0; i < length; i = i + 2) {
-    // Decode x, y
-    const int16_t y_coord = data[i] & 0x7FFF;
-    const int16_t x_coord = data[i + 1] & 0x7FFF;
-    assign_event(buffer1.get(), x_coord, y_coord);
+  } else {
+    for (int i = 0; i < length; i = i + 2) {
+      // Decode x, y
+      const int16_t y_coord = data[i] & 0x7FFF;
+      const int16_t x_coord = data[i + 1] & 0x7FFF;
+      assign_event(buffer1.get(), x_coord, y_coord);
+    }
   }
 }
 
@@ -87,7 +85,6 @@ void TensorBuffer::set_vector(std::vector<AER::Event> events) {
     }
     index_increment_cuda(buffer1.get(), offset_buffer.data(),
                          offset_buffer.size(), cuda_buffer.get());
-    return;
   }
   else
 #endif
@@ -96,9 +93,10 @@ void TensorBuffer::set_vector(std::vector<AER::Event> events) {
     for (const auto &event : events) {
       set_genn_event(event.x, event.y);
     }
-  }
-  for (auto event : events) {
-    assign_event(buffer1.get(), event.x, event.y);
+  } else {
+    for (auto event : events) {
+      assign_event(buffer1.get(), event.x, event.y);
+    }
   }
 }
 
