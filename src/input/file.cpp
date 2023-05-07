@@ -7,6 +7,8 @@ std::unique_ptr<FileBase> open_event_file(const std::string &filename) {
     return std::unique_ptr<FileBase>(new DAT(std::move(fp)));
   } else if (ends_with(filename, ".aedat4")) {
     return std::unique_ptr<FileBase>(new AEDAT4(std::move(fp)));
+  } else if (ends_with(filename, ".csv")) {
+    return std::unique_ptr<FileBase>(new CSV(filename));
   } else {
     throw std::invalid_argument("Unknown file type " + filename);
   }

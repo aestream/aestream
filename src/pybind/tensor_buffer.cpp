@@ -43,11 +43,11 @@ TensorBuffer::TensorBuffer(py_size_t size, std::string device,
       throw std::runtime_error("Unsupported shape");
     }
   }
-  buffer1 = allocate_buffer<float>(size[0] * size[1], device);
-  buffer2 = allocate_buffer<float>(size[0] * size[1], device);
+  else {
+    buffer1 = allocate_buffer<float>(size[0] * size[1], device);
+    buffer2 = allocate_buffer<float>(size[0] * size[1], device);
+  }
 }
-
-TensorBuffer::~TensorBuffer() {}
 
 void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
   const auto length = numbytes >> 1;
@@ -69,21 +69,19 @@ void TensorBuffer::set_buffer(uint16_t data[], int numbytes) {
 #endif
   if(device == "genn") {
     // Loop through events
-    // **THINK** else out buffer
     for (int i = 0; i < length; i = i + 2) {
       // Decode x, y coordinates and set event in GeNN format
       const int y_coord = data[i] & 0x7FFF;
       const int x_coord = data[i + 1] & 0x7FFF;
       set_genn_event(x_coord, y_coord, true);
     }
-  }
-  else {
-      for (int i = 0; i < length; i = i + 2) {
-        // Decode x, y
-        const int16_t y_coord = data[i] & 0x7FFF;
-        const int16_t x_coord = data[i + 1] & 0x7FFF;
-        assign_event(buffer1.get(), x_coord, y_coord);
-      }
+  } else {
+    for (int i = 0; i < length; i = i + 2) {
+      // Decode x, y
+      const int16_t y_coord = data[i] & 0x7FFF;
+      const int16_t x_coord = data[i + 1] & 0x7FFF;
+      assign_event(buffer1.get(), x_coord, y_coord);
+    }
   }
 }
 
@@ -106,11 +104,10 @@ void TensorBuffer::set_vector(std::vector<AER::Event> events) {
     for (const auto &event : events) {
       set_genn_event(event.x, event.y, event.polarity);
     }
-  }
-  else {
-      for (auto event : events) {
-        assign_event(buffer1.get(), event.x, event.y);
-      }
+  } else {
+    for (auto event : events) {
+      assign_event(buffer1.get(), event.x, event.y);
+    }
   }
 }
 
@@ -134,6 +131,7 @@ BufferPointer TensorBuffer::read() {
 
 void TensorBuffer::read_genn(uint32_t *bitmask, size_t size)
 {
+  // Check size
   assert(size == genn_events.size());
   
   // Lock
@@ -143,26 +141,8 @@ void TensorBuffer::read_genn(uint32_t *bitmask, size_t size)
   // Copy bitmask to GeNN-owned pointer
   std::copy(genn_events.cbegin(), genn_events.cend(), bitmask);
   
-  // Zero counts
+  // Zero bitmask
   std::fill(genn_events.begin(), genn_events.end(), 0);
-  
-  // Check size
-  //const size_t bitmask_words = ((shape[0] * shape[1] * shape[2]) + 31) / 32;
-  //assert(size == bitmask_words);
-  
-  // Lock
-  // **THINK** we COULD double-buffer but I suspect not worth it
-  //std::lock_guard lock{buffer_lock};
-  
-  //std::fill_n(bitmask, bitmask_words, 0);
-  
-  // Copy bitmask to GeNN-owned pointer
-  //for(size_t i = 0; i < genn_events.size(); i++) {
-  //    if(genn_events[i] > 8) {
-  //        bitmask[i / 32] |= (1 << (i % 32));
-  //        genn_events[i] = 0;
-  //    }
-  //}
 }
 
 BufferPointer::BufferPointer(buffer_t data, const std::vector<int64_t> &shape,
