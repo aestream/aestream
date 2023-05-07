@@ -26,6 +26,13 @@ except ImportError:
     logging.debug("Failed to import AEStream USB Input")
     del logging
 
-__all__ = ["Event", "FileInput", "UDPInput"] + modules
+try:
+    import aestream._genn as genn
+    modules.append("genn")
+except ImportError as ex:
+    import logging
 
+    logging.debug("Failed to import GeNN: AEStream cannot use GeNN device")
+    
+__all__ = ["Event", "FileInput", "UDPInput"] + modules
 del modules
