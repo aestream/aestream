@@ -21,11 +21,3 @@ def add_input(model, name, resolution):
     pop.set_extra_global_param("input", np.empty(num_words, dtype=np.uint32))
     
     return pop
-
-def read_input(population, stream):
-    # Read from stream into GeNN-owned memory
-    stream.read_genn(population.extra_global_params["input"].view)
-    
-    # Copy data to device
-    # **NOTE** this may be a NOP if CPU backend is used
-    population.push_extra_global_param_to_device("input")

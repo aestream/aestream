@@ -51,19 +51,16 @@ model.load(num_recording_timesteps=NUM_TIMESTEPS_PER_FRAME)
 # Initialize our canvas
 window, pixels = sdl.create_sdl_surface(640 + 160, 480)
 
+# Connect to a USB camera, receiving tensors of shape (640, 480)
 in_view = input_pop.extra_global_params["input"].view
 in_data = np.zeros(in_view.shape, np.uint32)
-# Connect to a USB camera, receiving tensors of shape (640, 480)
-# By default, we send the tensors to the CPU
-#   - if you have a GPU, try changing this to "cuda"
 with USBInput(RESOLUTION, device="genn") as stream:
     # Loop forever
     while True:
         # Run one frames worth of timesteps
         in_data[:] = 0
         for i in range(NUM_TIMESTEPS_PER_FRAME):
-            genn.read_input(input_pop, stream)
-            in_data = np.bitwise_or(in_data, in_view)
+            in_data = np.bitwise_or(in_data, stream.read_genn(input_pop))
 
             model.step_time()
 
