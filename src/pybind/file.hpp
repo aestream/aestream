@@ -36,7 +36,7 @@ public:
   FileInput(const std::string &filename, py_size_t shape,
             const std::string &device, bool ignore_time = false);
 
-  BufferPointer read();
+  std::unique_ptr<BufferPointer> read();
   void read_genn(uint32_t *bitmask, size_t size){ buffer.read_genn(bitmask, size); }
   Generator<AER::Event>::Iter begin();
   std::default_sentinel_t end();

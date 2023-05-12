@@ -10,7 +10,7 @@ class USBInput {
 private:
   Generator<AER::Event> generator;
   std::thread socket_thread;
-  static const uint32_t EVENT_BUFFER_SIZE = 128;
+  static const uint32_t EVENT_BUFFER_SIZE = 64;
   TensorBuffer buffer;
   std::atomic<bool> is_streaming = {true};
   std::atomic<bool> done_streaming = {false};
@@ -49,7 +49,7 @@ public:
     }
   }
 
-  BufferPointer read() { 
+  std::unique_ptr<BufferPointer> read() { 
     return buffer.read(); 
   }
   void read_genn(uint32_t *bitmask, size_t size){ buffer.read_genn(bitmask, size); }
