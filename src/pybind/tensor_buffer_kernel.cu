@@ -22,7 +22,7 @@ void index_increment_cuda(float *array, int *offset_pointer, size_t indices, int
 void* alloc_memory_cuda(size_t buffer_size, size_t bytes) {
   void *cuda_device_pointer;
   const size_t size = buffer_size * bytes;
-  cudaMallocAsync(&cuda_device_pointer, size, 0);
+  cudaMalloc(&cuda_device_pointer, size);
   cudaMemsetAsync(&cuda_device_pointer, 0, size, 0);
   return cuda_device_pointer;
 }

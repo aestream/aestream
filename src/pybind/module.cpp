@@ -100,7 +100,7 @@ NB_MODULE(aestream_ext, m) {
       .def("start_stream", &UDPInput::start_stream)
       .def("stop_stream", &UDPInput::stop_stream, nb::arg("a").none(),
            nb::arg("b").none(), nb::arg("c").none())
-      .def("read_buffer", &UDPInput::read, nb::rv_policy::take_ownership)
+      .def("read_buffer", &UDPInput::read)
       .def("read_genn", [](UDPInput &udp, nb::ndarray<uint32_t, nb::shape<nb::any>,
                                                       nb::c_contig, nb::device::cpu> buffer)
                           {
