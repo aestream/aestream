@@ -34,20 +34,20 @@ using buffer_t = std::unique_ptr<float[], BufferDeleter<float>>;
 using index_t = std::unique_ptr<int[], BufferDeleter<int>>;
 
 struct BufferPointer {
-  BufferPointer(buffer_t data, const std::vector<int64_t> &shape,
+  BufferPointer(buffer_t data, const std::vector<size_t> &shape,
                 std::string device);
   tensor_numpy to_numpy();
   tensor_torch to_torch();
 
 private:
   std::string device;
-  const std::vector<int64_t> &shape;
+  const std::vector<size_t> &shape;
   buffer_t data;
 };
 
 class TensorBuffer {
 private:
-  const std::vector<int64_t> shape;
+  const std::vector<size_t> shape;
   uint64_t current_timestamp = 0;
   std::string device;
 
@@ -69,7 +69,7 @@ private:
       genn_events[idx / 32] |= (1 << (idx % 32));
   }
 public:
-  TensorBuffer(py_size_t size, std::string device, size_t buffer_size);
+  TensorBuffer(std::vector<size_t> size, std::string device, size_t buffer_size);
   template <typename R> void assign_event(R *array, int16_t x, int16_t y);
   void set_buffer(uint16_t data[], int numbytes);
   void set_vector(std::vector<AER::Event> events);
