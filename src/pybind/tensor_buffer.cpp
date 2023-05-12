@@ -19,7 +19,7 @@ allocate_buffer(const size_t &length, std::string device) {
 }
 
 // TensorBuffer constructor
-TensorBuffer::TensorBuffer(py_size_t size, std::string device,
+TensorBuffer::TensorBuffer(std::vector<size_t> size, std::string device,
                            size_t buffer_size)
     : shape(size), device(device) {
 #ifdef USE_CUDA
@@ -134,7 +134,7 @@ void TensorBuffer::read_genn(uint32_t *bitmask, size_t size)
   std::fill(genn_events.begin(), genn_events.end(), 0);
 }
 
-BufferPointer::BufferPointer(buffer_t data, const std::vector<int64_t> &shape,
+BufferPointer::BufferPointer(buffer_t data, const std::vector<size_t> &shape,
                              std::string device)
     : data(std::move(data)), shape(shape), device(device) {}
 
