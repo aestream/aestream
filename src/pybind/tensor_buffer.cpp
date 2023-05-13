@@ -153,7 +153,7 @@ tensor_torch BufferPointer::to_torch() {
   nb::capsule owner;
   if (device == "cuda") {
     owner = nb::capsule(ptr, [](void *p) noexcept {
-      free_memory_cuda(static_cast<float *>(p));
+      free_memory_cuda(p);
     });
   } else {
     owner = nb::capsule(ptr, [](void *p) noexcept {
