@@ -27,10 +27,10 @@ FileInput::FileInput(const std::string &filename, py_size_t shape,
     : buffer(shape, device, EVENT_BUFFER_SIZE), ignore_time(ignore_time),
       shape(shape), filename(filename), file(open_event_file(filename)){};
 
-BufferPointer FileInput::read() {
+std::unique_ptr<BufferPointer> FileInput::read() {
   auto tmp = buffer.read();
   is_nonempty.store(false);
-  return tmp;
+  return std::unique_ptr<BufferPointer>(std::move(tmp));
 }
 
 Generator<AER::Event>::Iter FileInput::begin() { return generator.begin(); }

@@ -23,6 +23,6 @@ with USBInput((640, 480), device="cpu") as stream:
             # Reset the time so we're again counting to 500ms
             t_0 = time.time()
 
-            # Sum the incoming events and print along the timestamp
+            # # Sum the incoming events and print along the timestamp
             time_string = datetime.datetime.fromtimestamp(t_0).time()
             print(f"Frame at {time_string} with {frame.sum()} events")

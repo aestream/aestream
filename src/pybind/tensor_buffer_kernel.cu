@@ -15,15 +15,15 @@ __global__ void cuda_increment_kernel(scalar_t *__restrict__ array, int *__restr
 void index_increment_cuda(float *array, int *offset_pointer, size_t indices, int* event_device_pointer) {
   const size_t buffer_size = indices * sizeof(int);
 
-  cudaMemcpyAsync(event_device_pointer, offset_pointer, buffer_size, cudaMemcpyHostToDevice, 0);
+  cudaMemcpyAsync(event_device_pointer, offset_pointer, buffer_size, cudaMemcpyHostToDevice, cudaStreamPerThread);
   cuda_increment_kernel<float><<<1, indices>>>(array, event_device_pointer, indices);
 }
 
 void* alloc_memory_cuda(size_t buffer_size, size_t bytes) {
   void *cuda_device_pointer;
   const size_t size = buffer_size * bytes;
-  cudaMallocAsync(&cuda_device_pointer, size, 0);
-  cudaMemsetAsync(&cuda_device_pointer, 0, size, 0);
+  cudaMalloc(&cuda_device_pointer, size);
+  cudaMemset(&cuda_device_pointer, 0, size);
   return cuda_device_pointer;
 }
 

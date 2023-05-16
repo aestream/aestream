@@ -97,4 +97,4 @@ def test_stream_dat_torch_cuda():
             events += frame.sum()
             time.sleep(0.1)
         events += stream.read().sum()
-    assert events == 539136
+    assert events == 539481

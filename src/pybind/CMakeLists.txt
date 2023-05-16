@@ -11,13 +11,13 @@ if (USE_CUDA)
 
   enable_language(CUDA)
   list(APPEND module_source_files "${module_source_files}" tensor_buffer_kernel.cu)
-  set(module_link_libraries CUDA::cudart)
-  set(module_compile_definitions USE_CUDA)
+  list(APPEND module_link_libraries CUDA::cudart)
+  list(APPEND module_compile_definitions USE_CUDA)
 endif()
 
 # Configure Inivation
 if (WITH_CAER) 
-  set(module_compile_definitions WITH_CAER)
+  list(APPEND module_compile_definitions WITH_CAER)
   list(APPEND module_source_files "${module_source_files}" usb.cpp)
 endif()
 

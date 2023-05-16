@@ -23,7 +23,7 @@ template <typename scalar_t> struct BufferDeleter {
 #ifdef USE_CUDA
     free_memory_cuda(static_cast<void *>(ptr));
 #else
-    delete ptr;
+    delete[] ptr;
 #endif
   }
 };
@@ -35,12 +35,12 @@ using index_t = std::unique_ptr<int[], BufferDeleter<int>>;
 
 struct BufferPointer {
   BufferPointer(buffer_t data, const std::vector<size_t> &shape,
-                std::string device);
+                const std::string& device);
   tensor_numpy to_numpy();
   tensor_torch to_torch();
+  const std::string& device;
 
 private:
-  std::string device;
   const std::vector<size_t> &shape;
   buffer_t data;
 };
@@ -73,6 +73,6 @@ public:
   template <typename R> void assign_event(R *array, int16_t x, int16_t y);
   void set_buffer(uint16_t data[], int numbytes);
   void set_vector(std::vector<AER::Event> events);
-  BufferPointer read();
+  std::unique_ptr<BufferPointer> read();
   void read_genn(uint32_t *bitmask, size_t size);
 };

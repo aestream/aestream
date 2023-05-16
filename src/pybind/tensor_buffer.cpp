@@ -105,7 +105,7 @@ inline void TensorBuffer::assign_event(R *array, int16_t x, int16_t y) {
   (*(array + shape[1] * x + y))++;
 }
 
-BufferPointer TensorBuffer::read() {
+std::unique_ptr<BufferPointer> TensorBuffer::read() {
   // Swap out old pointer
   {
     const std::lock_guard lock{buffer_lock};
@@ -115,7 +115,7 @@ BufferPointer TensorBuffer::read() {
   buffer_t buffer3 = allocate_buffer<float>(shape[0] * shape[1], device);
   buffer2.swap(buffer3);
   // Return pointer
-  return BufferPointer(std::move(buffer3), shape, device);
+  return std::unique_ptr<BufferPointer>(new BufferPointer(std::move(buffer3), shape, device));
 }
 
 void TensorBuffer::read_genn(uint32_t *bitmask, size_t size)
@@ -135,19 +135,41 @@ void TensorBuffer::read_genn(uint32_t *bitmask, size_t size)
 }
 
 BufferPointer::BufferPointer(buffer_t data, const std::vector<size_t> &shape,
-                             std::string device)
+                             const std::string& device)
     : data(std::move(data)), shape(shape), device(device) {}
 
 tensor_numpy BufferPointer::to_numpy() {
   const size_t s[2] = {shape[0], shape[1]};
-  return tensor_numpy(data.release(), 2, s);
+  float *ptr = data.release();
+  nb::capsule owner(ptr, [](void *p) noexcept {
+      delete[] (float *) p;
+    });
+  return tensor_numpy(ptr, 2, s, owner);
 }
 
 tensor_torch BufferPointer::to_torch() {
   const size_t s[2] = {shape[0], shape[1]};
+  float *ptr = data.release();
+  nb::capsule owner;
+#ifdef USE_CUDA
+  if (device == "cuda") {
+    owner = nb::capsule(ptr, [](void *p) noexcept {
+      free_memory_cuda(p);
+    });
+  } else {
+    owner = nb::capsule(ptr, [](void *p) noexcept {
+      delete[] (float *) p;
+    });
+  }
+#else
+  owner = nb::capsule(ptr, [](void *p) noexcept {
+    delete[] (float *) p;
+  });
+#endif
+  
   int32_t device_type =
       device == "cuda" ? nb::device::cuda::value : nb::device::cpu::value;
-  return tensor_torch(data.release(), 2, s, nanobind::handle(), /* owner */
-                      nullptr,                                  /* strides */
+  return tensor_torch(ptr, 2, s, owner, /* owner */
+                      nullptr,          /* strides */
                       nanobind::dtype<float>(), device_type);
 }
