@@ -151,6 +151,7 @@ tensor_torch BufferPointer::to_torch() {
   const size_t s[2] = {shape[0], shape[1]};
   float *ptr = data.release();
   nb::capsule owner;
+#ifdef USE_CUDA
   if (device == "cuda") {
     owner = nb::capsule(ptr, [](void *p) noexcept {
       free_memory_cuda(p);
@@ -160,6 +161,11 @@ tensor_torch BufferPointer::to_torch() {
       delete[] (float *) p;
     });
   }
+#else
+  owner = nb::capsule(ptr, [](void *p) noexcept {
+    delete[] (float *) p;
+  });
+#endif
   
   int32_t device_type =
       device == "cuda" ? nb::device::cuda::value : nb::device::cpu::value;
