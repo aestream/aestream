@@ -59,15 +59,19 @@ private:
   index_t cuda_buffer;
 #endif
   std::vector<uint32_t> genn_events;
-  
-  void set_genn_event(int x, int y)
-  {
-      // Calculate 'flat' index
-      const int idx = (shape[0] * y) + x;
 
-      // Set bit
+  void set_genn_event(int x, int y, bool polarity)
+  {
+    if(shape.size() == 2 || shape[2] == 1) {
+      const int idx = x + (y * shape[0]);
       genn_events[idx / 32] |= (1 << (idx % 32));
+    }
+    else {
+      const int idx = (polarity ? 1 : 0) + (x * shape[2]) + (y * shape[0] * shape[2]);
+      genn_events[idx / 32] |= (1 << (idx % 32));
+    }
   }
+
 public:
   TensorBuffer(std::vector<size_t> size, std::string device, size_t buffer_size);
   template <typename R> void assign_event(R *array, int16_t x, int16_t y);
