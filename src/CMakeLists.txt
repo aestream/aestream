@@ -26,9 +26,10 @@ if (USE_PYTHON)
 endif() 
 
 # AEStream executable
-add_executable(aestream aestream.cpp)
+find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2)
+add_executable(aestream aestream.cpp viewer/viewer.hpp viewer/viewer.cpp)
 target_include_directories(aestream PRIVATE ${CMAKE_INSTALL_LIBDIR})
-target_link_libraries(aestream PRIVATE aer aestream_file aestream_input aestream_output)
+target_link_libraries(aestream PRIVATE aer aestream_file aestream_input aestream_output SDL2::SDL2)
 
 # Install targets
 if (${USE_CAMERA})
@@ -42,4 +43,5 @@ if (${USE_CAMERA})
   # install(TARGETS "${aestream_drivers}" DESTINATION ${CMAKE_INSTALL_BINDIR})
   # install(TARGETS MetavisionSDK::core MetavisionSDK::driver DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
-install(IMPORTED_RUNTIME_ARTIFACTS aestream DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS aer aestream_file aestream_input aestream_output DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS aestream DESTINATION ${CMAKE_INSTALL_BINDIR})
