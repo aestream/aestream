@@ -1,4 +1,5 @@
-# AEStream - Address Event streaming library
+
+<img src="logo.png" />
 
 <p align="center">
     <a href="https://github.com/aestream/aestream/actions">
@@ -16,10 +17,13 @@
     <a href="https://doi.org/10.5281/zenodo.6322829"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6322829.svg" alt="DOI"></a>
 </p>
 
-AEStream efficiently reads sparse events from an input source and streams it to an output sink.
-AEStream supports reading from files, USB cameras, as well as network via UDP and can stream events to files, network over UDP, and peripherals such as [GPU](https://en.wikipedia.org/wiki/Graphics_processing_unit)s and [neuromorphic hardware](https://en.wikipedia.org/wiki/Neuromorphic_engineering).
+AEStream efficiently processes event-based data from the command-line or in Python.
+AEStream converts events from multiple file formats, [event cameras](https://en.wikipedia.org/wiki/Event_camera), and networks into a common address-event representation (AER).
+The events can then be streamed into files, GPUs (via CUDA), over the network, into Python via Numpy or PyTorch, or visualized directly. and peripherals such as [GPU](https://en.wikipedia.org/wiki/Graphics_processing_unit)s and [neuromorphic hardware](https://en.wikipedia.org/wiki/Neuromorphic_engineering).
 
-<img src="https://jegp.github.io/aestream-paper/2212_aestream.svg" />
+The figure below lists supported inputs and outputs and visualizes the common address-event representation AEStream leverages.
+
+<img src="docs/aestream_flow.png" />
 
 Read more in [the AEStream publication](https://jegp.github.io/aestream-paper/).
 
@@ -27,12 +31,13 @@ Read more in [the AEStream publication](https://jegp.github.io/aestream-paper/).
 
 > Read more in our [installation guide](https://aestream.github.io/aestream/install.html)
 
-AEStream is usable both as a command-line binary or Python tool.
+The fastest way to install AEStream is by using pip: `pip install aestream`.
+See below for other sources.
 
-| **Source** | **Installation** |
-| -------------------- | --- |
-| [pip](https://pypi.org/) | <code>pip install aestream</code> <br/> <code>pip install aestream[torch]</code> ([PyTorch support](https://pytorch.com)) <br/> <code>pip install aestream --no-binary</code> (<a href="https://aestream.github.io/aestream/install.html#Event-camera-support">Event camera support *</a>) |
-| [nix](https://nixos.org/) | <code>nix run github:aestream/aestream</code> (CLI) <br/> <code>nix develop github:aestream/aestream</code> (Python environment) |
+| **Source** | **Installation** | **Description** |
+| -------------------- | --- | --- |
+| [pip](https://pypi.org/) | <code>pip install aestream</code> <br/> <code>pip install aestream[torch]</code> <br/> <code>pip install aestream --no-binary</code> | <br/> [PyTorch support](https://pytorch.com) <br/> <a href="https://aestream.github.io/aestream/install.html#Event-camera-support">Requires camera drivers*</a> |
+| [nix](https://nixos.org/) | <code>nix run github:aestream/aestream</code> <br/> <code>nix develop github:aestream/aestream</code> | Command-line interface <br/> Python environment |
 | [docker](https://docker.com/) | See <a href="https://aestream.github.io/aestream/install.html">Installation documentation</a> |
 
 <span style="font-size: 80%">
@@ -97,23 +102,23 @@ aestream input <input source> [output <output sink>]
 | --------- | :----------- | ----- |
 | DAVIS, DVXPlorer | [Inivation](https://inivation.com/) DVS Camera over USB | `input inivation` |
 | EVK Cameras      | [Prophesee](https://www.prophesee.ai/) DVS camera over USB  | `input prophesee` |
-| File             | [AEDAT file format](https://gitlab.com/inivation/inivation-docs/blob/master/Software%20user%20guides/AEDAT_file_formats.md) as `.aedat`, `.aedat4`, or `.dat` | `input file x.aedat4` |
+| File             | Reads `.aedat`, `.aedat4`, `.csv`, `.dat`, or `.raw` files | `input file x.aedat4` |
 
 | Output | Description | Usage |
 | --------- | ----------- | ----- |
 | STDOUT    | Standard output (default output) | `output stdout`
 | Ethernet over UDP | Outputs to a given IP and port using the [SPIF protocol](https://github.com/SpiNNakerManchester/spif)  | `output udp 10.0.0.1 1234` |
-| `.aedat4` file  | Output to [`.aedat4` format](https://gitlab.com/inivation/inivation-docs/blob/master/Software%20user%20guides/AEDAT_file_formats.md#aedat-40) | `output file my_file.aedat4` |
-| CSV file       | Output to comma-separated-value (CSV) file format | `output file my_file.txt` |
+| File: `.aedat4`  | Output to [`.aedat4` format](https://gitlab.com/inivation/inivation-docs/blob/master/Software%20user%20guides/AEDAT_file_formats.md#aedat-40) | `output file my_file.aedat4` |
+| File: `.csv`       | Output to comma-separated-value (CSV) file format | `output file my_file.txt` |
+| Viewer | View live event stream | `output view`
 
 ### CLI examples
 
 | Example | Syntax |
 | ------------- | ------------------------------|
-| Echo file to STDOUT | `aestream input file example/sample.aedat4` |
-| Stream DVS cameara from iniVation AG to STDOUT (Note, requires Inivation libraries) | `aestream input inivation output stdout` |
-| Stream DVS camera from Prophesee to STDOUT (Note, requires Metavision SDK) | `aestream input output stdout` |
-| Read file to remote IP X.X.X.X | `aestream input file example/sample.aedat4 output udp X.X.X.X` |
+| View live stream of Inivation camera (requires Inivation drivers) | `aestream input inivation output view` |
+| Stream Prophesee camera over the network to 10.0.0.1 (requires Metavision SDK) | `aestream input output udp 10.0.0.1` |
+| Convert `.dat` file to `.aedat4` | `aestream input example/sample.dat output file converted.aedat4` |
 
 ## Installation
 
