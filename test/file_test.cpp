@@ -41,6 +41,30 @@ TEST(FileTest, ReadDATFileParts) {
   const size_t expected2 = 539481 - 10000;
   ASSERT_EQ(size2, expected2);
 }
+TEST(FileTest, ReadEVT3File) {
+  auto file = open_event_file("example/sample.raw");
+  auto [events, size] = file->read_events(-1);
+  const size_t expected = 539481;
+  ASSERT_EQ(size, expected);
+  ASSERT_EQ(events[0].timestamp, 0);
+  ASSERT_EQ(events[0].x, 932);
+  ASSERT_EQ(events[0].y, 121);
+}
+TEST(FileTest, ReadEVT3FilePart) {
+  auto file = open_event_file("example/sample.raw");
+  auto [events, size] = file->read_events(10000);
+  const size_t expected = 10000;
+  ASSERT_EQ(size, expected);
+}
+TEST(FileTest, ReadEVT3FileParts) {
+  auto file = open_event_file("example/sample.raw");
+  auto [events1, size1] = file->read_events(10000);
+  const size_t expected1 = 10000;
+  ASSERT_EQ(size1, expected1);
+  auto [events2, size2] = file->read_events(-1);
+  const size_t expected2 = 539481 - 10000;
+  ASSERT_EQ(size2, expected2);
+}
 TEST(FileTest, ReadAEDAT4File) {
   auto file = open_event_file("example/sample.aedat4");
   auto [events, size] = file->read_events(-1);

@@ -1,6 +1,6 @@
 *.aedat filter=lfs diff=lfs merge=lfs -text
 *.aedat4 filter=lfs diff=lfs merge=lfs -text
+*.dat filter=lfs diff=lfs merge=lfs -text
 *.gif filter=lfs diff=lfs merge=lfs -text
 *.mov filter=lfs diff=lfs merge=lfs -text
-example/sample.dat filter=lfs diff=lfs merge=lfs -text
-example/sample.aedat4 filter=lfs diff=lfs merge=lfs -text
+*.raw filter=lfs diff=lfs merge=lfs -text

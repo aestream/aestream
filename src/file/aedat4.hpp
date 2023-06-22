@@ -31,39 +31,59 @@
 #include "rapidxml.hpp"
 #include "trigger_generated.h"
 
-struct AEDAT4 : FileBase {
+struct AEDAT4 : FileBase
+{
 
-  struct Frame {
+  struct Frame
+  {
     int64_t time;
     int16_t width;
     int16_t height;
     std::vector<uint8_t> pixels;
   };
 
-  struct OutInfo {
-    enum Type { EVTS, FRME, IMUS, TRIG };
+  struct OutInfo
+  {
+    enum Type
+    {
+      EVTS,
+      FRME,
+      IMUS,
+      TRIG
+    };
     int name;
     int size_x;
     int size_y;
     Type type;
     std::string compression;
 
-    static Type to_type(std::string str) {
-      if (str == "EVTS") {
+    static Type to_type(std::string str)
+    {
+      if (str == "EVTS")
+      {
         return Type::EVTS;
-      } else if (str == "FRME") {
+      }
+      else if (str == "FRME")
+      {
         return Type::FRME;
-      } else if (str == "IMUS") {
+      }
+      else if (str == "IMUS")
+      {
         return Type::IMUS;
-      } else if (str == "TRIG") {
+      }
+      else if (str == "TRIG")
+      {
         return Type::TRIG;
-      } else {
+      }
+      else
+      {
         throw std::runtime_error("unexpected event type");
       }
     }
   };
 
-  static std::tuple<char *, size_t> compress_lz4(char *buffer, size_t size) {
+  static std::tuple<char *, size_t> compress_lz4(char *buffer, size_t size)
+  {
     auto lz4FrameBound = LZ4F_compressBound(size, nullptr);
     auto new_buffer = new char[lz4FrameBound];
 
@@ -88,7 +108,8 @@ struct AEDAT4 : FileBase {
     // return {new_buffer, headerSize + packetSize + footerSize};
   }
 
-  static size_t save_header(std::fstream &stream) {
+  static size_t save_header(std::fstream &stream)
+  {
     stream << "#!AER-DAT4.0\r\n";
     // Save header
     flatbuffers::FlatBufferBuilder fbb;
@@ -104,7 +125,8 @@ struct AEDAT4 : FileBase {
 
   static void save_footer(std::fstream &stream, size_t headerSize,
                           int64_t timestampStart, int64_t timestampEnd,
-                          size_t eventCount) {
+                          size_t eventCount)
+  {
     flatbuffers::FlatBufferBuilder fbb;
     // Mutate offset to data table
     size_t tableOffset = stream.tellp();
@@ -140,12 +162,14 @@ struct AEDAT4 : FileBase {
   }
 
   static void save_events(std::fstream &stream,
-                          std::vector<AEDAT::PolarityEvent> events) {
+                          std::vector<AEDAT::PolarityEvent> events)
+  {
     // Create event buffer
     flatbuffers::FlatBufferBuilder fbb;
     fbb.ForceDefaults(true);
     std::vector<Event> bufferEvents;
-    for (auto event : events) {
+    for (auto event : events)
+    {
       const Event e = Event(static_cast<int64_t>(event.timestamp),
                             static_cast<int16_t>(event.x),
                             static_cast<int16_t>(event.y), event.polarity);
@@ -164,16 +188,21 @@ struct AEDAT4 : FileBase {
     stream.write(compressed, size);
   }
 
-  std::tuple<AER::Event *, size_t> read_events(const int64_t n_events = -1) {
+  std::tuple<std::vector<AER::Event>, size_t> read_events(const int64_t n_events = -1)
+  {
     int64_t byte_count =
         (n_events > 0 ? n_events : total_number_of_events) * sizeof(AER::Event);
-    AER::Event *events = (AER::Event *)malloc(byte_count);
+    std::vector<AER::Event> events{};
+    events.resize(n_events > 0 ? n_events : total_number_of_events);
 
     int64_t count = 0;
-    while (get_packet()) {
-      for (; packet_events_read < event_vector->size(); ++packet_events_read) {
+    while (get_packet())
+    {
+      for (; packet_events_read < event_vector->size(); ++packet_events_read)
+      {
         const Event *event = event_vector->Get(packet_events_read);
-        if (n_events > 0 && n_events - count <= 0) {
+        if (n_events > 0 && n_events - count <= 0)
+        {
           return {events, count};
         }
 
@@ -190,14 +219,17 @@ struct AEDAT4 : FileBase {
     return {events, count};
   }
 
-  Generator<AER::Event> stream(const int64_t n_events = -1) {
+  Generator<AER::Event> stream(const int64_t n_events = -1)
+  {
     int64_t size = 0, count = 0;
     static const size_t STREAM_BUFFER_SIZE = 128;
-    do {
+    do
+    {
       auto ret = read_events(STREAM_BUFFER_SIZE);
       auto events = std::get<0>(ret);
       size = std::get<1>(ret);
-      for (size_t i = 0; i < size; i++) {
+      for (size_t i = 0; i < size; i++)
+      {
         co_yield events[i];
         count++;
       }
@@ -206,12 +238,15 @@ struct AEDAT4 : FileBase {
   }
 
   explicit AEDAT4(file_t &&fp)
-      : fp{std::move(fp)}, dst_buffer(4096), packet_buffer(4096) {
+      : fp{std::move(fp)}, dst_buffer(4096), packet_buffer(4096)
+  {
     read_file_header();
   }
   explicit AEDAT4(const std::string &filename) : AEDAT4(open_file(filename)) {}
-  ~AEDAT4() {
-    if (ctx) {
+  ~AEDAT4()
+  {
+    if (ctx)
+    {
       LZ4F_freeDecompressionContext(ctx);
     }
   }
@@ -229,10 +264,12 @@ private:
   const flatbuffers::Vector<const Event *> *event_vector = nullptr;
 
   std::map<std::string, std::string>
-  collect_attributes(rapidxml::xml_node<> *node) {
+  collect_attributes(rapidxml::xml_node<> *node)
+  {
     std::map<std::string, std::string> attributes;
     for (const rapidxml::xml_attribute<> *a = node->first_attribute(); a;
-         a = a->next_attribute()) {
+         a = a->next_attribute())
+    {
       auto name = std::string(a->name(), a->name_size());
       auto value = std::string(a->value(), a->value_size());
       attributes[name] = value;
@@ -240,22 +277,26 @@ private:
     return attributes;
   }
 
-  void read_file_header() {
+  void read_file_header()
+  {
     static const uint32_t VERSION_STRING_SIZE = 14;
     std::vector<char> data_buffer(BUFFER_SIZE);
 
     struct stat stat_info;
-    if (fstat(fileno(fp.get()), &stat_info)) {
+    if (fstat(fileno(fp.get()), &stat_info))
+    {
       throw std::runtime_error("Failed to stat file");
     }
 
     auto header_ret = fread(data_buffer.data(), 1, dst_buffer.size(), fp.get());
-    if (header_ret <= 0) {
+    if (header_ret <= 0)
+    {
       throw std::runtime_error("Failed to read file version number");
     }
 
     auto header = std::string(data_buffer.data(), VERSION_STRING_SIZE);
-    if (header != "#!AER-DAT4.0\r\n") {
+    if (header != "#!AER-DAT4.0\r\n")
+    {
       throw std::runtime_error("Invalid AEDAT version");
     }
 
@@ -267,12 +308,14 @@ private:
 
     // TODO: We currently only support LZ4 compression
     if (ioheader->compression() != CompressionType_LZ4 &&
-        ioheader->compression() != CompressionType_LZ4_HIGH) {
+        ioheader->compression() != CompressionType_LZ4_HIGH)
+    {
       throw std::runtime_error("Only LZ4 compression is supported");
     }
 
     const size_t data_table_position = ioheader->data_table_position();
-    if (data_table_position < 0) {
+    if (data_table_position < 0)
+    {
       throw std::runtime_error(
           "AEDAT files without datatables are currently not supported");
     }
@@ -331,28 +374,33 @@ private:
     LZ4F_errorCode_t lz4_error =
         LZ4F_createDecompressionContext(&ctx, LZ4F_VERSION);
 
-    if (LZ4F_isError(lz4_error)) {
+    if (LZ4F_isError(lz4_error))
+    {
       const auto message = "Error creating LZ4 decompression context: " +
                            std::string(LZ4F_getErrorName(lz4_error));
       throw std::runtime_error(message);
     }
 
     // Load data table
-    if (fseek(fp.get(), data_table_position, SEEK_SET) != 0) {
+    if (fseek(fp.get(), data_table_position, SEEK_SET) != 0)
+    {
       throw std::runtime_error("Failed to locate AEDAT4 data table");
     }
     size_t data_table_size = stat_info.st_size - data_table_position;
     // Ensure buffer is large enough
-    if (data_buffer.size() < data_table_size) {
+    if (data_buffer.size() < data_table_size)
+    {
       data_buffer.resize(data_table_size);
       dst_buffer.resize(data_table_size * 2); // Ensure sufficient capacity
     }
-    if (fread(data_buffer.data(), sizeof(char), data_table_size, fp.get()) != data_table_size) {
+    if (fread(data_buffer.data(), sizeof(char), data_table_size, fp.get()) != data_table_size)
+    {
       throw std::runtime_error("Failed to read AEDAT4 data table");
     }
     size_t dst_capacity = dst_buffer.capacity();
     int ret = LZ4F_decompress(ctx, dst_buffer.data(), &dst_capacity, data_buffer.data(), &data_table_size, nullptr);
-    if (LZ4F_isError(ret)) {
+    if (LZ4F_isError(ret))
+    {
       std::string message = "Error decompressing AEDAT4 DataTable:" +
                             std::string(LZ4F_getErrorName(ret));
       throw std::runtime_error(message);
@@ -362,15 +410,19 @@ private:
     // Record offsets of event packets
     // TODO: add IMU + frames
     auto packets = root->table();
-    for (size_t i = 0; i < packets->size(); ++i) {
+    for (size_t i = 0; i < packets->size(); ++i)
+    {
       auto definition = packets->Get(i);
-      if (definition->num_elements() == 0) {
+      if (definition->num_elements() == 0)
+      {
         continue;
       }
       const auto stream_id = definition->packet_info()->stream_id();
       const size_t offset = definition->byte_offset();
-      switch (stream_id) {
-      case 0: {
+      switch (stream_id)
+      {
+      case 0:
+      {
         event_packet_offsets.push_back(offset - 8); // Include 8 byte header
         total_number_of_events += definition->num_elements();
       }
@@ -386,26 +438,33 @@ private:
       //   auto trigger_packet = GetSizePrefixedTriggerPacket(&dst_buffer[0]);
       //   break;
       // }
-      default: {
+      default:
+      {
         break;
       }
       }
     }
   }
 
-  bool get_packet() {
+  bool get_packet()
+  {
     // Test for end of current packet
-    if (event_vector) {
-      if (packet_events_read >= event_vector->size()) {
+    if (event_vector)
+    {
+      if (packet_events_read >= event_vector->size())
+      {
         packet_index++; // Move to next packet
         event_vector = nullptr;
-      } else {
+      }
+      else
+      {
         return true; // Continue reading current packet
       }
     }
 
     // Test for end of packets
-    if (packet_index >= event_packet_offsets.size()) {
+    if (packet_index >= event_packet_offsets.size())
+    {
       return false;
     }
 
@@ -416,22 +475,26 @@ private:
     int32_t id, size;
     auto id_ret = fread(&id, 4, 1, fp.get());
     auto size_ret = fread(&size, 4, 1, fp.get());
-    if (id_ret == 0 || size_ret == 0) { // Error or EOF
+    if (id_ret == 0 || size_ret == 0)
+    { // Error or EOF
       return false;
     }
-    if (size == 0) { // Continue if packet is empty
+    if (size == 0)
+    { // Continue if packet is empty
       packet_index++;
       event_vector = nullptr;
       return get_packet();
     }
-    if (packet_buffer.size() < size) { // Resize buffer if needed
+    if (packet_buffer.size() < size)
+    { // Resize buffer if needed
       packet_buffer.resize(size);
       dst_buffer.resize(size * 4); // x4 ensures buffer is large enough
     }
 
     // Read packet bytes
     auto packet_ret = fread(&packet_buffer[0], 1, size, fp.get());
-    if (packet_ret == 0) { // Error or EOF
+    if (packet_ret == 0)
+    { // Error or EOF
       return false;
     }
 
@@ -440,7 +503,8 @@ private:
     size_t dst_capacity = dst_buffer.capacity();
     auto ret = LZ4F_decompress(ctx, &dst_buffer[0], &dst_capacity,
                                &packet_buffer[0], &decomp_size, nullptr);
-    if (LZ4F_isError(ret)) {
+    if (LZ4F_isError(ret))
+    {
       printf("Decompression package error: %s\n", LZ4F_getErrorName(ret));
       return false;
     }
