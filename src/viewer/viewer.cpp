@@ -1,6 +1,6 @@
+#include <iomanip>
 #include <iostream>
 #include <locale>
-#include <iomanip>
 #include <vector>
 
 #include <SDL2/SDL.h>
@@ -16,9 +16,8 @@ void render_polarity_events(SDL_Renderer *renderer,
   SDL_RenderDrawPoints(renderer, &negative_events[0], negative_events.size());
 }
 
-struct NumberGrouping : std::numpunct<char>
-{
-    std::string do_grouping() const { return "\3"; }
+struct NumberGrouping : std::numpunct<char> {
+  std::string do_grouping() const { return "\3"; }
 };
 
 int view_stream(Generator<AER::Event> &generator, size_t width, size_t height,
@@ -40,6 +39,10 @@ int view_stream(Generator<AER::Event> &generator, size_t width, size_t height,
 
   size_t frame_idx = 0;
   size_t event_count = 0;
+  size_t event_count_positive = 0;
+  size_t event_count_positive_last_fps = 0;
+  size_t event_count_negative = 0;
+  size_t event_count_negative_last_fps = 0;
   size_t event_count_last_fps = 0;
   // Ticks are value in ms since initialization
   size_t ticks_frame = SDL_GetTicks();
@@ -51,8 +54,10 @@ int view_stream(Generator<AER::Event> &generator, size_t width, size_t height,
   for (auto event : generator) {
     if (event.polarity) {
       positive_buffer.push_back({event.x, event.y});
+      event_count_positive++;
     } else {
       negative_buffer.push_back({event.x, event.y});
+      event_count_negative++;
     }
     event_count++;
 
@@ -64,9 +69,15 @@ int view_stream(Generator<AER::Event> &generator, size_t width, size_t height,
 
     if (!quiet && next_ticks - ticks_text >= 1000) {
       auto eps = event_count - event_count_last_fps;
+      auto eps_pos = event_count_positive - event_count_positive_last_fps;
+      auto eps_neg = event_count_negative - event_count_negative_last_fps;
       event_count_last_fps = event_count;
+      event_count_positive = event_count_positive_last_fps;
+      event_count_negative = event_count_negative_last_fps;
       std::cout.imbue(std::locale(std::cout.getloc(), new NumberGrouping));
-      std::cout << "Events per second: " << std::setw(15) << eps << std::endl;
+      std::cout << "Events per second: " << std::setw(15) << eps << "  (+"
+                << std::setw(15) << eps_pos << "/ -" << std::setw(15) << eps_neg
+                << ")" << std::endl;
       ticks_text = next_ticks;
     }
 
