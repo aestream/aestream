@@ -17,14 +17,13 @@
     <a href="https://doi.org/10.5281/zenodo.6322829"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6322829.svg" alt="DOI"></a>
 </p>
 
-AEStream efficiently processes event-based data from the command-line or in Python.
-AEStream converts events from multiple file formats, [event cameras](https://en.wikipedia.org/wiki/Event_camera), and networks into a common address-event representation (AER).
-The events can then be streamed into files, GPUs (via CUDA), over the network, into Python via Numpy or PyTorch, or visualized directly. and peripherals such as [GPU](https://en.wikipedia.org/wiki/Graphics_processing_unit)s and [neuromorphic hardware](https://en.wikipedia.org/wiki/Neuromorphic_engineering).
-
-The figure below lists supported inputs and outputs and visualizes the common address-event representation AEStream leverages.
+AEStream effiently sends event-based data from A to B.
+AEStream can be used from the command-line, via Python, or as a C++ library.
+We support multiple inputs and outputs, providing seamless integration with files, [event cameras](https://en.wikipedia.org/wiki/Event_camera), network data, Python libraries via Numpy or PyTorch, and visualization tools.
 
 <img src="docs/aestream_flow.png" />
 
+AEStream is built around the address-event representation, ubiquitous in neuromorphic computing.
 Read more in [the AEStream publication](https://jegp.github.io/aestream-paper/).
 
 ## Installation
