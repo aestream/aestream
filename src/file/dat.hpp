@@ -61,7 +61,7 @@ struct DAT : FileBase
     buffer_vector.resize(buffer_size);
     uint64_t *buffer = buffer_vector.data();
     std::vector<AER::Event> events{};
-    events.resize(event_array_size);
+    events.reserve(event_array_size);
     size_t timestep = 0, overflows = 0, index = 0, size = 0;
     do
     {
@@ -100,6 +100,9 @@ struct DAT : FileBase
 private:
   const file_t fp;
   const size_t total_number_of_events;
+
+  static constexpr char HEADER_END = 0x0A; // \n
+  static constexpr char HEADER_START = 0x25; // %
 
   size_t dat_read_header()
   {

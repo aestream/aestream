@@ -7,8 +7,6 @@
 #include "../aer.hpp"
 #include "../generator.hpp"
 
-#define HEADER_START 0x25
-#define HEADER_END 0x0A
 #define BUFFER_SIZE 4096
 
 static void close_file(FILE *fp)
