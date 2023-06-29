@@ -83,6 +83,7 @@ jobs:
         with:
           python-version: 3.x
       - run: pip install pipx
+      - run: sudo apt install libsdl2-dev
 
       - name: Build sdist
         run: pipx run build --sdist
