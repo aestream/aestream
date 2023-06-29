@@ -41,9 +41,17 @@ bool FileInput::get_is_streaming() {
 }
 
 nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>> FileInput::load() {
+  struct Container {
+    std::vector<AER::Event> events;
+  };
   auto [arr, n_read] = file->read_events(-1);
+  Container *c = new Container();
+  c->events = std::move(arr);
+  nb::capsule deleter(c, [](void *p) noexcept {
+    delete (Container *) p;
+  });
   const size_t shape[1] = {n_read * sizeof(AER::Event)};
-  return nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>>(arr, 1, shape);
+  return nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>>(c->events.data(), 1, shape, deleter);
 }
 
 // py::array_t<AER::Event> FileInput::events_co() {
