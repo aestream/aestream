@@ -38,7 +38,7 @@ setup(
     long_description_content_type="text/markdown",
     python_requires=">=3.7",
     packages=["aestream"],
-    install_requires=["numpy"],
+    install_requires=["numpy", "pysdl2"],
     extras_require={"torch": ["torch"]},
     classifiers=[
         "License :: OSI Approved :: MIT License",
