@@ -23,14 +23,14 @@ struct EVT3 : FileBase
         unsigned int type : 4;
     } __attribute__((packed));
 
-    struct VECT8
+    struct Vect8
     {
         unsigned int valid : 8;
         unsigned int unused : 4;
         unsigned int type : 4;
     } __attribute__((packed));
 
-    struct VECT12
+    struct Vect12
     {
         unsigned int valid : 12;
         unsigned int type : 4;
@@ -76,8 +76,8 @@ struct EVT3 : FileBase
     {
         static const size_t READ_BUFFER_SIZE = 4096;
         const size_t buffer_size = n_events > 0 && n_events < READ_BUFFER_SIZE ? n_events * 2 : READ_BUFFER_SIZE;
-        const size_t event_array_size =
-            n_events > 0 ? n_events : 512;
+        // If reading the full file we reserve bytes / 5 as a lower estimate
+        const size_t event_array_size = n_events > 0 ? n_events : file_bytes / 5;
 
         std::vector<uint16_t> buffer_vector = std::vector<uint16_t>();
         buffer_vector.reserve(buffer_size);
@@ -121,14 +121,13 @@ struct EVT3 : FileBase
     }
 
     explicit EVT3(const std::string &filename) : EVT3(open_file(filename)) {}
-    explicit EVT3(file_t &&fp) : fp(std::move(fp)) { skip_evt3_header(); }
-
-    bool debug = false;
+    explicit EVT3(file_t &&fp) : fp(std::move(fp)), file_bytes(file_size(this->fp.get())) { skip_evt3_header(); }
 
 private:
     static constexpr char HEADER_LINE_END = 0x0A;
     static constexpr char HEADER_LINE_START = 0x25;
     const file_t fp;
+    const long file_bytes;
     bool is_first = true;
     uint32_t time_low = 0, time_high = 0, time_overflow_high = 0; // State
     uint64_t current_time = 0;
@@ -169,6 +168,10 @@ private:
     int32_t decode_event_buffer(uint16_t *buffer, size_t buffer_size, std::vector<AER::Event> &events, const size_t remaining_events)
     {
         const size_t max_remaining_limit = events.size() + remaining_events; // Maximum events to emit
+        AER::Event event;
+        EventCoordinate * x;
+        Vect8* vect8_event;
+        Vect12* vect12_event;
 
         // Process left-over vector event from previous call, if any
         if (state.bits_remaining > 0) {
@@ -179,61 +182,56 @@ private:
         for (; i < buffer_size; ++i)
         {
             auto raw_event = reinterpret_cast<RawEvent *>(&buffer[i]);
-            if (raw_event->type == EVT3::EventType::EVT_ADDR_Y)
-            {
-                y_event = * reinterpret_cast<EventCoordinate *>(raw_event);
+            switch(raw_event->type){
+                case EventType::EVT_ADDR_Y:
+                    y_event = * reinterpret_cast<EventCoordinate *>(raw_event);
+                    break;
+                case EventType::EVT_ADDR_X:
+                    x = reinterpret_cast<EventCoordinate *>(raw_event);
+                    event = {current_time, static_cast<uint16_t>(x->coordinate),
+                     static_cast<uint16_t>(y_event.value().coordinate), x->meta};
+                    events.push_back(event);
+                    break;
+                case EventType::EVT_TIME_HIGH:
+                    static constexpr uint64_t TIMESTAMP_MAX = 1ULL << 11;
+                    time_high = raw_event->content;
+                    if (!is_first && time_high > TIMESTAMP_MAX + current_time)
+                    {
+                        time_overflow_high++;
+                    }
+                    if (is_first) { // Remove first flag
+                        is_first = false;
+                    }
+                    if (current_time & time_high != time_high)
+                    {
+                        time_low = 0;
+                    }
+                    current_time = (time_overflow_high << 24) | (time_high << 12) | time_low;
+                    break;
+                case EventType::EVT_TIME_LOW:
+                    if (time_low < raw_event->content) {
+                        time_high++;
+                    }
+                    time_low += raw_event->content;
+                    current_time = (time_overflow_high << 24) | (time_high << 12) | time_low;
+                    break;
+                case EventType::VEC_BASE_X:
+                    x_event = *reinterpret_cast<EventCoordinate *>(raw_event);
+                    break;
+                case EventType::VECT_8:
+                    vect8_event = reinterpret_cast<Vect8 *>(raw_event);
+                    state.bits = vect8_event->valid;
+                    state.bit_size = 8;
+                    state = process_vector_event(events, max_remaining_limit - events.size());
+                    break;
+                case EventType::VECT_12:
+                    vect12_event = reinterpret_cast<Vect12 *>(raw_event);
+                    state.bits = vect12_event->valid;
+                    state.bit_size = 12;
+                    state = process_vector_event(events, max_remaining_limit - events.size());
+                    break;
             }
-            else if (raw_event->type == EVT3::EventType::EVT_ADDR_X)
-            {
-                const auto x = reinterpret_cast<EventCoordinate *>(raw_event);
-                const AER::Event event = {current_time, static_cast<uint16_t>(x->coordinate),
-                 static_cast<uint16_t>(y_event.value().coordinate), x->meta};
-                events.push_back(event);
-            }
-            else if (raw_event->type == EventType::EVT_TIME_HIGH)
-            {
-                static constexpr uint64_t TIMESTAMP_MAX = 1ULL << 11;
-                time_high = raw_event->content;
 
-                if (!is_first && time_high > TIMESTAMP_MAX + current_time)
-                {
-                    time_overflow_high++;
-                }
-                if (is_first) { // Remove first flag
-                    is_first = false;
-                }
-                if (current_time & time_high != time_high)
-                {
-                    time_low = 0;
-                }
-                current_time = (time_overflow_high << 24) | (time_high << 12) | time_low;
-            }
-            else if (raw_event->type == EventType::EVT_TIME_LOW)
-            {
-                if (time_low < raw_event->content) {
-                    time_high++;
-                }
-                time_low += raw_event->content;
-                current_time = (time_overflow_high << 24) | (time_high << 12) | time_low;
-            }
-            else if (raw_event->type == EventType::VEC_BASE_X)
-            {
-                x_event = *reinterpret_cast<EventCoordinate *>(raw_event);
-            }
-            else if (raw_event->type == EventType::VECT_8)
-            {
-                const auto vect_event = reinterpret_cast<const VECT8 *>(raw_event);
-                state.bits = vect_event->valid;
-                state.bit_size = 8;
-                state = process_vector_event(events, max_remaining_limit - events.size());
-            }
-            else if (raw_event->type == EventType::VECT_12)
-            {
-                const auto vect_event = reinterpret_cast<const VECT12 *>(raw_event);
-                state.bits = vect_event->valid;
-                state.bit_size = 12;
-                state = process_vector_event(events, max_remaining_limit - events.size());
-            }
             if (events.size() >= max_remaining_limit) { // Break if decoded enough events
                 i++;
                 break;

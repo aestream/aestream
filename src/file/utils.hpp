@@ -39,6 +39,14 @@ static file_t open_file(const std::string &filename)
   return fp;
 }
 
+static long file_size(FILE *fp) {
+  auto origin = ftell(fp);
+  fseek(fp, 0, SEEK_END);
+  auto size = ftell(fp);
+  fseek(fp, origin, SEEK_SET);
+  return size;
+}
+
 struct FileBase
 {
   virtual ~FileBase() = default;
