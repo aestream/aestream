@@ -23,8 +23,7 @@ We support multiple inputs and outputs, providing seamless integration with file
 
 <img src="docs/aestream_flow.png" />
 
-AEStream is built around the address-event representation, ubiquitous in neuromorphic computing.
-Read more in [the AEStream publication](https://jegp.github.io/aestream-paper/).
+Read more about the inner workings of the library in [the AEStream publication](https://jegp.github.io/aestream-paper/).
 
 ## Installation
 
@@ -97,13 +96,13 @@ aestream input <input source> [output <output sink>]
 ```
 ## Supported Inputs and Outputs
 
-| Input | Description | Usage |
+| Input | Description | Example usage |
 | --------- | :----------- | ----- |
 | DAVIS, DVXPlorer | [Inivation](https://inivation.com/) DVS Camera over USB | `input inivation` |
 | EVK Cameras      | [Prophesee](https://www.prophesee.ai/) DVS camera over USB  | `input prophesee` |
 | File             | Reads `.aedat`, `.aedat4`, `.csv`, `.dat`, or `.raw` files | `input file x.aedat4` |
 
-| Output | Description | Usage |
+| Output | Description | Example usage |
 | --------- | ----------- | ----- |
 | STDOUT    | Standard output (default output) | `output stdout`
 | Ethernet over UDP | Outputs to a given IP and port using the [SPIF protocol](https://github.com/SpiNNakerManchester/spif)  | `output udp 10.0.0.1 1234` |
@@ -111,18 +110,13 @@ aestream input <input source> [output <output sink>]
 | File: `.csv`       | Output to comma-separated-value (CSV) file format | `output file my_file.txt` |
 | Viewer | View live event stream | `output view`
 
-### CLI examples
+## CLI examples
 
 | Example | Syntax |
 | ------------- | ------------------------------|
 | View live stream of Inivation camera (requires Inivation drivers) | `aestream input inivation output view` |
 | Stream Prophesee camera over the network to 10.0.0.1 (requires Metavision SDK) | `aestream input output udp 10.0.0.1` |
 | Convert `.dat` file to `.aedat4` | `aestream input example/sample.dat output file converted.aedat4` |
-
-## Installation
-
-> Read more in our [Installation guide](https://aestream.github.io/aestream)
-
 
 ## Acknowledgments
 
