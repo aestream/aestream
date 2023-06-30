@@ -29,7 +29,7 @@ endif()
 find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2)
 add_executable(aestream aestream.cpp viewer/viewer.hpp viewer/viewer.cpp)
 target_include_directories(aestream PRIVATE ${CMAKE_INSTALL_LIBDIR})
-target_link_libraries(aestream PRIVATE aer aestream_file aestream_input aestream_output SDL2::SDL2)
+target_link_libraries(aestream PRIVATE aer aestream_file aestream_input aestream_output SDL2)
 
 # Install targets
 if (${USE_CAMERA})
