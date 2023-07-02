@@ -21,6 +21,8 @@ include_directories("/opt/homebrew/opt/lz4/include")
 link_directories("/opt/homebrew/opt/lz4/lib")
 include_directories("/opt/local/include")
 link_directories("/opt/local/lib")
+include_directories("/opt/homebrew/opt/sdl2/include/")
+link_directories("/opt/homebrew/opt/sdl2/lib")
 include(include/CPM.cmake)
 
 # Add tests
