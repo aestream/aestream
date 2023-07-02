@@ -1,10 +1,12 @@
 set(input_definitions "")
-set(input_sources file.hpp file.cpp )
+set(input_sources file.hpp file.cpp zmq.hpp zmq.cpp)
 set(input_libraries aer aestream_file)
 set(input_include_directories "")
 
 include(FetchContent)
 include(GNUInstallDirs)
+
+find_package(cppzmq)
 
 if (${USE_CAMERA})
   message(DEBUG "Camera option set to ON, building...")
@@ -33,6 +35,6 @@ endif()
 
 # Create the input library
 add_library(aestream_input SHARED ${input_sources})
-target_link_libraries(aestream_input ${input_libraries})
+target_link_libraries(aestream_input ${input_libraries} cppzmq)
 target_compile_definitions(aestream_input PUBLIC ${input_definitions})
 target_include_directories(aestream_input PUBLIC ${input_include_directories})

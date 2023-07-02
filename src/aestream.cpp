@@ -17,6 +17,7 @@
 #ifdef WITH_METAVISION
 #include "input/prophesee.hpp"
 #endif
+#include "input/zmq.hpp"
 
 // Output
 #include "output/dvs_to_file.hpp"
@@ -73,6 +74,10 @@ int main(int argc, char *argv[]) {
   // app_input_file->add_flag(
   //     "--ignore-time", input_ignore_time,
   //     "Playback in real-time (false, default) or ignore timestamps (true).");
+  // - ZMQ
+  std::string input_zmq_socket = "tcp://localhost:5555";
+  auto app_input_zmq = app_input->add_subcommand("zmq", "ZMQ input");
+  app_input_zmq->add_option("sock", input_zmq_socket, "ZMQ socket. Defaults to tcp://localhost:5555");
 
   //
   // Output
@@ -159,6 +164,8 @@ int main(int argc, char *argv[]) {
   } else if (app_input_file->parsed()) {
     file_handle = open_event_file(input_filename);
     input_generator = file_handle->stream();
+  } else if (app_input_zmq->parsed()) {
+    input_generator = open_zmq(input_zmq_socket, runFlag);
   }
 
   //
