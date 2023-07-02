@@ -72,6 +72,7 @@
             pkgs.ninja
             pkgs.lz4
             pkgs.SDL2
+            pkgs.zeromq pkgs.cppzmq
             libcaer
             # openeb
           ];
