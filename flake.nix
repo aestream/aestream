@@ -2,7 +2,7 @@
   description = "Address Event Streaming library";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-22.11";
+    nixpkgs.url = "nixpkgs/nixos-23.05";
     flake-utils.url = "github:numtide/flake-utils";
     # mach-nix.url = "mach-nix/3.5.0";
   };
@@ -71,6 +71,7 @@
             pkgs.python39
             pkgs.ninja
             pkgs.lz4
+            pkgs.SDL2
             libcaer
             # openeb
           ];

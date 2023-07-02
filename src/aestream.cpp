@@ -21,6 +21,7 @@
 // Output
 #include "output/dvs_to_file.hpp"
 #include "output/dvs_to_udp.hpp"
+#include "viewer/viewer.hpp"
 
 // Interrupt
 auto runFlag = std::atomic<bool>(true);
@@ -51,7 +52,7 @@ int main(int argc, char *argv[]) {
   app_input_inivation->add_option("address", deviceAddress, "Hardware address");
   app_input_inivation->add_option("camera", camera,
                                   "Type of camera; davis or dvx");
-  uint64_t timeLimitMs;
+  int64_t timeLimitMs;
   app_input_inivation
       ->add_option("timeout", timeLimitMs,
                    "Time limit of the stream in ms. Defaults to infinity")
@@ -104,6 +105,23 @@ int main(int argc, char *argv[]) {
   auto app_output_file = app_output->add_subcommand("file", "File output");
   app_output_file->add_option("output-filename", output_filename,
                               "Output Filename. Supports .txt or .aedat4");
+  // - VIEWER
+  size_t viewer_width = 1280;
+  size_t viewer_height = 720;
+  size_t viewer_frame_duration = 20;
+  bool viewer_quiet = false;
+  auto app_output_viewer =
+      app_output->add_subcommand("view", "View event stream on-screen");
+  app_output_viewer->add_option(
+      "--width", viewer_width, "Width of viewport in pixels. Defaults to 1280");
+  app_output_viewer->add_option(
+      "--height", viewer_height,
+      "Height of viewport in pixels. Defaults to 720");
+  app_output_viewer->add_option(
+      "--frame_duration", viewer_frame_duration,
+      "Duration of one rendered frame in ms. Defaults to 20");
+  app_output_viewer->add_flag("--quiet,-q", viewer_quiet,
+                              "Prevent the viewer from printing");
 
   //
   // Generate options
@@ -163,13 +181,15 @@ int main(int argc, char *argv[]) {
         error << "Unsupported file ending" << output_filename;
         throw std::invalid_argument(error.str());
       }
+    } else if (app_output_viewer->parsed()) {
+      view_stream(input_generator, viewer_width, viewer_height,
+                  viewer_frame_duration, viewer_quiet);
     } else { // Default to STDOUT
       uint64_t count = 0;
       for (AER::Event event : input_generator) {
         count += 1;
-        std::cout << std::to_string(event.timestamp) << ","
-                  << event.x << "," << event.y
-                  << std::endl;
+        std::cout << std::to_string(event.timestamp) << "," << event.x << ","
+                  << event.y << std::endl;
       }
       std::cout << "Sent a total of " << count << " events" << std::endl;
     }
