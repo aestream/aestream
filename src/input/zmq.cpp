@@ -32,8 +32,17 @@ Generator<AER::Event> open_zmq(const std::string socket, std::atomic<bool>& runF
       const std::string header = message.to_string();
       if (header == "V") {
         auto rc2 = sock.recv(message);
-        DvsEvent *data = message.data<DvsEvent>();
-        co_yield {data->timestamp, data->x, data->y, data->polarity};
+        if (rc2.has_value()) {
+          // DvsEvent *data = message.data<DvsEvent>();
+          // co_yield {data->timestamp, data->x, data->y, data->polarity};
+          const auto* const dataPtr = message.data<const DvsEvent>();
+          const std::size_t size = message.size() / sizeof(DvsEvent);
+          const auto events = std::vector(dataPtr, dataPtr + size);
+          for (const auto event : events) {
+            co_yield {event.timestamp, static_cast<uint16_t>(event.x), 
+            static_cast<uint16_t>(event.y), static_cast<bool>(event.polarity)};
+          }
+        }
       }
     }
   }
