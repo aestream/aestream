@@ -11,7 +11,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        py = pkgs.python310Packages;
+        py = pkgs.python310Packages { inherit pkgs; };
         libcaer = pkgs.stdenv.mkDerivation {
           pname = "libcaer";
           version = "3.3.14";
