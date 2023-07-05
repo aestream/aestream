@@ -41,14 +41,14 @@ void dvs_to_file_aedat(Generator<AER::Event> &input_generator,
   fileOutput.close();
 }
 
-void dvs_to_file_txt(Generator<AER::Event> &input_generator,
+void dvs_to_file_csv(Generator<AER::Event> &input_generator,
                      const std::string &filename) {
   std::fstream fileOutput;
   fileOutput.open(filename, std::fstream::app);
 
   for (AER::Event event : input_generator) {
-    fileOutput << event.timestamp << " " << event.x << " "
-               << event.y << " " << event.polarity << std::endl;
+    fileOutput << event.timestamp << "," << event.x << ","
+               << event.y << "," << event.polarity << std::endl;
   }
 
   fileOutput.close();

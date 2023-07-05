@@ -2,7 +2,7 @@
 #include "../generator.hpp"
 
 struct DvsEvent {
-  unsigned int polarity : 1;
+  unsigned int polarity : 8;
   unsigned int y : 8;
   unsigned int x : 8;
   unsigned int timestamp : 32;
