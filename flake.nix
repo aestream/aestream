@@ -74,7 +74,6 @@
             pkgs.SDL2
             pkgs.zeromq pkgs.cppzmq
             libcaer
-            # openeb
           ];
           cmakeFlags = [
             "-GNinja"

@@ -21,6 +21,12 @@ if (WITH_CAER)
   list(APPEND module_source_files "${module_source_files}" usb.cpp)
 endif()
 
+# Configure ZMQ
+if (WITH_ZMQ)
+  list(APPEND module_compile_definitions WITH_ZMQ)
+  list(APPEND module_source_files "${module_source_files}" zmq.cpp)
+endif()
+
 # find_library(MetavisionSDK NAMES metavision_sdk_core REQUIRED)
 
 # Thanks to https://github.com/wjakob/nanobind_example/blob/master/CMakeLists.txt

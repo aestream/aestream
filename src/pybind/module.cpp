@@ -127,4 +127,24 @@ NB_MODULE(aestream_ext, m) {
                           nb::device::cpu>
                   buffer) { usb.read_genn(buffer.data(), buffer.size()); });
 #endif
+
+#ifdef WITH_ZMQ
+  nb::class_<ZmqInput>(m, "SpeckInput")
+      .def(nb::init<py_size_t, std::string, std::string>(), nb::arg("shape"),
+           nb::arg("device") = "cpu", nb::arg("address") = "tcp://0.0.0.0:40001")
+      .def("__enter__", &ZmqInput::start_stream)
+      .def("__exit__",
+           [](ZmqInput &i, nb::object t, nb::object v, nb::object trace) {
+             i.stop_stream();
+             return false;
+           })
+      .def("start_stream", &ZmqInput::start_stream)
+      .def("stop_stream", &ZmqInput::stop_stream)
+      .def("read_buffer", &ZmqInput::read, nb::rv_policy::take_ownership)
+      .def("read_genn",
+           [](ZmqInput &zmq,
+              nb::ndarray<uint32_t, nb::shape<nb::any>, nb::c_contig,
+                          nb::device::cpu>
+                  buffer) { zmq.read_genn(buffer.data(), buffer.size()); });
+#endif
 }
