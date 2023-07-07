@@ -17,12 +17,16 @@
 #ifdef WITH_METAVISION
 #include "input/prophesee.hpp"
 #endif
+#ifdef WITH_ZMQ
 #include "input/zmq.hpp"
+#endif
 
 // Output
 #include "output/dvs_to_file.hpp"
 #include "output/dvs_to_udp.hpp"
+#ifdef WITH_SDL
 #include "viewer/viewer.hpp"
+#endif
 
 // Interrupt
 auto runFlag = std::atomic<bool>(true);
@@ -113,6 +117,7 @@ int main(int argc, char *argv[]) {
   app_output_file->add_option("output-filename", output_filename,
                               "Output Filename. Supports .csv or .aedat4");
   // - VIEWER
+#ifdef WITH_SDL
   size_t viewer_width = 1280;
   size_t viewer_height = 720;
   size_t viewer_frame_duration = 20;
@@ -129,6 +134,7 @@ int main(int argc, char *argv[]) {
       "Duration of one rendered frame in ms. Defaults to 20");
   app_output_viewer->add_flag("--quiet,-q", viewer_quiet,
                               "Prevent the viewer from printing");
+#endif
 
   //
   // Generate options
@@ -166,9 +172,12 @@ int main(int argc, char *argv[]) {
   } else if (app_input_file->parsed()) {
     file_handle = open_event_file(input_filename);
     input_generator = file_handle->stream();
-  } else if (app_input_zmq->parsed()) {
+  }
+#ifdef WITH_ZMQ
+  else if (app_input_zmq->parsed()) {
     input_generator = open_zmq(input_zmq_socket, runFlag);
   }
+#endif
 
   //
   // Handle output
@@ -190,10 +199,14 @@ int main(int argc, char *argv[]) {
         error << "Unsupported file ending" << output_filename;
         throw std::invalid_argument(error.str());
       }
-    } else if (app_output_viewer->parsed()) {
+    }
+#ifdef WITH_SDL
+    else if (app_output_viewer->parsed()) {
       view_stream(input_generator, viewer_width, viewer_height,
                   viewer_frame_duration, viewer_quiet);
-    } else { // Default to STDOUT
+    }
+#endif
+    else { // Default to STDOUT
       uint64_t count = 0;
       for (AER::Event event : input_generator) {
         count += 1;
