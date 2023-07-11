@@ -17,18 +17,21 @@ from aestream._input import FileInput, UDPInput
 modules = []
 try:
     from aestream._input import USBInput
+
     modules.append("USBInput")
 except ImportError:
     logging.debug("Failed to import AEStream USB Input")
 
 try:
     import aestream._genn as genn
+
     modules.append("genn")
 except ImportError as ex:
     logging.debug("Failed to import GeNN: AEStream cannot use GeNN device")
 
 try:
     from aestream._input import SpeckInput
+
     modules.append("SpeckInput")
 except ImportError:
     logging.debug("Failed to import ZMQ: AEStream cannot use ZMQ input")
