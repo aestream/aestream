@@ -2,11 +2,12 @@
 #include "../generator.hpp"
 
 struct DvsEvent {
-  unsigned int polarity : 8;
-  unsigned int y : 8;
-  unsigned int x : 8;
-  unsigned int timestamp : 32;
-} __attribute__((packed));
+  bool polarity;
+  uint8_t y;
+  uint8_t x;
+  uint32_t timestamp;
+};
+
 
 constexpr char ZMQ_SUBSCRIBE_HEADER = 1;
 
