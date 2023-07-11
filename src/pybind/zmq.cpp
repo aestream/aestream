@@ -1,5 +1,5 @@
 #include "input/zmq.hpp"
-#includu "types.hpp"
+#include "types.hpp"
 #include "tensor_buffer.hpp"
 
 struct ZmqInput {
