@@ -2,3 +2,4 @@ matplotlib
 norse
 pysdl2
 pysdl2-dll
+scipy

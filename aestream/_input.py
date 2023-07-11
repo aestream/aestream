@@ -83,3 +83,27 @@ try:
             return population.extra_global_params["input"].view
 except:
     pass # Ignore if drivers are not installed
+
+try:
+    class SpeckInput(ext.SpeckInput):
+        def read(self):
+            t = self.read_buffer()
+            if USE_TORCH:
+                return t.to_torch()
+            else:
+                return t.to_numpy()
+        
+        def read_genn(self, population):
+            # **YUCK** I would like to implement this with a mixin
+            # to reduce copy-paste but seemingly nanobind doesn't like this
+            # Read from stream into GeNN-owned memory
+            super().read_genn(population.extra_global_params["input"].view)
+            
+            # Copy data to device
+            # **NOTE** this may be a NOP if CPU backend is used
+            population.push_extra_global_param_to_device("input")
+            
+            return population.extra_global_params["input"].view
+except Exception as e:
+    print("NO SPECK", e)
+    pass # Ignore if Speck/ZMQ isn't installed
