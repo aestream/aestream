@@ -47,7 +47,6 @@ private:
 
 class TensorBuffer {
 private:
-  const std::vector<size_t> shape;
   uint64_t current_timestamp = 0;
   std::string device;
 
@@ -74,6 +73,8 @@ private:
 
 public:
   TensorBuffer(std::vector<size_t> size, std::string device, size_t buffer_size);
+  const std::vector<size_t> shape;
+
   template <typename R> void assign_event(R *array, int16_t x, int16_t y);
   void set_buffer(uint16_t data[], int numbytes);
   void set_vector(std::vector<AER::Event> events);

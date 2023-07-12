@@ -14,6 +14,10 @@
 #include "usb.cpp"
 #endif
 
+#ifdef WITH_ZMQ
+#include "zmq.cpp"
+#endif
+
 namespace nb = nanobind;
 
 NB_MODULE(aestream_ext, m) {
@@ -126,5 +130,25 @@ NB_MODULE(aestream_ext, m) {
               nb::ndarray<uint32_t, nb::shape<nb::any>, nb::c_contig,
                           nb::device::cpu>
                   buffer) { usb.read_genn(buffer.data(), buffer.size()); });
+#endif
+
+#ifdef WITH_ZMQ
+  nb::class_<ZMQInput>(m, "SpeckInput")
+      .def(nb::init<py_size_t, std::string, std::string>(), nb::arg("shape") = std::vector<int>({128, 128}),
+           nb::arg("device") = "cpu", nb::arg("address") = "tcp://0.0.0.0:40001")
+      .def("__enter__", &ZMQInput::start_stream)
+      .def("__exit__",
+           [](ZMQInput &i, nb::object t, nb::object v, nb::object trace) {
+             i.stop_stream();
+             return false;
+           })
+      .def("start_stream", &ZMQInput::start_stream)
+      .def("stop_stream", &ZMQInput::stop_stream)
+      .def("read_buffer", &ZMQInput::read, nb::rv_policy::take_ownership)
+      .def("read_genn",
+           [](ZMQInput &zmq,
+              nb::ndarray<uint32_t, nb::shape<nb::any>, nb::c_contig,
+                          nb::device::cpu>
+                  buffer) { zmq.read_genn(buffer.data(), buffer.size()); });
 #endif
 }

@@ -1,5 +1,5 @@
 set(output_definitions "")
-set(output_sources dvs_to_udp.hpp dvs_to_udp.cpp dvs_to_file.hpp dvs_to_file.cpp )
+set(output_sources dvs_to_udp.hpp dvs_to_udp.cpp dvs_to_file.hpp dvs_to_file.cpp)
 set(output_libraries aer aestream_file)
 
 # Create the output library

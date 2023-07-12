@@ -101,13 +101,15 @@ aestream input <input source> [output <output sink>]
 | DAVIS, DVXPlorer | [Inivation](https://inivation.com/) DVS Camera over USB | `input inivation` |
 | EVK Cameras      | [Prophesee](https://www.prophesee.ai/) DVS camera over USB  | `input prophesee` |
 | File             | Reads `.aedat`, `.aedat4`, `.csv`, `.dat`, or `.raw` files | `input file x.aedat4` |
+| [SynSense Speck](https://www.synsense.ai/products/speck-2/) | Stream events via ZMQ | `input speck` |
+| UDP network | Receives stream of events via the [SPIF protocol](https://github.com/SpiNNakerManchester/spif/tree/master/spiffer) | `input udp`
 
 | Output | Description | Example usage |
 | --------- | ----------- | ----- |
 | STDOUT    | Standard output (default output) | `output stdout`
 | Ethernet over UDP | Outputs to a given IP and port using the [SPIF protocol](https://github.com/SpiNNakerManchester/spif)  | `output udp 10.0.0.1 1234` |
 | File: `.aedat4`  | Output to [`.aedat4` format](https://gitlab.com/inivation/inivation-docs/blob/master/Software%20user%20guides/AEDAT_file_formats.md#aedat-40) | `output file my_file.aedat4` |
-| File: `.csv`       | Output to comma-separated-value (CSV) file format | `output file my_file.txt` |
+| File: `.csv`       | Output to comma-separated-value (CSV) file format | `output file my_file.csv` |
 | Viewer | View live event stream | `output view`
 
 ## CLI examples

@@ -21,7 +21,14 @@ if (WITH_CAER)
   list(APPEND module_source_files "${module_source_files}" usb.cpp)
 endif()
 
-# find_library(MetavisionSDK NAMES metavision_sdk_core REQUIRED)
+# Configure ZMQ
+if (WITH_ZMQ)
+  list(APPEND module_compile_definitions WITH_ZMQ)
+  list(APPEND module_source_files "${module_source_files}" zmq.cpp)
+endif()
+
+# Configure Python extension
+find_package(PythonExtensions REQUIRED)
 
 # Thanks to https://github.com/wjakob/nanobind_example/blob/master/CMakeLists.txt
 # Create CMake targets for all Python components needed by nanobind
@@ -75,7 +82,7 @@ else()
   )
 endif()
 target_compile_definitions(aestream_ext PRIVATE ${module_compile_definitions})
-target_include_directories(aestream_ext PRIVATE "${CMAKE_INSTALL_LIBDIR}" "${CUDA_INCLUDE_DIRS}" "${CudaToolkitLibDir}" "${PYTHON_SITE_PACKAGES_DIR}/aestream")
+target_include_directories(aestream_ext PRIVATE "${CMAKE_INSTALL_LIBDIR}" "${CUDA_INCLUDE_DIRS}" "${CudaToolkitLibDir}" "${PYTHON_SITE_PACKAGES_DIR}")
 target_link_libraries(aestream_ext PRIVATE ${module_link_libraries} aer aestream_file aestream_input aestream_output)
 
 install(TARGETS aestream_ext LIBRARY DESTINATION aestream)

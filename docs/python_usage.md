@@ -54,3 +54,19 @@ with UDPInput((640, 480), port=3333) as stream:
 > Example: [Print number of events received over UDP](https://github.com/aestream/aestream/blob/main/example/udp_client.py): `python3 example/udp_client.py`
 
 > Example: [Record frames over UDP](https://github.com/aestream/aestream/blob/main/example/udp_video.py): `python3 example/udp_video.py`
+
+## `SpeckInput`
+
+We interface [SynSense Speck](https://www.synsense.ai/products/speck-2/) via [ZMQ](https://zeromq.org/) to directly stream events from the camera, or *after* one of the layers have processed the incoming camera events.
+This integration is therefore ideal for just offloading events or post-processing the Speck events.
+
+Note: this requires using the [`JitZMQStreamer` filter](https://synsense-sys-int.gitlab.io/samna/jitFilters.html#built-in-filters) from the [Samna documentation](https://synsense-sys-int.gitlab.io/samna/).
+
+```python
+with SpeckInput() as stream:
+    while True:
+        frame = stream.read() # Provides a (128, 128)
+        ...
+```
+
+> Example: [Visualize events from the Speck chip](https://github.com/aestream/blob/main/example/speck_video.py)

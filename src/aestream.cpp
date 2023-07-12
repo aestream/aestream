@@ -17,11 +17,16 @@
 #ifdef WITH_METAVISION
 #include "input/prophesee.hpp"
 #endif
+#ifdef WITH_ZMQ
+#include "input/zmq.hpp"
+#endif
 
 // Output
 #include "output/dvs_to_file.hpp"
 #include "output/dvs_to_udp.hpp"
+#ifdef WITH_SDL
 #include "viewer/viewer.hpp"
+#endif
 
 // Interrupt
 auto runFlag = std::atomic<bool>(true);
@@ -73,6 +78,12 @@ int main(int argc, char *argv[]) {
   // app_input_file->add_flag(
   //     "--ignore-time", input_ignore_time,
   //     "Playback in real-time (false, default) or ignore timestamps (true).");
+  // - ZMQ
+  std::string input_zmq_socket = "tcp://0.0.0.0:40001";
+  auto app_input_zmq =
+      app_input->add_subcommand("speck", "SynSense Speck input");
+  app_input_zmq->add_option("sock", input_zmq_socket,
+                            "ZMQ socket. Defaults to tcp://0.0.0.0:40001");
 
   //
   // Output
@@ -104,8 +115,9 @@ int main(int argc, char *argv[]) {
   std::string output_filename;
   auto app_output_file = app_output->add_subcommand("file", "File output");
   app_output_file->add_option("output-filename", output_filename,
-                              "Output Filename. Supports .txt or .aedat4");
+                              "Output Filename. Supports .csv or .aedat4");
   // - VIEWER
+#ifdef WITH_SDL
   size_t viewer_width = 1280;
   size_t viewer_height = 720;
   size_t viewer_frame_duration = 20;
@@ -122,6 +134,7 @@ int main(int argc, char *argv[]) {
       "Duration of one rendered frame in ms. Defaults to 20");
   app_output_viewer->add_flag("--quiet,-q", viewer_quiet,
                               "Prevent the viewer from printing");
+#endif
 
   //
   // Generate options
@@ -160,6 +173,11 @@ int main(int argc, char *argv[]) {
     file_handle = open_event_file(input_filename);
     input_generator = file_handle->stream();
   }
+#ifdef WITH_ZMQ
+  else if (app_input_zmq->parsed()) {
+    input_generator = open_zmq(input_zmq_socket, runFlag);
+  }
+#endif
 
   //
   // Handle output
@@ -172,8 +190,8 @@ int main(int argc, char *argv[]) {
       client.stream(input_generator, include_timestamp);
     } else if (app_output_file->parsed()) {
       std::cout << "Sending events to file " << output_filename << std::endl;
-      if (output_filename.ends_with(".txt")) {
-        dvs_to_file_txt(input_generator, output_filename);
+      if (output_filename.ends_with(".csv")) {
+        dvs_to_file_csv(input_generator, output_filename);
       } else if (output_filename.ends_with(".aedat4")) {
         dvs_to_file_aedat(input_generator, output_filename);
       } else {
@@ -181,15 +199,19 @@ int main(int argc, char *argv[]) {
         error << "Unsupported file ending" << output_filename;
         throw std::invalid_argument(error.str());
       }
-    } else if (app_output_viewer->parsed()) {
+    }
+#ifdef WITH_SDL
+    else if (app_output_viewer->parsed()) {
       view_stream(input_generator, viewer_width, viewer_height,
                   viewer_frame_duration, viewer_quiet);
-    } else { // Default to STDOUT
+    }
+#endif
+    else { // Default to STDOUT
       uint64_t count = 0;
       for (AER::Event event : input_generator) {
         count += 1;
         std::cout << std::to_string(event.timestamp) << "," << event.x << ","
-                  << event.y << std::endl;
+                  << event.y << "," << event.polarity << std::endl;
       }
       std::cout << "Sent a total of " << count << " events" << std::endl;
     }
