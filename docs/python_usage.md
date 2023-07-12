@@ -69,4 +69,4 @@ with SpeckInput() as stream:
         ...
 ```
 
-> Example: [Visualize frames from the Speck chip](https://github.com/aestream/blob/main/example/speck_video.py)
+> Example: [Visualize events from the Speck chip](https://github.com/aestream/blob/main/example/speck_video.py)
