@@ -8,10 +8,10 @@ from aestream import SpeckInput
 # Initialize our canvas
 window, pixels = sdl.create_sdl_surface(512, 512)
 
-# Start streaming from a DVS camera on USB 2:2
+# Start streaming from the SynSense Speck chip
 with SpeckInput() as stream:
     while True:
-        # Read a tensor (640, 480) tensor from the camera
+        # Read a tensor (128, 128) tensor from the camera
         tensor = stream.read()
 
         # Zoom to (512, 512)
