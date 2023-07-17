@@ -37,7 +37,7 @@
         };
         aestream = pkgs.stdenv.mkDerivation {
           name = "aestream";
-          version = "0.5.1";
+          version = "0.6";
           src = ./.;
           nativeBuildInputs = [
             pkgs.pkg-config

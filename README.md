@@ -1,5 +1,5 @@
 
-<img src="logo.png" />
+<img src="https://github.com/aestream/aestream/raw/main/logo.png" />
 
 <p align="center">
     <a href="https://github.com/aestream/aestream/actions">
@@ -21,7 +21,7 @@ AEStream effiently sends event-based data from A to B.
 AEStream can be used from the command-line, via Python, or as a C++ library.
 We support multiple inputs and outputs, providing seamless integration with files, [event cameras](https://en.wikipedia.org/wiki/Event_camera), network data, Python libraries via Numpy or PyTorch, and visualization tools.
 
-<img src="docs/aestream_flow.png" />
+<img src="https://github.com/aestream/aestream/raw/main/docs/aestream_flow.png" />
 
 Read more about the inner workings of the library in [the AEStream publication](https://jegp.github.io/aestream-paper/).
 

@@ -28,9 +28,9 @@ except:
 # Setuptools entrypoint
 setup(
     name="aestream",
-    version="0.5.1",
-    author="Jens E. Pedersen, Christian Pehle",
-    author_email="jens@jepedersen.dk, christian.pehle@gmail.com",
+    version="0.6.0",
+    author="Jens E. Pedersen",
+    author_email="jens@jepedersen.dk",
     url="https://github.com/aestream/aestream",
     description="Streaming library for Address-Event Representation (AER) data",
     license="MIT",

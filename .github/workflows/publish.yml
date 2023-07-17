@@ -96,6 +96,11 @@ jobs:
     #needs: [build-wheels, build-wheels-aarch64, build-sdist]
     needs: [build-wheels, build-sdist]
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/aestream
+    permissions:
+      id-token: write
     
     # alternatively, to publish when a GitHub Release is created, use the following rule:
     if: github.event_name == 'release' && github.event.action == 'published'
@@ -107,7 +112,26 @@ jobs:
           path: dist
 
       - uses: pypa/gh-action-pypi-publish@release/v1
+
+  publish-pypi-test:
+    #needs: [build-wheels, build-wheels-aarch64, build-sdist]
+    needs: [build-wheels, build-sdist]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/aestream
+    permissions:
+      id-token: write
+    
+    # alternatively, to publish when a GitHub Release is created, use the following rule:
+    if: github.event_name != 'release' && github.event.action != 'published'
+    steps:
+      - uses: actions/download-artifact@v3
         with:
-          user: __token__
-          password: ${{ secrets.PYPI_TOKEN }}
-          verbose: true
+          # unpacks default artifact into dist/
+          name: artifact
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
