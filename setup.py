@@ -1,5 +1,5 @@
 import os
-from skbuild import setup
+from scikit_build_core import setup
 
 pwd = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(pwd, "README.md"), encoding="utf-8") as fp:
