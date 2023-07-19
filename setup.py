@@ -1,5 +1,8 @@
+# With scikit-build-core this file is unused
+# Instead pyproject.toml is used exclusively
+
 import os
-from scikit_build_core import setup
+from skbuild import setup
 
 pwd = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(pwd, "README.md"), encoding="utf-8") as fp:

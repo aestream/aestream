@@ -1,3 +1,5 @@
+message("@ src/pybind/CMakeLists.txt")
+
 include(GNUInstallDirs)
 include(FetchContent)
 include(FindCUDAToolkit)
@@ -27,16 +29,20 @@ if (WITH_ZMQ)
   list(APPEND module_source_files "${module_source_files}" zmq.cpp)
 endif()
 
-# Configure Python extension
-find_package(PythonExtensions REQUIRED)
+# Configure Python extension (Do not include for scikit-build-core)
+# find_package(PythonExtensions REQUIRED)
 
 # Thanks to https://github.com/wjakob/nanobind_example/blob/master/CMakeLists.txt
 # Create CMake targets for all Python components needed by nanobind
-if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.26)
-  find_package(Python 3.8 COMPONENTS Interpreter Development.Module Development.SABIModule REQUIRED)
-else()
-  find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
-endif()
+# if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.26)
+#   find_package(Python 3.8 COMPONENTS Interpreter Development.Module Development.SABIModule REQUIRED)
+# else()
+#   find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
+# endif()
+
+find_package(Python 3.8
+  REQUIRED COMPONENTS Interpreter Development.Module
+  OPTIONAL_COMPONENTS Development.SABIModule)
 
 # Run `nanobind.cmake_dir()` from Python to detect where nanobind is installed
 execute_process(
@@ -85,4 +91,5 @@ target_compile_definitions(aestream_ext PRIVATE ${module_compile_definitions})
 target_include_directories(aestream_ext PRIVATE "${CMAKE_INSTALL_LIBDIR}" "${CUDA_INCLUDE_DIRS}" "${CudaToolkitLibDir}" "${PYTHON_SITE_PACKAGES_DIR}")
 target_link_libraries(aestream_ext PRIVATE ${module_link_libraries} aer aestream_file aestream_input aestream_output)
 
+message("Installing aestream_ext to aestream")
 install(TARGETS aestream_ext LIBRARY DESTINATION aestream)

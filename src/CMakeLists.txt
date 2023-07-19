@@ -1,3 +1,4 @@
+message("@ src/CMakeLists.txt")
 include(GNUInstallDirs)
 include(FetchContent)
 
