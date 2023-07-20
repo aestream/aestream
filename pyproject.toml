@@ -21,6 +21,7 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/aestream/aestream"
+Documentation = "https://aestream.github.io/aestream"
 
 [tool.scikit-build]
 build-dir = "_skbuild/{wheel_tag}"

@@ -122,5 +122,4 @@ try:
             return population.extra_global_params["input"].view
 
 except Exception as e:
-    print("NO SPECK", e)
     pass  # Ignore if Speck/ZMQ isn't installed
