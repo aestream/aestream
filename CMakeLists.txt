@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 option(USE_PYTHON "Buid Python lib" OFF)
-option(USE_CUDA "Build CUDA tensor export" OFF)
+option(USE_CUDA "Build CUDA tensor export, if the library is found" ON)
 
 find_package(libcaer CONFIG QUIET)
 option(USE_CAMERA "Build with camera drivers?" ${libcaer_FOUND})
