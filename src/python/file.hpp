@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../aer.hpp"
-#include "../generator.hpp"
-#include "../input/file.hpp"
+#include "../cpp/aer.hpp"
+#include "../cpp/generator.hpp"
+#include "../cpp/input/file.hpp"
 
 #include "tensor_buffer.hpp"
 #include "tensor_iterator.hpp"

@@ -5,7 +5,7 @@
 #include <thread>
 #include <vector>
 
-#include "../aer.hpp"
+#include "../cpp/aer.hpp"
 #include "types.hpp"
 
 #include <nanobind/nanobind.h>

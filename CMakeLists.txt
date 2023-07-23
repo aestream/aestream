@@ -36,4 +36,4 @@ endif()
 
 
 # Add sources
-add_subdirectory("src/cpp")
+add_subdirectory("src")

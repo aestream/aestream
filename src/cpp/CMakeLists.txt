@@ -1,4 +1,4 @@
-message("@ src/CMakeLists.txt")
+message("@ src/cpp/CMakeLists.txt")
 include(GNUInstallDirs)
 include(FetchContent)
 
@@ -20,11 +20,6 @@ endif()
 add_subdirectory(file)
 add_subdirectory(output)
 add_subdirectory(input)
-
-if (USE_PYTHON)
-  # AEStream Python
-  add_subdirectory(python)
-endif() 
 
 # AEStream executable
 set(aestream_sources "")
