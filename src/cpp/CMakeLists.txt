@@ -23,7 +23,7 @@ add_subdirectory(input)
 
 if (USE_PYTHON)
   # AEStream Python
-  add_subdirectory(pybind)
+  add_subdirectory(python)
 endif() 
 
 # AEStream executable
