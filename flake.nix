@@ -102,6 +102,7 @@
               pkgs.lz4
               pkgs.zlib
               pkgs.cmake
+              pkgs.ninja
               pkgs.cpm-cmake
               pkgs.flatcc
               pkgs.zeromq
@@ -116,7 +117,7 @@
             ];
             venvDir = "./.venv";
             postVenvCreation = ''
-              pip install scikit-build nanobind ninja
+              pip install scikit-build-core nanobind
             '';
             postShellHook = ''
               unset SOURCE_DATE_EPOCH
