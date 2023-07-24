@@ -2,7 +2,7 @@ message("@ src/CMakeLists.txt")
 
 # Define install path
 if (DEFINED SKBUILD)
-  find_package(Python COMPONENTS Interpreter Development REQUIRED)
+  find_package(Python REQUIRED)
   set(AESTREAM_BINDIR ${SKBUILD_SCRIPTS_DIR})
   set(AESTREAM_LIBDIR ${Python_SITELIB}/aestream)
 else()
