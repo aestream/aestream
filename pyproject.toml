@@ -35,7 +35,7 @@ Documentation = "https://aestream.github.io/aestream"
 
 [tool.scikit-build]
 build-dir = "_skbuild/{wheel_tag}"
-cmake.args = ["-DUSE_PYTHON=1"]
+cmake.args = ["-DUSE_PYTHON=1", "-DUSE_CUDA=1"]
 
 [tool.cibuildwheel]
 # Necessary to see build output from the actual compilation

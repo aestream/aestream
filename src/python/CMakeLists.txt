@@ -26,13 +26,13 @@ else()
   message("CUDA toolkit could not be found; CUDA extensions won't be built")
 endif()
 
-# Configure Inivation
+# Configure Inivation cameras
 if (WITH_CAER) 
   list(APPEND module_compile_definitions WITH_CAER)
   list(APPEND module_source_files "${module_source_files}" usb.cpp)
 endif()
 
-# Configure ZMQ
+# Configure ZMQ for Speck
 if (WITH_ZMQ)
   list(APPEND module_compile_definitions WITH_ZMQ)
   list(APPEND module_source_files "${module_source_files}" zmq.cpp)
@@ -43,14 +43,10 @@ find_package(Python 3.8
   REQUIRED COMPONENTS Interpreter Development.Module
   OPTIONAL_COMPONENTS Development.SABIModule)
 
-# Run `nanobind.cmake_dir()` from Python to detect where nanobind is installed
-execute_process(
-  COMMAND "${Python_EXECUTABLE}" -c "import nanobind; print(nanobind.cmake_dir())"
-  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE NB_DIR)
-list(APPEND CMAKE_PREFIX_PATH "${NB_DIR}")
 
 find_package(nanobind CONFIG REQUIRED)
 
+# Add nanobind module
 nanobind_add_module(
   aestream_ext 
   NB_STATIC STABLE_ABI LTO 
@@ -72,6 +68,7 @@ nanobind_add_module(
 message(WARNING ${SKBUILD_PLATLIB_DIR})
 install(TARGETS aer aestream_file aestream_input aestream_output RUNTIME_DEPENDENCIES DESTINATION aestream)
 
+#
 if (USE_CUDA)
   set_target_properties(aestream_ext PROPERTIES
     INSTALL_RPATH "\$ORIGIN"
