@@ -69,7 +69,6 @@ nanobind_add_module(
   tensor_iterator.hpp
   tensor_iterator.cpp
 )
-message(WARNING ${SKBUILD_PLATLIB_DIR})
 install(TARGETS aer aestream_file aestream_input aestream_output RUNTIME_DEPENDENCIES DESTINATION aestream)
 
 if (USE_CUDA)
@@ -86,7 +85,7 @@ else()
   )
 endif()
 target_compile_definitions(aestream_ext PRIVATE ${module_compile_definitions})
-target_include_directories(aestream_ext PRIVATE "${CMAKE_INSTALL_LIBDIR}" "${CUDA_INCLUDE_DIRS}" "${CudaToolkitLibDir}" "${PYTHON_SITE_PACKAGES_DIR}")
+target_include_directories(aestream_ext PRIVATE "${CMAKE_INSTALL_LIBDIR}" "${CUDA_INCLUDE_DIRS}" "${CudaToolkitLibDir}" "${Python_SITEDIR}")
 target_link_libraries(aestream_ext PRIVATE ${module_link_libraries} aer aestream_file aestream_input aestream_output)
 
 message("Installing aestream_ext to aestream")

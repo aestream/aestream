@@ -100,6 +100,7 @@
           pkgs.mkShell {
             buildInputs = [
               pkgs.lz4
+              pkgs.libsodium
               pkgs.zlib
               pkgs.cmake
               pkgs.ninja

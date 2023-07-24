@@ -1,6 +1,6 @@
-#include "../aer.hpp"
-#include "../generator.hpp"
-#include "../input/inivation.hpp"
+#include "../cpp/aer.hpp"
+#include "../cpp/generator.hpp"
+#include "../cpp/input/inivation.hpp"
 
 #include "types.hpp"
 #include "tensor_buffer.hpp"
