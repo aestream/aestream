@@ -70,8 +70,8 @@
             addAutoPatchelfSearchPath src/output
           '';
           installPhase = ''
-            install -m555 -D -t $out/lib/ src/*.so src/file/*.so src/input/*.so src/output/*.so
-            install -m755 -D src/aestream $out/bin/aestream
+            install -m555 -D -t $out/lib/ src/cpp/*.so src/cpp/file/*.so src/cpp/input/*.so src/cpp/output/*.so
+            install -m755 -D src/cpp/aestream $out/bin/aestream
           '';
         };
         aestream-test = aestream.overrideAttrs (parent: {
@@ -100,6 +100,7 @@
           pkgs.mkShell {
             buildInputs = [
               pkgs.lz4
+              pkgs.libsodium
               pkgs.zlib
               pkgs.cmake
               pkgs.ninja

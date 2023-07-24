@@ -20,7 +20,7 @@ jobs:
       - if: ${{ env.ACT }}
         run: pip install pipx 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.10.2
+        uses: pypa/cibuildwheel@v2.14.1
         env:
           CIBW_BUILD_VERBOSITY: 2
           CIBW_BUILD: "cp3{8,9,10}*"
