@@ -4,7 +4,7 @@ void FileInput::stream_generator_to_buffer() {
   // We add a local buffer to avoid overusing the atomic
   // lock in the actual buffer
   std::vector<AER::Event> local_buffer = {};
-  for (const auto &event : generator) {
+  for (const auto event : generator) {
     if (!is_streaming.load()) {
       break;
     }
@@ -47,11 +47,10 @@ nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>> FileInput::load() {
   auto [arr, n_read] = file->read_events(-1);
   Container *c = new Container();
   c->events = std::move(arr);
-  nb::capsule deleter(c, [](void *p) noexcept {
-    delete (Container *) p;
-  });
+  nb::capsule deleter(c, [](void *p) noexcept { delete (Container *)p; });
   const size_t shape[1] = {n_read * sizeof(AER::Event)};
-  return nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>>(c->events.data(), 1, shape, deleter);
+  return nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>>(
+      c->events.data(), 1, shape, deleter);
 }
 
 // py::array_t<AER::Event> FileInput::events_co() {

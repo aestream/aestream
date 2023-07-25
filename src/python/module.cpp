@@ -134,8 +134,10 @@ NB_MODULE(aestream_ext, m) {
 
 #ifdef WITH_ZMQ
   nb::class_<ZMQInput>(m, "SpeckInput")
-      .def(nb::init<py_size_t, std::string, std::string>(), nb::arg("shape") = std::vector<int>({128, 128}),
-           nb::arg("device") = "cpu", nb::arg("address") = "tcp://0.0.0.0:40001")
+      .def(nb::init<py_size_t, std::string, std::string>(),
+           nb::arg("shape") = std::vector<int>({128, 128}),
+           nb::arg("device") = "cpu",
+           nb::arg("address") = "tcp://0.0.0.0:40001")
       .def("__enter__", &ZMQInput::start_stream)
       .def("__exit__",
            [](ZMQInput &i, nb::object t, nb::object v, nb::object trace) {

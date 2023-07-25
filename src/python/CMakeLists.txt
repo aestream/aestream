@@ -67,7 +67,7 @@ nanobind_add_module(
 )
 install(TARGETS aer aestream_file aestream_input aestream_output RUNTIME_DEPENDENCIES DESTINATION aestream)
 
-#
+# Setup install paths
 if (USE_CUDA)
   set_target_properties(aestream_ext PROPERTIES
     INSTALL_RPATH "\$ORIGIN"
