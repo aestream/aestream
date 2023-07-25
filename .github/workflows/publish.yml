@@ -27,6 +27,7 @@ jobs:
           CIBW_SKIP: "*musllinux*"
           CIBW_ARCHS: x86_64
           # Note: We need 2_28 because libcaer requires recent linux headers
+          CIBW_BUILD_FRONTEND: "pip"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
           CIBW_BEFORE_BUILD: "rm -rf {project}/_skbuild"
           CIBW_BEFORE_ALL_LINUX: 'yum install -y lz4-devel ninja-build libgusb-devel SDL2-devel gcc-toolset-11'
