@@ -30,8 +30,8 @@ jobs:
           CIBW_BUILD_FRONTEND: "pip"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
           CIBW_BEFORE_BUILD: "rm -rf {project}/_skbuild"
-          CIBW_BEFORE_ALL_LINUX: 'yum install -y lz4-devel ninja-build libgusb-devel SDL2-devel gcc-toolset-11'
-          CIBW_REPAIR_WHEEL_COMMAND: 'source .github/deps/fix_path.sh && auditwheel repair -w {dest_dir} {wheel} --plat=linux_x86_64'
+          CIBW_BEFORE_ALL_LINUX: 'yum install -y lz4-devel libgusb-devel SDL2-devel'
+          CIBW_REPAIR_WHEEL_COMMAND: 'source .github/deps/fix_path.sh && auditwheel repair -w {dest_dir} {wheel}'
 
       - uses: actions/upload-artifact@v3
         with:

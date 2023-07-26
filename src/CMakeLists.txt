@@ -1,5 +1,7 @@
 message("@ src/CMakeLists.txt")
 
+include(GNUInstallDirs)
+
 # Define install path
 if (DEFINED SKBUILD)
   find_package(Python REQUIRED)

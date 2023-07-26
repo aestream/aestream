@@ -1,5 +1,4 @@
 message("@ src/cpp/CMakeLists.txt")
-include(GNUInstallDirs)
 include(FetchContent)
 
 # AER processing
