@@ -6,11 +6,10 @@ include(GNUInstallDirs)
 if (DEFINED SKBUILD)
   find_package(Python REQUIRED)
   set(AESTREAM_BINDIR ${SKBUILD_SCRIPTS_DIR})
-  set(AESTREAM_LIBDIR ${Python_SITELIB}/aestream)
 else()
   set(AESTREAM_BINDIR ${CMAKE_INSTALL_BINDIR})
-  set(AESTREAM_LIBDIR ${CMAKE_INSTALL_LIBDIR})
 endif()
+set(AESTREAM_LIBDIR ${CMAKE_INSTALL_LIBDIR})
 
 # Add CPP files
 add_subdirectory("cpp")
