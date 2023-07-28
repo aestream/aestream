@@ -37,7 +37,8 @@ add_executable(aestream aestream.cpp ${aestream_sources})
 target_include_directories(aestream PRIVATE ${AESTREAM_LIBDIR} ${CMAKE_INSTALL_LIBDIR})
 target_link_libraries(aestream PRIVATE aer aestream_file aestream_input aestream_output ${aestream_link_libraries})
 if (USE_PYTHON)
-  set_target_properties(aestream PROPERTIES INSTALL_RPATH ${AESTREAM_LIBDIR})
+  # Thanks to https://github.com/scikit-build/scikit-build-sample-projects/
+  set_target_properties(aestream PROPERTIES INSTALL_RPATH ${AESTREAM_RUNPATH})
 endif()
 
 # Install targets
@@ -50,5 +51,5 @@ if (${USE_CAMERA})
     list(APPEND aestream_drivers "MetavisionSDK::core MetavisionSDK::driver")
   endif()
 endif()
-install(TARGETS aer aestream_file aestream_input aestream_output DESTINATION ${AESTREAM_LIBDIR})
+install(TARGETS aer aestream_file aestream_input aestream_output LIBRARY DESTINATION ${AESTREAM_LIBDIR})
 install(TARGETS aestream DESTINATION ${AESTREAM_BINDIR})
