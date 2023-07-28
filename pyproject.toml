@@ -7,7 +7,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "aestream"
-version = "0.6.0"
+version = "0.6.1"
 description = "Streaming library for Address-Event Representation (AER) data"
 readme = "README.md"
 requires-python = ">=3.8"
