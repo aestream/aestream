@@ -1,10 +1,7 @@
-import time
-
 import torch
 import matplotlib
 
 matplotlib.use("Qt5Agg")
-import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 
 from aestream import USBInput

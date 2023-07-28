@@ -5,11 +5,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /app
 
+# Install dependencies
 RUN apt-get update
-RUN apt-get upgrade -y
-
-RUN apt-get install -y git python3-pip
-RUN apt-get install -y gcc-10 g++-10
+RUN apt-get install -y git python3-pip --no-install-recommends
+RUN apt-get install -y gcc-10 g++-10 --no-install-recommends
 
 # Pytorch
 RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
@@ -24,4 +23,4 @@ RUN apt-get install -y cuda-toolkit-12-0
 ENV PATH="/usr/local/cuda/bin:$PATH"
 
 # AEStream
-RUN CC=gcc-10 CXX=g++-10 pip install git+https://github.com/aestream/aestream.git@feature-torch
+RUN CC=gcc-10 CXX=g++-10 pip install git+https://github.com/aestream/aestream.git

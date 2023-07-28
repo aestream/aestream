@@ -20,7 +20,7 @@ jobs:
       - if: ${{ env.ACT }}
         run: pip install pipx 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.10.2
+        uses: pypa/cibuildwheel@v2.14.1
         env:
           CIBW_BUILD_VERBOSITY: 2
           CIBW_BUILD: "cp3{8,9,10}*"
@@ -30,7 +30,7 @@ jobs:
           CIBW_BUILD_FRONTEND: "pip"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
           CIBW_BEFORE_BUILD: "rm -rf {project}/_skbuild"
-          CIBW_BEFORE_ALL_LINUX: 'yum install -y lz4-devel ninja-build libgusb-devel SDL2-devel gcc-toolset-11'
+          CIBW_BEFORE_ALL_LINUX: 'yum install -y lz4-devel libgusb-devel SDL2-devel'
           CIBW_REPAIR_WHEEL_COMMAND: 'source .github/deps/fix_path.sh && auditwheel repair -w {dest_dir} {wheel}'
 
       - uses: actions/upload-artifact@v3
@@ -124,7 +124,7 @@ jobs:
       id-token: write
     
     # alternatively, to publish when a GitHub Release is created, use the following rule:
-    if: github.event_name != 'release' && github.event.action != 'published'
+    if: github.event_name == 'release' && github.event.action == 'published'
     steps:
       - uses: actions/download-artifact@v3
         with:

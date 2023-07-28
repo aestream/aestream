@@ -20,7 +20,7 @@ with UDPInput((640, 480), "cpu", 4301) as stream:
 
             # Grab a tensor of the events arriving during the past 500ms
             frame = stream.read()
-            out.append(frame.clone())
+            out.append(frame)
 
             # Reset the time so we're again counting to 500ms
             t_0 = time.time()

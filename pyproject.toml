@@ -1,9 +1,46 @@
 [build-system]
 requires = [
-        "setuptools>=42",
-        "scikit-build",
-        "cmake>=3.23",
-        "wheel",
+        "scikit-build-core",
         "nanobind>=1.2",
-        "ninja; platform_system!='Windows'"]
-build-backend = "setuptools.build_meta"
+        ]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "aestream"
+version = "0.6.1"
+description = "Streaming library for Address-Event Representation (AER) data"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    { name = "Jens E. Pedersen", email = "jens@jepedersen.dk" },
+]
+license = { text = "MIT" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: C++",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: System :: Hardware :: Universal Serial Bus (USB)",
+]
+dependencies = [
+    "numpy",
+    "nanobind>=1.2",
+    "pysdl2-dll"
+]
+
+
+[project.urls]
+Homepage = "https://github.com/aestream/aestream"
+Documentation = "https://aestream.github.io/aestream"
+
+[tool.scikit-build]
+build-dir = "_skbuild/{wheel_tag}"
+cmake.args = ["-DUSE_PYTHON=1", "-DUSE_CUDA=1"]
+
+[tool.cibuildwheel]
+# Necessary to see build output from the actual compilation
+build-verbosity = 1
+
+# Needed for full C++17 support
+[tool.cibuildwheel.macos.environment]
+MACOSX_DEPLOYMENT_TARGET = "10.14"
