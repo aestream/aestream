@@ -2,7 +2,7 @@ message("@ src/cpp/CMakeLists.txt")
 include(FetchContent)
 
 # AER processing
-add_library(aer SHARED aer.hpp generator.hpp)
+add_library(aer STATIC aer.hpp generator.hpp)
 target_include_directories(aer INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 set_target_properties(aer PROPERTIES LINKER_LANGUAGE CXX)
 # set coroutine flags for clang appropriately

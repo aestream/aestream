@@ -42,7 +42,8 @@ else()
 endif()
 
 # Create the input library
-add_library(aestream_input SHARED ${input_sources})
+add_library(aestream_input STATIC ${input_sources})
 target_link_libraries(aestream_input ${input_libraries})
 target_compile_definitions(aestream_input PUBLIC ${input_definitions})
 target_include_directories(aestream_input PUBLIC ${input_include_directories})
+target_compile_options(aestream_input PRIVATE "-fPIC")
