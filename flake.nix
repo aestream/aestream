@@ -70,7 +70,7 @@
             addAutoPatchelfSearchPath src/output
           '';
           installPhase = ''
-            install -m555 -D -t $out/lib/ src/cpp/*.so src/cpp/file/*.so src/cpp/input/*.so src/cpp/output/*.so
+            install -m555 -D -t $out/lib/ src/cpp/*.a src/cpp/file/*.a src/cpp/input/*.a src/cpp/output/*.a
             install -m755 -D src/cpp/aestream $out/bin/aestream
           '';
         };
