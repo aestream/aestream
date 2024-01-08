@@ -28,6 +28,7 @@ template <typename scalar_t> struct BufferDeleter {
   }
 };
 
+using tensor_jax = nb::ndarray<nb::jax, float, nb::shape<2, nb::any>>;
 using tensor_numpy = nb::ndarray<nb::numpy, float, nb::shape<2, nb::any>>;
 using tensor_torch = nb::ndarray<nb::pytorch, float, nb::shape<2, nb::any>>;
 using buffer_t = std::unique_ptr<float[], BufferDeleter<float>>;
@@ -37,11 +38,13 @@ struct BufferPointer {
   BufferPointer(buffer_t data, const std::vector<size_t> &shape,
                 const std::string &device);
   tensor_numpy to_numpy();
+  tensor_jax to_jax();
   tensor_torch to_torch();
   const std::string &device;
 
 private:
   const std::vector<size_t> &shape;
+  template <typename tensor_type> tensor_type to_tensor_type();
   buffer_t data;
 };
 

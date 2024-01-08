@@ -5,13 +5,8 @@ Please refer to https://github.com/aestream/aestream for usage
 """
 import logging
 
-try:
-    import torch
-except ImportError:
-    logging.debug("Failed to import Torch: AEStream is running in Numpy mode")
-
 # Import AEStream modules
-from aestream.aestream_ext import Event
+from aestream.aestream_ext import Backend, Event
 from aestream._input import FileInput, UDPInput
 
 modules = []

@@ -1,3 +1,5 @@
+from enum import Enum
+from typing import Any, Optional
 from aestream import aestream_ext as ext
 
 # Set Numpy Event dtype
@@ -20,12 +22,21 @@ try:
 except ImportError as e:
     raise ImportError("Numpy is required but could not be imported", e)
 
-try:
-    import torch
 
-    USE_TORCH = True
-except ImportError:
-    USE_TORCH = False
+def _read_backend(obj: Any, backend: ext.Backend, population: Optional[Any]):
+    if backend == ext.Backend.GeNN:
+        obj.read_genn(population.extra_global_params["input"].view)
+        population.push_extra_global_param_to_device("input")
+        return population.extra_global_params["input"].view
+    elif backend == ext.Backend.Jax:
+        t = obj.read_buffer()
+        return t.to_jax()
+    elif backend == ext.Backend.Torch:
+        t = obj.read_buffer()
+        return t.to_torch()
+    else:
+        t = obj.read_buffer()
+        return t.to_numpy()
 
 
 class FileInput(ext.FileInput):
@@ -33,68 +44,20 @@ class FileInput(ext.FileInput):
         buffer = self.load_all()
         return np.frombuffer(buffer.data, NUMPY_EVENT_DTYPE)
 
-    def read(self):
-        t = self.read_buffer()
-        if USE_TORCH:
-            return t.to_torch()
-        else:
-            return t.to_numpy()
-
-    def read_genn(self, population):
-        # **YUCK** I would like to implement this with a mixin
-        # to reduce copy-paste but seemingly nanobind doesn't like this
-        # Read from stream into GeNN-owned memory
-        super().read_genn(population.extra_global_params["input"].view)
-
-        # Copy data to device
-        # **NOTE** this may be a NOP if CPU backend is used
-        population.push_extra_global_param_to_device("input")
-
-        return population.extra_global_params["input"].view
+    def read(self, backend: ext.Backend = ext.Backend.Numpy):
+        return _read_backend(self, backend, None)
 
 
 class UDPInput(ext.UDPInput):
-    def read(self):
-        t = self.read_buffer()
-        if USE_TORCH:
-            return t.to_torch()
-        else:
-            return t.to_numpy()
-
-    def read_genn(self, population):
-        # **YUCK** I would like to implement this with a mixin
-        # to reduce copy-paste but seemingly nanobind doesn't like this
-        # Read from stream into GeNN-owned memory
-        super().read_genn(population.extra_global_params["input"].view)
-
-        # Copy data to device
-        # **NOTE** this may be a NOP if CPU backend is used
-        population.push_extra_global_param_to_device("input")
-
-        return population.extra_global_params["input"].view
+    def read(self, backend: ext.Backend = ext.Backend.Numpy):
+        return _read_backend(self, backend, None)
 
 
 try:
 
     class USBInput(ext.USBInput):
-        def read(self):
-            t = self.read_buffer()
-            if USE_TORCH:
-                return t.to_torch()
-            else:
-                return t.to_numpy()
-
-        def read_genn(self, population):
-            # **YUCK** I would like to implement this with a mixin
-            # to reduce copy-paste but seemingly nanobind doesn't like this
-            # Read from stream into GeNN-owned memory
-            super().read_genn(population.extra_global_params["input"].view)
-
-            # Copy data to device
-            # **NOTE** this may be a NOP if CPU backend is used
-            population.push_extra_global_param_to_device("input")
-
-            return population.extra_global_params["input"].view
+        def read(self, backend: ext.Backend = ext.Backend.Numpy):
+            return _read_backend(self, backend, None)
 
 except:
     pass  # Ignore if drivers are not installed
@@ -102,24 +65,8 @@ except:
 try:
 
     class SpeckInput(ext.SpeckInput):
-        def read(self):
-            t = self.read_buffer()
-            if USE_TORCH:
-                return t.to_torch()
-            else:
-                return t.to_numpy()
-
-        def read_genn(self, population):
-            # **YUCK** I would like to implement this with a mixin
-            # to reduce copy-paste but seemingly nanobind doesn't like this
-            # Read from stream into GeNN-owned memory
-            super().read_genn(population.extra_global_params["input"].view)
-
-            # Copy data to device
-            # **NOTE** this may be a NOP if CPU backend is used
-            population.push_extra_global_param_to_device("input")
-
-            return population.extra_global_params["input"].view
+        def read(self, backend: ext.Backend = ext.Backend.Numpy):
+            return _read_backend(self, backend, None)
 
 except Exception as e:
     pass  # Ignore if Speck/ZMQ isn't installed

@@ -29,7 +29,14 @@ NB_MODULE(aestream_ext, m) {
       .def_rw("y", &AER::Event::y)
       .def_rw("polarity", &AER::Event::polarity);
 
+  nb::enum_<Backend>(m, "Backend")
+      .value("GeNN", Backend::GeNN)
+      .value("Jax", Backend::Jax)
+      .value("Numpy", Backend::Numpy)
+      .value("Torch", Backend::Torch);
+
   nb::class_<BufferPointer>(m, "BufferPointer")
+      .def("to_jax", &BufferPointer::to_jax)
       .def("to_numpy", &BufferPointer::to_numpy)
       .def("to_torch", &BufferPointer::to_torch);
 

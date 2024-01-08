@@ -146,14 +146,8 @@ BufferPointer::BufferPointer(buffer_t data, const std::vector<size_t> &shape,
                              const std::string &device)
     : data(std::move(data)), shape(shape), device(device) {}
 
-tensor_numpy BufferPointer::to_numpy() {
-  const size_t s[2] = {shape[0], shape[1]};
-  float *ptr = data.release();
-  nb::capsule owner(ptr, [](void *p) noexcept { delete[](float *) p; });
-  return tensor_numpy(ptr, 2, s, owner);
-}
-
-tensor_torch BufferPointer::to_torch() {
+template <typename tensor_type>
+inline tensor_type BufferPointer::to_tensor_type() {
   const size_t s[2] = {shape[0], shape[1]};
   float *ptr = data.release();
   nb::capsule owner;
@@ -169,7 +163,21 @@ tensor_torch BufferPointer::to_torch() {
 
   int32_t device_type =
       device == "cuda" ? nb::device::cuda::value : nb::device::cpu::value;
-  return tensor_torch(ptr, 2, s, owner, /* owner */
-                      nullptr,          /* strides */
-                      nanobind::dtype<float>(), device_type);
+  return tensor_type(ptr, 2, s, owner, /* owner */
+                     nullptr,          /* strides */
+                     nanobind::dtype<float>(), device_type);
+}
+
+tensor_numpy BufferPointer::to_numpy() {
+  // const size_t s[2] = {shape[0], shape[1]};
+  // float *ptr = data.release();
+  // nb::capsule owner(ptr, [](void *p) noexcept { delete[](float *) p; });
+  // return tensor_numpy(ptr, 2, s, owner);
+  return to_tensor_type<tensor_numpy>();
+}
+
+tensor_jax BufferPointer::to_jax() { return to_tensor_type<tensor_jax>(); }
+
+tensor_torch BufferPointer::to_torch() {
+  return to_tensor_type<tensor_torch>();
 }

@@ -3,6 +3,7 @@
 #include "../cpp/aer.hpp"
 #include "../cpp/generator.hpp"
 #include "../cpp/input/file.hpp"
+#include "types.hpp"
 
 #include "tensor_buffer.hpp"
 #include "tensor_iterator.hpp"
@@ -42,10 +43,6 @@ public:
   bool get_is_streaming();
 
   nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>> load();
-
-  // py::array_t<AER::Event> events_co();
-
-  // Generator<py::array_t<AER::Event>> parts_co(size_t n_events_per_part);
 
   FileInput *start_stream();
 
