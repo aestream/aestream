@@ -1,5 +1,4 @@
-from enum import Enum
-from typing import Any, Optional
+from typing import Any, Optional, Union
 from aestream import aestream_ext as ext
 
 # Set Numpy Event dtype
@@ -23,7 +22,17 @@ except ImportError as e:
     raise ImportError("Numpy is required but could not be imported", e)
 
 
+def _convert_parameter_to_backend(backend: Union[ext.Backend, str]):
+    if isinstance(backend, ext.Backend):
+        return backend
+    elif isinstance(backend, str):
+        return getattr(ext.Backend, backend)
+    else:
+        raise TypeError("backend must be either ext.Backend or str")
+
+
 def _read_backend(obj: Any, backend: ext.Backend, population: Optional[Any]):
+    backend = _convert_parameter_to_backend(backend)
     if backend == ext.Backend.GeNN:
         obj.read_genn(population.extra_global_params["input"].view)
         population.push_extra_global_param_to_device("input")
