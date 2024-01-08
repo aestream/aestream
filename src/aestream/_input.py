@@ -49,6 +49,18 @@ def _read_backend(obj: Any, backend: ext.Backend, population: Optional[Any]):
 
 
 class FileInput(ext.FileInput):
+    """
+    Reads events from a file.
+
+    Parameters:
+        filename (str): Path to file.
+        shape (tuple): Shape of the camera surface in pixels (X, Y).
+        device (str): Device name. Defaults to "cpu"
+        ignore_time (bool): Whether to ignore the timestamps for the events when
+            streaming. If set to True, the events will be streamed as fast as possible.
+            Defaults to False.
+    """
+
     def load(self):
         buffer = self.load_all()
         return np.frombuffer(buffer.data, NUMPY_EVENT_DTYPE)
@@ -58,6 +70,15 @@ class FileInput(ext.FileInput):
 
 
 class UDPInput(ext.UDPInput):
+    """
+    Reads events from a UDP socket.
+
+    Parameters:
+        shape (tuple): Shape of the camera surface in pixels (X, Y).
+        device (str): Device name. Defaults to "cpu"
+        port (int): Port to listen on. Defaults to 3333.
+    """
+
     def read(self, backend: ext.Backend = ext.Backend.Numpy):
         return _read_backend(self, backend, None)
 
@@ -65,6 +86,16 @@ class UDPInput(ext.UDPInput):
 try:
 
     class USBInput(ext.USBInput):
+        """
+        Reads events from a USB camera.
+
+        Parameters:
+            shape (tuple): Shape of the camera surface in pixels (X, Y).
+            device (str): Device name. Defaults to "cpu"
+            device_id (int): Device ID. Defaults to 0.
+            device_address (int): Device address, typically on the bus. Defaults to 0.
+        """
+
         def read(self, backend: ext.Backend = ext.Backend.Numpy):
             return _read_backend(self, backend, None)
 

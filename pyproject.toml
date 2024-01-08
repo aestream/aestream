@@ -1,19 +1,14 @@
 [build-system]
-requires = [
-        "scikit-build-core",
-        "nanobind>=1.2",
-        ]
+requires = ["scikit-build-core", "nanobind>=1.2"]
 build-backend = "scikit_build_core.build"
 
 [project]
 name = "aestream"
-version = "0.6.1"
+version = "0.6.2"
 description = "Streaming library for Address-Event Representation (AER) data"
 readme = "README.md"
 requires-python = ">=3.8"
-authors = [
-    { name = "Jens E. Pedersen", email = "jens@jepedersen.dk" },
-]
+authors = [{ name = "Jens E. Pedersen", email = "jens@jepedersen.dk" }]
 license = { text = "MIT" }
 classifiers = [
     "License :: OSI Approved :: MIT License",
@@ -22,11 +17,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
     "Topic :: System :: Hardware :: Universal Serial Bus (USB)",
 ]
-dependencies = [
-    "numpy",
-    "nanobind>=1.2",
-    "pysdl2-dll"
-]
+dependencies = ["numpy", "nanobind>=1.2", "pysdl2-dll"]
 
 
 [project.urls]
