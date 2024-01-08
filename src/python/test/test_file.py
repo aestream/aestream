@@ -21,7 +21,6 @@ def test_load_aedat4():
     assert buf[0]["y"] == 15
     assert buf[0]["polarity"] == True
 
-
 def test_stream_aedat4():
     with FileInput(
         filename="example/sample.aedat4", shape=(346, 260), ignore_time=True

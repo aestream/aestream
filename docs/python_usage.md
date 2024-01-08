@@ -70,3 +70,14 @@ with SpeckInput() as stream:
 ```
 
 > Example: [Visualize events from the Speck chip](https://github.com/aestream/blob/main/example/speck_video.py)
+
+## Using different backends
+
+AEStream is built with [Nanobind](https://nanobind.readthedocs.io/) that can directly [expose arrays in various memory formats](https://nanobind.readthedocs.io/), including [PyTorch](https://pytorch.org), [Numpy](https://numpy.org), and [Jax](https:/jax.readthedocs.io).
+You can directly decide which backend to use by passing a `backend` argument to the `read` function:
+
+```python
+with FileInput(...) as stream:
+    ...
+    stream.read(backend="torch")
+```

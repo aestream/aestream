@@ -2,16 +2,16 @@ import os
 import sys
 
 extensions = [
-    "sphinx.ext.autodoc", # Imports modules and docs
-    "sphinx.ext.intersphinx", # Links to external libs docs
-    "sphinx.ext.napoleon", # Converts docs to rst format
+    "sphinx.ext.autodoc",  # Imports modules and docs
+    "sphinx.ext.intersphinx",  # Links to external libs docs
+    "sphinx.ext.napoleon",  # Converts docs to rst format
     "sphinx.ext.autosummary",
     "sphinx_copybutton",
     "myst_parser",
-    "sphinx.ext.napoleon"
+    "sphinx.ext.napoleon",
 ]
 
-intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
+intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 
 autosummary_generate = True
 
@@ -33,7 +33,7 @@ project = "AEStream"
 # The short X.Y version.
 version = "0.6"
 # The full version, including alpha/beta/rc tags.
-release = "0.6.1"
+release = "0.6.2"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -42,12 +42,10 @@ exclude_patterns = ["_build"]
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
 
-
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
-
-html_theme = "furo"
+html_theme = 'furo'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
