@@ -12,5 +12,5 @@ def test_read_numpy_string():
 
 
 def test_read_nonexistent_backend():
-    with pytest.raises(AttributeError) as e:
+    with pytest.raises(AttributeError):
         FileInput("example/sample.aedat4", shape=(600, 400)).read("NonexistentBackend")
