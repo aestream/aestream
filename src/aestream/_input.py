@@ -1,4 +1,5 @@
 from typing import Any, Optional, Union
+
 from aestream import aestream_ext as ext
 
 # Set Numpy Event dtype
@@ -82,9 +83,7 @@ class UDPInput(ext.UDPInput):
     def read(self, backend: ext.Backend = ext.Backend.Numpy):
         return _read_backend(self, backend, None)
 
-
-try:
-
+if "caer" in ext.drivers or "metavision" in ext.drivers:
     class USBInput(ext.USBInput):
         """
         Reads events from a USB camera.
@@ -99,14 +98,8 @@ try:
         def read(self, backend: ext.Backend = ext.Backend.Numpy):
             return _read_backend(self, backend, None)
 
-except:
-    pass  # Ignore if drivers are not installed
-
-try:
+if "zmq" in ext.drivers:
 
     class SpeckInput(ext.SpeckInput):
         def read(self, backend: ext.Backend = ext.Backend.Numpy):
             return _read_backend(self, backend, None)
-
-except Exception as e:
-    pass  # Ignore if Speck/ZMQ isn't installed

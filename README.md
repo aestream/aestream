@@ -62,7 +62,7 @@ This is particularly useful in real-time scenarios, for instance when operating 
 # Stream events from a DVS camera over USB
 with USBInput((640, 480)) as stream:
     while True:
-        frame = stream.read() # Provides a (640, 480) tensor
+        frame = stream.read() # Provides a (640, 480) tensor for Numpy
         ...
 ```
 
@@ -70,7 +70,7 @@ with USBInput((640, 480)) as stream:
 # Stream events from UDP port 3333 (default)
 with UDPInput((640, 480), port=3333) as stream:
     while True:
-        frame = stream.read() # Provides a (640, 480) tensor
+        frame = stream.read("torch") # Provides a (640, 480) tensor for PyTorch
         ...
 ```
 

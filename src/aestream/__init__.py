@@ -4,17 +4,26 @@ AEStream library for streaming address-event representations.
 Please refer to https://github.com/aestream/aestream for usage
 """
 import logging
+from importlib.metadata import version, PackageNotFoundError
 
 # Import AEStream modules
-from aestream.aestream_ext import Backend, Event
+from aestream.aestream_ext import Backend, Camera, Event, drivers
 from aestream._input import FileInput, UDPInput
 
-modules = []
+
 try:
+    __version__ = version("aestream")
+except PackageNotFoundError:
+    # package is not installed
+    pass
+
+modules = []
+
+if "caer" in drivers or "metavision" in drivers:
     from aestream._input import USBInput
 
     modules.append("USBInput")
-except ImportError:
+else:
     logging.debug("Failed to import AEStream USB Input")
 
 try:
@@ -24,14 +33,14 @@ try:
 except ImportError as ex:
     logging.debug("Failed to import GeNN: AEStream cannot use GeNN device")
 
-try:
+if "zmq" in drivers:
     from aestream._input import SpeckInput
 
     modules.append("SpeckInput")
-except ImportError:
+else:
     logging.debug("Failed to import ZMQ: AEStream cannot use ZMQ input")
 
 del logging
 
-__all__ = ["Event", "FileInput", "UDPInput"] + modules
+__all__ = ["Backend", "Camera", "drivers", "Event", "FileInput", "UDPInput"] + modules
 del modules
