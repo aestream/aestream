@@ -33,6 +33,9 @@ with USBInput((640, 480)) as stream:
         ...
 ```
 
+You can specify either Inivation or Prophesee cameras by passing the `camera` argument to the `USBInput` constructor:
+`USBInput((640, 480), camera=Camera.Inivation)`.
+
 > Example: [Displaying a video of streaming events](https://github.com/aestream/aestream/blob/main/example/usb_video.py): `python3 example/usb_video.py`
 
 > Example: [Detecting edges with a neural network](https://github.com/aestream/aestream/blob/main/example/usb_edgedetection.py): `python3 example/usb_edgedetection.py`
@@ -71,7 +74,7 @@ with SpeckInput() as stream:
 
 > Example: [Visualize events from the Speck chip](https://github.com/aestream/blob/main/example/speck_video.py)
 
-## Using different backends
+## Usage with PyTorch, Numpy, or Jax
 
 AEStream is built with [Nanobind](https://nanobind.readthedocs.io/) that can directly [expose arrays in various memory formats](https://nanobind.readthedocs.io/), including [PyTorch](https://pytorch.org), [Numpy](https://numpy.org), and [Jax](https:/jax.readthedocs.io).
 You can directly decide which backend to use by passing a `backend` argument to the `read` function:
@@ -79,5 +82,9 @@ You can directly decide which backend to use by passing a `backend` argument to 
 ```python
 with FileInput(...) as stream:
     ...
-    stream.read(backend="torch")
+    stream.read("torch")
 ```
+
+* `stream.read(backend="numpy")` returns a Numpy array (default)
+* `stream.read(backend="torch")` returns a PyTorch tensor
+* `stream.read(backend="jax")` returns a Jax array

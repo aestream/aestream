@@ -5,7 +5,7 @@ from aestream import USBInput
 
 # Connect to a USB camera, receiving tensors of shape (640, 480)
 # By default, we send the tensors to the CPU
-#   - if you have a GPU, try changing this to "cuda"
+#   - if you have an NVIDIA GPU, try changing this to "cuda"
 with USBInput((640, 480), device="cpu") as stream:
 
     # In this case, we read() every 100ms

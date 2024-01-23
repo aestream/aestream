@@ -4,7 +4,7 @@ AEStream is usable both as a command-line binary or Python tool.
 
 | **Source** | **Installation**
 | -------------------- | --- |
-| [pip](https://pypi.org/) | <code>pip install aestream <br/> pip install aestream[torch]</code> ([PyTorch support](https://pytorch.com)) |
+| [pip](https://pypi.org/) | <code>pip install aestream |
 | [nix](https://nixos.org/) | <code>nix run github:aestream/aestream</code> (CLI) <br/> <code>nix develop github:aestream/aestream</code> (Python environment) |
 | [docker](https://docker.com/) | See [Installation documentation](https://aestream.github.io/aestream/install.html) |
 
@@ -26,14 +26,19 @@ Installing via pip is the most convenient method to install AEStream and provide
 Pip is the [Python package manager](https://pip.pypa.io/en/stable/installation/) that is accessible on most computers.
 
 ### Event camera drivers
-AEStream can read from Inivation event cameras, *given that the drivers are installed*. To stream events via either [CLI](cli) or [Python](python_usage),
+AEStream can read from [Inivation](https://gitlab.com/inivation/dv/libcaer/) or [Prophesee](https://github.com/prophesee-ai/openeb/) event cameras, *given that the drivers are installed*.
+That is, the **drivers must be installed before aestream**.
 
-1. Follow the instructions at https://gitlab.com/inivation/dv/libcaer/ to install the Inivation drivers
-2. Install AEStream with pip: `pip install aestream --no-binary`
+1. Follow the instructions at https://gitlab.com/inivation/dv/libcaer/ to install the Inivation drivers and/or https://github.com/prophesee-ai/openeb/ to install the Prophesee drivers
+2. Install AEStream with pip: `pip install aestream --no-binary -v`
     * The `--no-binary` flag forces a recompilation, which will detect the event camera drivers, if 
+    * The `-v` flag enables verbose output, which will show you if the drivers were detected
     * If you already have an installation, you need to re-install
-3. Test your installation by running the [`usb_video.py` example](https://github.com/aestream/aestream/blob/main/example/usb_video.py). If a window with streaming events pops up, you are successful!
+3. Ensure that the drivers were detected by inspecting the installation log
+    * If successful, you should see messages like `-- Inivation dependencies (libcaer) found at /usr/local/lib/cmake/libcaer`
+4. Test your installation by running the [`usb_video.py` example](https://github.com/aestream/aestream/blob/main/example/usb_video.py). If a window with streaming events pops up, you are successful!
 
+Once installed, the cameras can be used in both [CLI](cli) or [Python](python_usage).
 We are working to automate the driver installation as a part of AEStream. Help is welcome and appreciated!
 
 ## Installing via Docker

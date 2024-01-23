@@ -10,7 +10,7 @@
 #include "types.hpp"
 #include "udp.cpp"
 
-#ifdef WITH_CAER
+#if defined(WITH_CAER) || defined(WITH_METAVISION)
 #include "usb.cpp"
 #endif
 
@@ -22,12 +22,18 @@ namespace nb = nanobind;
 
 NB_MODULE(aestream_ext, m) {
 
-  nb::class_<AER::Event>(m, "Event")
-      .def(nb::init<uint64_t, uint16_t, uint16_t, bool>())
-      .def_rw("timestamp", &AER::Event::timestamp)
-      .def_rw("x", &AER::Event::x)
-      .def_rw("y", &AER::Event::y)
-      .def_rw("polarity", &AER::Event::polarity);
+  // Drivers
+  m.attr("drivers") = std::vector<std::string>({
+#ifdef WITH_CAER
+      "caer",
+#endif
+#ifdef WITH_METAVISION
+      "metavision",
+#endif
+#ifdef with_ZMQ
+      "zmq"
+#endif
+  });
 
   nb::enum_<Backend>(m, "Backend")
       .value("GeNN", Backend::GeNN)
@@ -39,6 +45,17 @@ NB_MODULE(aestream_ext, m) {
       .def("to_jax", &BufferPointer::to_jax)
       .def("to_numpy", &BufferPointer::to_numpy)
       .def("to_torch", &BufferPointer::to_torch);
+
+  nb::enum_<Camera>(m, "Camera")
+      .value("Inivation", Camera::Inivation)
+      .value("Prophesee", Camera::Prophesee);
+
+  nb::class_<AER::Event>(m, "Event")
+      .def(nb::init<uint64_t, uint16_t, uint16_t, bool>())
+      .def_rw("timestamp", &AER::Event::timestamp)
+      .def_rw("x", &AER::Event::x)
+      .def_rw("y", &AER::Event::y)
+      .def_rw("polarity", &AER::Event::polarity);
 
   //   nb::class_<Iterator>(m, "EventIterator")
   //       //  .def( // Thanks to https://stackoverflow.com/a/57217995/999865
@@ -118,11 +135,20 @@ NB_MODULE(aestream_ext, m) {
                           nb::device::cpu>
                   buffer) { udp.read_genn(buffer.data(), buffer.size()); });
 
-#ifdef WITH_CAER
+#if defined(WITH_CAER) || defined(WITH_METAVISION)
   nb::class_<USBInput>(m, "USBInput")
+      .def(nb::init<py_size_t, std::string, Camera>(), nb::arg("shape"),
+           nb::arg("device") = "cpu", nb::arg("camera") = Camera::Inivation)
+#ifdef WITH_CAER
       .def(nb::init<py_size_t, std::string, int, int>(), nb::arg("shape"),
            nb::arg("device") = "cpu", nb::arg("device_id") = 0,
            nb::arg("device_address") = 0)
+#endif
+#ifdef WITH_METAVISION
+      .def(nb::init<py_size_t, std::string, std::string>(), nb::arg("shape"),
+           nb::arg("device") = "cpu", nb::arg("serial_number") = nb::none())
+
+#endif
       .def("__enter__", &USBInput::start_stream)
       .def("__exit__",
            [](USBInput &i, nb::object t, nb::object v, nb::object trace) {

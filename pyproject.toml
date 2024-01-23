@@ -1,10 +1,9 @@
 [build-system]
-requires = ["scikit-build-core", "nanobind>=1.2"]
+requires = ["scikit-build-core", "nanobind>=1.2", "setuptools_scm>=8"]
 build-backend = "scikit_build_core.build"
 
 [project]
 name = "aestream"
-version = "0.6.2"
 description = "Streaming library for Address-Event Representation (AER) data"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -17,16 +16,19 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
     "Topic :: System :: Hardware :: Universal Serial Bus (USB)",
 ]
-dependencies = ["numpy", "nanobind>=1.2", "pysdl2-dll"]
-
+dependencies = ["numpy", "nanobind>=1.2", "pysdl2", "pysdl2-dll"]
+dynamic = ["version"] # Version number read from __init__.py
 
 [project.urls]
 Homepage = "https://github.com/aestream/aestream"
 Documentation = "https://aestream.github.io/aestream"
 
+[tool.setuptools_scm]
+
 [tool.scikit-build]
 build-dir = "_skbuild/{wheel_tag}"
 cmake.args = ["-DUSE_PYTHON=1", "-DUSE_CUDA=1"]
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
 
 [tool.cibuildwheel]
 # Necessary to see build output from the actual compilation

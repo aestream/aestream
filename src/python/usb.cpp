@@ -1,9 +1,14 @@
 #include "../cpp/aer.hpp"
 #include "../cpp/generator.hpp"
+#ifdef WITH_METAVISION
+#include "../cpp/input/prophesee.hpp"
+#endif
+#ifdef WITH_CAER
 #include "../cpp/input/inivation.hpp"
+#endif
 
-#include "types.hpp"
 #include "tensor_buffer.hpp"
+#include "types.hpp"
 
 class USBInput {
 
@@ -33,7 +38,26 @@ private:
   };
 
 public:
-  USBInput(py_size_t shape, const std::string& device, uint16_t deviceId,
+  // General constructor
+  USBInput(py_size_t shape, const std::string device, Camera camera)
+      : buffer(shape, device, EVENT_BUFFER_SIZE) {
+    if (camera == Camera::Inivation) {
+#ifdef WITH_CAER
+      generator = inivation_event_generator({}, is_streaming);
+#else
+      throw std::invalid_argument("Inivation camera drivers not available.");
+#endif
+    } else if (camera == Camera::Prophesee) {
+#ifdef WITH_CAER
+      generator = prophesee_event_generator(is_streaming, std::nullopt);
+#else
+      throw std::invalid_argument("Inivation camera drivers not available.");
+#endif
+    }
+  }
+// Inivation via LIBCAER
+#ifdef WITH_CAER
+  USBInput(py_size_t shape, const std::string device, uint16_t deviceId,
            uint16_t deviceAddress)
       : buffer(shape, device, EVENT_BUFFER_SIZE) {
     if (deviceId > 0) {
@@ -48,11 +72,20 @@ public:
       generator = inivation_event_generator({}, is_streaming);
     }
   }
-
-  std::unique_ptr<BufferPointer> read() { 
-    return buffer.read(); 
+#endif
+// Prophesee via Metavision
+#ifdef WITH_CAER
+  USBInput(py_size_t shape, const std::string device, const std::string serial)
+      : buffer(shape, device, EVENT_BUFFER_SIZE) {
+        std::cout << serial << std::endl;
+    generator = prophesee_event_generator(is_streaming, serial);
   }
-  void read_genn(uint32_t *bitmask, size_t size){ buffer.read_genn(bitmask, size); }
+#endif
+
+  std::unique_ptr<BufferPointer> read() { return buffer.read(); }
+  void read_genn(uint32_t *bitmask, size_t size) {
+    buffer.read_genn(bitmask, size);
+  }
 
   USBInput *start_stream() {
     std::thread socket_thread(&USBInput::stream_synchronous, this);
@@ -63,7 +96,8 @@ public:
   void stop_stream() {
     is_streaming.store(false);
     while (!done_streaming.load()) {
-      // Wait until the thread is done streaming to avoid freeing memory too early
+      // Wait until the thread is done streaming to avoid freeing memory too
+      // early
     }
   }
 };
