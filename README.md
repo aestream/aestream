@@ -1,11 +1,11 @@
 
-<img src="https://github.com/aestream/aestream/raw/main/logo.png" />
+<a href="https://github.com/aestream/aestream"><img src="https://github.com/aestream/aestream/raw/main/logo.png" /></a>
 
 <p align="center">
     <a href="https://github.com/aestream/aestream/actions">
         <img src="https://github.com/aestream/aestream/workflows/Build%20and%20test/badge.svg" alt="Test status"></a>
     <a href="https://pypi.org/project/aestream/" alt="PyPi">
-        <img src="https://img.shields.io/pypi/v/aestream" />
+        <img src="https://img.shields.io/pypi/dm/aestream" />
     </a>
     <a href="https://github.com/aestream/aestream/pulse" alt="Activity">
         <img src="https://img.shields.io/github/last-commit/aestream/aestream" />
@@ -13,13 +13,12 @@
     <a href="https://discord.gg/7fGN359">
         <img src="https://img.shields.io/discord/723215296399147089"
             alt="chat on Discord"></a>
-    <a href="https://www.codacy.com/gh/aestream/aestream/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=aestream/aestream&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/0a04a852daf540a9b9bbe9d78df9eea7"/></a>
     <a href="https://doi.org/10.5281/zenodo.6322829"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6322829.svg" alt="DOI"></a>
 </p>
 
-AEStream effiently sends event-based data from A to B.
-AEStream can be used from the command-line, via Python, or as a C++ library.
-We support multiple inputs and outputs, providing seamless integration with files, [event cameras](https://en.wikipedia.org/wiki/Event_camera), network data, Python libraries via Numpy or PyTorch, and visualization tools.
+AEStream sends event-based data from A to B.
+AEStream is both a command-line tool an a C++/Python library with built-in GPU-acceleration for use with [PyTorch](https://pytorch.org/), and [Jax](https://jax.readthedocs.io/en/latest/).
+We support reading and writing from files, [event cameras](https://en.wikipedia.org/wiki/Event_camera), network protocols, and visualization tools.
 
 <img src="https://github.com/aestream/aestream/raw/main/docs/aestream_flow.png" />
 
@@ -30,39 +29,45 @@ Read more about the inner workings of the library in [the AEStream publication](
 > Read more in our [installation guide](https://aestream.github.io/aestream/install.html)
 
 The fastest way to install AEStream is by using pip: `pip install aestream`.
-See below for other sources.
 
 | **Source** | **Installation** | **Description** |
 | -------------------- | --- | --- |
-| [pip](https://pypi.org/) | <code>pip install aestream</code> <br/> <code>pip install aestream[torch]</code> <br/> <code>pip install aestream --no-binary</code> | <br/> [PyTorch support](https://pytorch.com) <br/> <a href="https://aestream.github.io/aestream/install.html#Event-camera-support">Requires camera drivers*</a> |
+| [pip](https://pypi.org/) | <code>pip install aestream</code> <br/> <code>pip install aestream --no-binary</code> | Standard installation <br/> Compilation with support for<a href="https://aestream.github.io/aestream/install.html#Event-camera-support">event-cameras</a> and CUDA kernels*</a> |
 | [nix](https://nixos.org/) | <code>nix run github:aestream/aestream</code> <br/> <code>nix develop github:aestream/aestream</code> | Command-line interface <br/> Python environment |
 | [docker](https://docker.com/) | See <a href="https://aestream.github.io/aestream/install.html">Installation documentation</a> |
 
-<span style="font-size: 80%">
-* Event camera support requires available drivers. <a href="https://aestream.github.io/aestream/install.html">A step-by-step guide is available in our documentation</a>.
-</span>
-
 Contributions to support AEStream on additional platforms are always welcome.
 
-## Usage (Python)
+## Usage (Python): Load event files
 
 > Read more in our [Python usage guide](https://aestream.github.io/aestream/python_usage.html)
 
-AEStream can process fixed input sources like files like so:
+AEStream can process `.csv`, `.dat`, `.evt3`, and `.aedat4` files like so.
+You can either directly load the file into memory
 
 ```python
-FileInput("file", (640, 480)).load()
+FileInput("file.aedat4", (640, 480)).load()
 ```
 
-## Usage: stream real-time data in Python
-AEStream also supports streaming data in real-time *without strict guarantees on orders*. 
-This is particularly useful in real-time scenarios, for instance when operating with `USBInput` or `UDPInput`
+or stream the file in real-time to PyTorch, Jax, or Numpy
+
+```python
+with FileInput("file.aedat4", (640, 480)) as stream:
+    while True:
+        frame = stream.read("torch") # Or "jax" or "numpy"
+        ...
+```
+
+## Usage (Python): stream data from camera or network
+Streaming data is particularly useful in real-time scenarios.
+We currently support [Inivation](https://inivation.com/), [Prophesee](https://github.com/prophesee-ai/openeb/), and [SynSense](https://www.synsense.ai/) devices over USB, as well as the [SPIF](https://github.com/SpiNNakerManchester/spif) protocol over UDP.
+Note: requires local installation of drivers and/or SDKs (see [installation guide](https://aestream.github.io/aestream/install.html)).
 
 ```python
 # Stream events from a DVS camera over USB
 with USBInput((640, 480)) as stream:
     while True:
-        frame = stream.read() # Provides a (640, 480) tensor for Numpy
+        frame = stream.read() # A (640, 480) Numpy tensor
         ...
 ```
 
@@ -70,7 +75,7 @@ with USBInput((640, 480)) as stream:
 # Stream events from UDP port 3333 (default)
 with UDPInput((640, 480), port=3333) as stream:
     while True:
-        frame = stream.read("torch") # Provides a (640, 480) tensor for PyTorch
+        frame = stream.read("torch") # A (640, 480) Pytorch tensor
         ...
 ```
 
