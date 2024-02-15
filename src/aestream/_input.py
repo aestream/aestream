@@ -27,7 +27,7 @@ def _convert_parameter_to_backend(backend: Union[ext.Backend, str]):
     if isinstance(backend, ext.Backend):
         return backend
     elif isinstance(backend, str):
-        return getattr(ext.Backend, backend)
+        return getattr(ext.Backend, backend.title())
     else:
         raise TypeError("backend must be either ext.Backend or str")
 

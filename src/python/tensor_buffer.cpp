@@ -3,19 +3,19 @@
 namespace nb = nanobind;
 
 template <typename scalar_t>
-inline std::unique_ptr<scalar_t[], BufferDeleter<scalar_t>>
+// inline std::unique_ptr<scalar_t[], void (*)(scalar_t *)>
+inline std::unique_ptr<scalar_t[], void (*)(scalar_t *)>
 allocate_buffer(const size_t &length, std::string device) {
 #ifdef USE_CUDA
   if (device == "cuda") {
-    // Thanks to https://stackoverflow.com/a/47406068
-    std::unique_ptr<scalar_t[], BufferDeleter<scalar_t>> buffer_ptr(
+    std::unique_ptr<scalar_t[], void (*)(scalar_t *)> buffer_ptr(
         static_cast<scalar_t *>(alloc_memory_cuda(length, sizeof(scalar_t))),
-        BufferDeleter<scalar_t>());
+        &delete_cuda_buffer<scalar_t>);
     return buffer_ptr;
   }
 #endif
-  return std::unique_ptr<scalar_t[], BufferDeleter<scalar_t>>(
-      new scalar_t[length]{0}, BufferDeleter<scalar_t>());
+  return std::unique_ptr<scalar_t[], void (*)(scalar_t *)>(
+      new scalar_t[length]{0}, delete_cpu_buffer<scalar_t>);
 }
 
 // TensorBuffer constructor
@@ -142,7 +142,9 @@ void TensorBuffer::read_genn(uint32_t *bitmask, size_t size) {
   std::fill(genn_events.begin(), genn_events.end(), 0);
 }
 
-BufferPointer::BufferPointer(buffer_t data, const std::vector<size_t> &shape,
+#include <iostream>
+
+BufferPointer::BufferPointer(buffer_t &&data, const std::vector<size_t> &shape,
                              const std::string &device)
     : data(std::move(data)), shape(shape), device(device) {}
 
@@ -150,29 +152,14 @@ template <typename tensor_type>
 inline tensor_type BufferPointer::to_tensor_type() {
   const size_t s[2] = {shape[0], shape[1]};
   float *ptr = data.release();
-  nb::capsule owner;
-#ifdef USE_CUDA
-  if (device == "cuda") {
-    owner = nb::capsule(ptr, [](void *p) noexcept { free_memory_cuda(p); });
-  } else {
-#endif
-    owner = nb::capsule(ptr, [](void *p) noexcept { delete[](float *) p; });
-#ifdef USE_CUDA
-  }
-#endif
-
   int32_t device_type =
       device == "cuda" ? nb::device::cuda::value : nb::device::cpu::value;
-  return tensor_type(ptr, 2, s, owner, /* owner */
-                     nullptr,          /* strides */
+  return tensor_type(ptr, 2, s, nb::handle(), /* owner */
+                     nullptr,                 /* strides */
                      nanobind::dtype<float>(), device_type);
 }
 
 tensor_numpy BufferPointer::to_numpy() {
-  // const size_t s[2] = {shape[0], shape[1]};
-  // float *ptr = data.release();
-  // nb::capsule owner(ptr, [](void *p) noexcept { delete[](float *) p; });
-  // return tensor_numpy(ptr, 2, s, owner);
   return to_tensor_type<tensor_numpy>();
 }
 

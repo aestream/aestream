@@ -9,6 +9,7 @@ def test_read_numpy():
 
 def test_read_numpy_string():
     FileInput("example/sample.aedat4", shape=(600, 400)).read("Numpy")
+    FileInput("example/sample.aedat4", shape=(600, 400)).read("numpy")
 
 
 def test_read_nonexistent_backend():
