@@ -29,7 +29,7 @@ AEStream also supports streaming data from event cameras in real-time. This is p
 # Stream events from a DVS camera over USB
 with USBInput((640, 480)) as stream:
     while True:
-        frame = stream.read() # Provides a (640, 480) tensor
+        frame = stream.read() # Provides a (640, 480) Numpy tensor 
         ...
 ```
 
@@ -50,7 +50,7 @@ AEStream implements the ["SPIF" UDP event protocol](https://github.com/SpiNNaker
 # Stream events from UDP port 3333 (default)
 with UDPInput((640, 480), port=3333) as stream:
     while True:
-        frame = stream.read() # Provides a (640, 480) tensor
+        frame = stream.read() # Provides a (640, 480) Numpy tensor
         ...
 ```
 
@@ -68,7 +68,7 @@ Note: this requires using the [`JitZMQStreamer` filter](https://synsense-sys-int
 ```python
 with SpeckInput() as stream:
     while True:
-        frame = stream.read() # Provides a (128, 128)
+        frame = stream.read() # Provides a (128, 128) Numpy tensor
         ...
 ```
 
