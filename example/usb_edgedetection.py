@@ -34,7 +34,7 @@ try:
     with USBInput((640, 480)) as stream:
         while True:  # Loop forever
             # Read a tensor (640, 480) tensor from the camera
-            tensor = stream.read()
+            tensor = stream.read("torch")
             # Run the tensor through the network, while updating the state
             with torch.inference_mode():
                 filtered, state = net(tensor.view(1, 1, 640, 480), state)
