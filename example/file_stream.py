@@ -8,7 +8,7 @@ from aestream import FileInput
 #   - if you have a PyTorch installation with a GPU, try changing this to "cuda"
 s = 0
 st = time.time()
-with FileInput("sample.dat", (640, 480), device="cpu", ignore_time=True) as stream:
+with FileInput("sample.dat", (640, 480), device="cuda", ignore_time=True) as stream:
     # In this case, we read() every 1ms
     interval = 0.001
     c = 0
@@ -19,7 +19,7 @@ with FileInput("sample.dat", (640, 480), device="cpu", ignore_time=True) as stre
         # When 1 ms passed...
         if t_0 + interval <= time.time():
             # Grab a tensor of the events arriving during the past 1ms
-            frame = stream.read()
+            frame = stream.read(backend="torch")
 
             # Sum up the events and increment frame counter
             s += frame.sum()

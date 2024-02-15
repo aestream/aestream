@@ -21,7 +21,7 @@ try:
     with USBInput((640, 480), device="cuda") as stream:
         while True:  # Loop forever
             # Read a tensor (640, 480) tensor from the camera
-            tensor = stream.read().cpu()
+            tensor = stream.read("torch").cpu()
             # Run the tensor through the network, while updating the state
             with torch.inference_mode():
                 filtered, state = net(tensor.view(1, 640, 480), state)

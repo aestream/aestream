@@ -10,20 +10,16 @@ AEStream is usable both as a command-line binary or Python tool.
 
 Contributions to support AEStream on additional platforms are always welcome.
 
-## Requirements
-AEStream relies on new coroutine features and, in turn, compilers that support them such as [GCC 10](https://gcc.gnu.org/).
-
-If you are on older machines that default to GCC versions *below* 10, you can enforce a specific version by setting the environmental variable `CXX`. Here is an example for pip:
-
-`CXX=/path/to/g++-10 pip install aestream`
-
----
-
 ## Installing via pip
 Run `pip install aestream`
 
 Installing via pip is the most convenient method to install AEStream and provides access to both the [command-line interface](cli) and the [Python API](python_usage).
 Pip is the [Python package manager](https://pip.pypa.io/en/stable/installation/) that is accessible on most computers.
+
+### Installing with CUDA support
+If you want to use AEStream with CUDA support, you likely need to build the package yourself. This is because the CUDA version must match the one installed on your system.
+To do so, simply run `pip install aestream --no-binary` to avoid using the binary cache.
+Note that you can provide a `-v` flag to enable verbose output, which will show you if the CUDA drivers were detected (look for `CUDA found`).
 
 ### Event camera drivers
 AEStream can read from [Inivation](https://gitlab.com/inivation/dv/libcaer/) or [Prophesee](https://github.com/prophesee-ai/openeb/) event cameras, *given that the drivers are installed*.
@@ -57,16 +53,54 @@ cd aestream
 pip install .
 ```
 
+Note that this will setup the install in an isolated virtual environment, which is slow and can cause problems if you would like to work with the source code.
+To avoid this, we recomment using `--no-build-isolation` in the pip install, but that requires manually installing the necessary packages for the build system, shown below.
+
+```bash
+# Pull the source code
+git clone https://github.com/aestream/aestream
+cd aestream
+# Install build dependencies
+pip install scikit-build-core setuptools_scm pathspec
+# Build aestream, but without build isolation
+# Any future compilation will *only* compile the files you changed
+pip install --no-build-isolation .
+```
+
+
 ### CMake source install
-Note that this will only install the CLI version of AEStream. To have access to the Python features, you must enable the `USE_PYTHON` config.
+You can also install the C++ code directly using [CMake](https://cmake.org/).
 ```bash
 git clone https://github.com/aestream/aestream
 cd aestream
 mkdir build
 cd build
-cmake -GNinja ..
+cmake -GNinja .. 
 ninja install
 ```
+Note that this will only install the CLI version of AEStream.
+To have access to the Python features, you must enable the `USE_PYTHON` config in CMAKE by running `cmake -GNinja -DUSE_PYTHON=ON ..` instead.
 
 If your default C++ compiler doesn't support C++ 20, you will have to install an up-to-date compiler and provide the environmental variable `CXX`.
 For instance like this: `CXX=/path/to/g++-10 cmake -GNinja ..`
+
+## Requirements
+AEStream relies on modern compiler features and require at least [GCC 10](https://gcc.gnu.org/) and [CMake 3.20](https://cmake.org/).
+
+If you are on older machines that default to GCC versions *below* 10, you can enforce a specific version by setting the environmental variable `CXX`. Here is an example for pip:
+
+```CXX=/path/to/g++-10 pip install aestream```
+
+If you have problems with CMake, try installing the latest version from pip: `pip install cmake`.
+
+## Common issues
+
+Here, we list some common issues that users encounter during installation.
+If you run into problems that is not listed here, please [open an issue](https://github.com/aestream/aestream/issues/new).
+
+```{admonition} CMake Error: Could not find a package configuration file provided by "nanobind" with any of the following names: ...
+    :class: warning
+
+This happens when the `nanobind` dependency could not be found. Run `pip install nanobind` to install it and retry.
+
+```

@@ -44,7 +44,7 @@ NB_MODULE(aestream_ext, m) {
   nb::class_<BufferPointer>(m, "BufferPointer")
       .def("to_jax", &BufferPointer::to_jax)
       .def("to_numpy", &BufferPointer::to_numpy)
-      .def("to_torch", &BufferPointer::to_torch);
+      .def("to_torch", &BufferPointer::to_torch, nb::rv_policy::reference);
 
   nb::enum_<Camera>(m, "Camera")
       .value("Inivation", Camera::Inivation)

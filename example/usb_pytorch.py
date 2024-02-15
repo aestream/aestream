@@ -28,11 +28,11 @@ net.weight = torch.nn.Parameter(
 )
 
 # Start streaming from a DVS camera and put them on the GPU
-with USBInput((640, 480), device="gpu") as stream:
+with USBInput((640, 480), device="cuda") as stream:
     try:
         while True:
             # Read a tensor (346, 260) tensor from the camera
-            tensor = stream.read()
+            tensor = stream.read("torch")
             with torch.inference_mode():
                 filtered = net(tensor.view(1, 640, 480))
 

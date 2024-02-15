@@ -23,8 +23,8 @@ def start_stream(port):
 
 
 def test_udp():
-    with UDPInput((640, 480), device="cpu") as stream:
-        start_stream(3333)  # Start streaming from file
+    with UDPInput((640, 480), device="cpu", port=33333) as stream:
+        p = start_stream(33333)  # Start streaming from file
 
         interval = 0.5
         t_0 = time.time()
@@ -36,23 +36,20 @@ def test_udp():
 
 
 @pytest.mark.skipif(not _has_cuda_torch(), reason="Torch-gpu is not installed")
-def test_udp_gpu():
+def test_udp_cuda():
     import torch
 
-    if torch.has_cuda:
-        with UDPInput((640, 480), device="cuda", port=3334) as stream:
-            start_stream(3334)  # Start streaming from file
+    with UDPInput((640, 480), device="cuda", port=33334) as stream:
+        start_stream(33334)  # Start streaming from file
 
-            interval = 0.5
-            time.sleep(0.5)
-            t_0 = time.time()
-            while True:
-                if t_0 + interval <= time.time():
-                    frame = stream.read()
-                    print(frame.argmax(0).argmax(), frame.argmax(1).argmax())
-                    break
-
-        assert torch.eq(frame[218, 15], 1)
+        interval = 0.5
+        time.sleep(1.0)
+        t_0 = time.time()
+        while True:
+            if t_0 + interval <= time.time():
+                frame = stream.read("torch")
+                break
+    assert torch.eq(frame[218, 15], 1)
 
 
 if __name__ == "__main__":

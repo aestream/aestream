@@ -12,7 +12,7 @@ def _has_cuda_torch():
     try:
         import torch
 
-        return torch.has_cuda
+        return torch.backends.cuda.is_built()
     except ImportError:
         pass
     return False

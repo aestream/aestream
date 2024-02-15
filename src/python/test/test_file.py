@@ -21,6 +21,7 @@ def test_load_aedat4():
     assert buf[0]["y"] == 15
     assert buf[0]["polarity"] == True
 
+
 def test_stream_aedat4():
     with FileInput(
         filename="example/sample.aedat4", shape=(346, 260), ignore_time=True
@@ -32,12 +33,13 @@ def test_stream_aedat4():
         while True:
             if time.time() > t_0 + interval:
                 break
-            frame = stream.read()
             if _has_torch():
                 import torch
 
+                frame = stream.read(backend="torch")
                 assert isinstance(frame, torch.Tensor)
             else:
+                frame = stream.read()
                 assert isinstance(frame, np.ndarray)
             events += frame.sum()
     assert events == 117667
@@ -65,12 +67,13 @@ def test_stream_dat():
         while True:
             if time.time() > t_0 + interval:
                 break
-            frame = stream.read()
             if _has_torch():
                 import torch
 
+                frame = stream.read("torch")
                 assert isinstance(frame, torch.Tensor)
             else:
+                frame = stream.read()
                 assert isinstance(frame, np.ndarray)
             events += frame.sum()
     assert events == 539481
@@ -90,10 +93,11 @@ def test_stream_dat_torch_cuda():
         while True:
             if time.time() > t_0 + interval:
                 break
-            frame = stream.read()
+            frame = stream.read(backend="torch")
             assert isinstance(frame, torch.Tensor)
             assert frame.device.type == "cuda"
+            time.sleep(0.5)
             events += frame.sum()
             time.sleep(0.1)
-        events += stream.read().sum()
+        events += stream.read("torch").sum()
     assert events == 539481
