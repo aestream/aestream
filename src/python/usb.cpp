@@ -74,7 +74,7 @@ public:
   }
 #endif
 // Prophesee via Metavision
-#ifdef WITH_CAER
+#ifdef WITH_METAVISION
   USBInput(py_size_t shape, const std::string device, const std::string serial)
       : buffer(shape, device, EVENT_BUFFER_SIZE) {
         std::cout << serial << std::endl;
