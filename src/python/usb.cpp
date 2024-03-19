@@ -48,7 +48,7 @@ public:
       throw std::invalid_argument("Inivation camera drivers not available.");
 #endif
     } else if (camera == Camera::Prophesee) {
-#ifdef WITH_CAER
+#ifdef WITH_METAVISION
       generator = prophesee_event_generator(is_streaming, std::nullopt);
 #else
       throw std::invalid_argument("Inivation camera drivers not available.");
