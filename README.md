@@ -32,7 +32,7 @@ The fastest way to install AEStream is by using pip: `pip install aestream`.
 
 | **Source** | **Installation** | **Description** |
 | -------------------- | --- | --- |
-| [pip](https://pypi.org/) | <code>pip install aestream</code> <br/> <code>pip install aestream --no-binary</code> | Standard installation <br/> Compilation with support for<a href="https://aestream.github.io/aestream/install.html#Event-camera-support">event-cameras</a> and CUDA kernels*</a> |
+| [pip](https://pypi.org/) | <code>pip install aestream</code> <br/> <code>pip install aestream --no-binary aestream</code> | Standard installation <br/> Support for <a href="https://aestream.github.io/aestream/install.html#Event-camera-support">event-cameras</a> and CUDA kernels</a> ([more info](https://aestream.github.io/aestream/install.html#installing-with-cuda-support)) |
 | [nix](https://nixos.org/) | <code>nix run github:aestream/aestream</code> <br/> <code>nix develop github:aestream/aestream</code> | Command-line interface <br/> Python environment |
 | [docker](https://docker.com/) | See <a href="https://aestream.github.io/aestream/install.html">Installation documentation</a> |
 

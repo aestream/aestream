@@ -13,21 +13,22 @@ Contributions to support AEStream on additional platforms are always welcome.
 ## Installing via pip
 Run `pip install aestream`
 
-Installing via pip is the most convenient method to install AEStream and provides access to both the [command-line interface](cli) and the [Python API](python_usage).
-Pip is the [Python package manager](https://pip.pypa.io/en/stable/installation/) that is accessible on most computers.
+Installing via pip is the most convenient method for installing AEStream and gives you both the [command-line interface](cli) and the [Python API](python_usage).
+Pip is the [Python package manager](https://pip.pypa.io/en/stable/installation/) and is accessible on most computers.
 
 ### Installing with CUDA support
 If you want to use AEStream with CUDA support, you likely need to build the package yourself. This is because the CUDA version must match the one installed on your system.
-To do so, simply run `pip install aestream --no-binary` to avoid using the binary cache.
+To do so, simply run `pip install aestream --no-binary aestream` to avoid using the binary cache.
+It will take a few minutes to compile, but if you have an NVIDIA GPU, you'll see dramatic performance improvements.
 Note that you can provide a `-v` flag to enable verbose output, which will show you if the CUDA drivers were detected (look for `CUDA found`).
 
 ### Event camera drivers
 AEStream can read from [Inivation](https://gitlab.com/inivation/dv/libcaer/) or [Prophesee](https://github.com/prophesee-ai/openeb/) event cameras, *given that the drivers are installed*.
-That is, the **drivers must be installed before aestream**.
+**Please make sure the drivers are installed before installing aestream** (step 1 below).
 
 1. Follow the instructions at https://gitlab.com/inivation/dv/libcaer/ to install the Inivation drivers and/or https://github.com/prophesee-ai/openeb/ to install the Prophesee drivers
-2. Install AEStream with pip: `pip install aestream --no-binary -v`
-    * The `--no-binary` flag forces a recompilation, which will detect the event camera drivers, if 
+2. Install AEStream with pip: `pip install aestream --no-binary aestream -v`
+    * The `--no-binary` flag forces pip to recompile aestream for your system, which will detect the event camera drivers, if present.
     * The `-v` flag enables verbose output, which will show you if the drivers were detected
     * If you already have an installation, you need to re-install
 3. Ensure that the drivers were detected by inspecting the installation log
@@ -35,6 +36,7 @@ That is, the **drivers must be installed before aestream**.
 4. Test your installation by running the [`usb_video.py` example](https://github.com/aestream/aestream/blob/main/example/usb_video.py). If a window with streaming events pops up, you are successful!
 
 Once installed, the cameras can be used in both [CLI](cli) or [Python](python_usage).
+
 We are working to automate the driver installation as a part of AEStream. Help is welcome and appreciated!
 
 ## Installing via Docker
@@ -46,7 +48,7 @@ docker build -t aestream .
 ## Installing via source
 Source installations can either be done via pip, which wraps the C++ code, or CMake, where you have to manually configure the project.
 
-### Python source install
+### Python source install and development
 ```bash
 git clone https://github.com/aestream/aestream
 cd aestream
