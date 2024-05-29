@@ -25,9 +25,9 @@ template <typename scalar_t> void delete_cpu_buffer(scalar_t *ptr) {
   delete[] ptr;
 }
 
-using tensor_jax = nb::ndarray<nb::jax, float, nb::shape<nb::any>>;
-using tensor_numpy = nb::ndarray<nb::numpy, float, nb::shape<nb::any>>;
-using tensor_torch = nb::ndarray<nb::pytorch, float, nb::shape<nb::any>>;
+using tensor_jax = nb::ndarray<nb::jax, float, nb::shape<-1>>;
+using tensor_numpy = nb::ndarray<nb::numpy, float, nb::shape<-1>>;
+using tensor_torch = nb::ndarray<nb::pytorch, float, nb::shape<-1>>;
 using buffer_t = std::unique_ptr<float[], void (*)(float *)>;
 using index_t = std::unique_ptr<int[], void (*)(int *)>;
 
