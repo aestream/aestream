@@ -40,7 +40,7 @@ bool FileInput::get_is_streaming() {
   return is_streaming.load() || is_nonempty.load();
 }
 
-nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>> FileInput::load() {
+nb::ndarray<nb::numpy, uint8_t, nb::shape<1, -1>> FileInput::load() {
   struct Container {
     std::vector<AER::Event> events;
   };
@@ -49,7 +49,7 @@ nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>> FileInput::load() {
   c->events = std::move(arr);
   nb::capsule deleter(c, [](void *p) noexcept { delete (Container *)p; });
   const size_t shape[1] = {n_read * sizeof(AER::Event)};
-  return nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>>(
+  return nb::ndarray<nb::numpy, uint8_t, nb::shape<1, -1>>(
       c->events.data(), 1, shape, deleter);
 }
 

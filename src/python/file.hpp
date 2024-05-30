@@ -42,7 +42,7 @@ public:
 
   bool get_is_streaming();
 
-  nb::ndarray<nb::numpy, uint8_t, nb::shape<1, nb::any>> load();
+  nb::ndarray<nb::numpy, uint8_t, nb::shape<1, -1>> load();
 
   FileInput *start_stream();
 

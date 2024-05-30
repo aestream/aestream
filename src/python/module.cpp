@@ -96,7 +96,7 @@ NB_MODULE(aestream_ext, m) {
       .def("read_buffer", &FileInput::read)
       .def("read_genn",
            [](FileInput &file,
-              nb::ndarray<uint32_t, nb::shape<nb::any>, nb::c_contig,
+              nb::ndarray<uint32_t, nb::shape<-1>, nb::c_contig,
                           nb::device::cpu>
                   buffer) { file.read_genn(buffer.data(), buffer.size()); });
   //  .def("parts",
@@ -131,7 +131,7 @@ NB_MODULE(aestream_ext, m) {
       .def("read_buffer", &UDPInput::read)
       .def("read_genn",
            [](UDPInput &udp,
-              nb::ndarray<uint32_t, nb::shape<nb::any>, nb::c_contig,
+              nb::ndarray<uint32_t, nb::shape<-1>, nb::c_contig,
                           nb::device::cpu>
                   buffer) { udp.read_genn(buffer.data(), buffer.size()); });
 
@@ -160,7 +160,7 @@ NB_MODULE(aestream_ext, m) {
       .def("read_buffer", &USBInput::read, nb::rv_policy::take_ownership)
       .def("read_genn",
            [](USBInput &usb,
-              nb::ndarray<uint32_t, nb::shape<nb::any>, nb::c_contig,
+              nb::ndarray<uint32_t, nb::shape<-1>, nb::c_contig,
                           nb::device::cpu>
                   buffer) { usb.read_genn(buffer.data(), buffer.size()); });
 #endif
@@ -182,7 +182,7 @@ NB_MODULE(aestream_ext, m) {
       .def("read_buffer", &ZMQInput::read, nb::rv_policy::take_ownership)
       .def("read_genn",
            [](ZMQInput &zmq,
-              nb::ndarray<uint32_t, nb::shape<nb::any>, nb::c_contig,
+              nb::ndarray<uint32_t, nb::shape<-1>, nb::c_contig,
                           nb::device::cpu>
                   buffer) { zmq.read_genn(buffer.data(), buffer.size()); });
 #endif

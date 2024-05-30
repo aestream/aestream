@@ -21,6 +21,9 @@ If you want to use AEStream with CUDA support, you likely need to build the pack
 To do so, simply run `pip install aestream --no-binary aestream` to avoid using the binary cache.
 It will take a few minutes to compile, but if you have an NVIDIA GPU, you'll see dramatic performance improvements.
 Note that you can provide a `-v` flag to enable verbose output, which will show you if the CUDA drivers were detected (look for `CUDA found`).
+If you need to specify a different C++ compiler, be sure to also specify it for NVCC:
+
+```CXX=/path/to/g++-10 NVCC_PREPEND_FLAGS='-ccbin /path/to/g++-10' pip install aestream --no-binary aestream```
 
 ### Event camera drivers
 AEStream can read from [Inivation](https://gitlab.com/inivation/dv/libcaer/) or [Prophesee](https://github.com/prophesee-ai/openeb/) event cameras, *given that the drivers are installed*.
