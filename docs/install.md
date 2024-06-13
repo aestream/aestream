@@ -29,7 +29,7 @@ If you need to specify a different C++ compiler, be sure to also specify it for 
 AEStream can read from [Inivation](https://gitlab.com/inivation/dv/libcaer/) or [Prophesee](https://github.com/prophesee-ai/openeb/) event cameras, *given that the drivers are installed*.
 **Please make sure the drivers are installed before installing aestream** (step 1 below).
 
-1. Follow the instructions at https://gitlab.com/inivation/dv/libcaer/ to install the Inivation drivers and/or https://github.com/prophesee-ai/openeb/ to install the Prophesee drivers
+1. Follow the instructions at [Inivation libcaer](https://gitlab.com/inivation/dv/libcaer/) to install the Inivation drivers and/or [Prophesee Openeb](https://github.com/prophesee-ai/openeb/) to install the Prophesee drivers
 2. Install AEStream with pip: `pip install aestream --no-binary aestream -v`
     * The `--no-binary` flag forces pip to recompile aestream for your system, which will detect the event camera drivers, if present.
     * The `-v` flag enables verbose output, which will show you if the drivers were detected
@@ -66,7 +66,7 @@ To avoid this, we recomment using `--no-build-isolation` in the pip install, but
 git clone https://github.com/aestream/aestream
 cd aestream
 # Install build dependencies
-pip install scikit-build-core setuptools_scm pathspec
+pip install scikit-build-core setuptools_scm pathspec nanobind
 # Build aestream, but without build isolation
 # Any future compilation will *only* compile the files you changed
 pip install --no-build-isolation .
