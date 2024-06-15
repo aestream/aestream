@@ -154,8 +154,18 @@ inline tensor_type BufferPointer::to_tensor_type() {
   float *ptr = data.release();
   int32_t device_type =
       device == "cuda" ? nb::device::cuda::value : nb::device::cpu::value;
-  return tensor_type(ptr, 2, s, nb::handle(), /* owner */
-                     nullptr,                 /* strides */
+  nb::capsule owner;
+  #ifdef USE_CUDA
+    if (device == "cuda") {
+      owner = nb::capsule(ptr, [](void *p) noexcept { free_memory_cuda((float *)p); });
+    } else {
+  #endif
+      owner = nb::capsule(ptr, [](void *p) noexcept { delete[] (float *) p; });
+  #ifdef USE_CUDA
+    }
+  #endif
+  return tensor_type(ptr, 2, s, owner, /* owner */
+                     nullptr,          /* strides */
                      nanobind::dtype<float>(), device_type);
 }
 
