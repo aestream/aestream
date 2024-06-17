@@ -28,7 +28,15 @@ int view_stream(Generator<AER::Event> &generator, size_t width, size_t height,
 
   SDL_Init(SDL_INIT_VIDEO);
 
-  SDL_CreateWindowAndRenderer(width, height, 0, &window, &renderer);
+  int error = SDL_CreateWindowAndRenderer(width, height, 0, &window, &renderer);
+
+  if (error != 0 || !window || !renderer) {
+    std::ostringstream err;
+    err << "Failed to create window and renderer: " << SDL_GetError() << std::endl;
+    if (window) SDL_DestroyWindow(window);
+    SDL_Quit();
+    throw std::runtime_error(err.str());
+  }
 
   auto frame_texture =
       SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888,
