@@ -1,7 +1,9 @@
 #include <atomic>
 #include <csignal>
+#include <ratio>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <sys/types.h>
 
 #include "CLI11.hpp"
@@ -31,6 +33,28 @@
 // Interrupt
 auto runFlag = std::atomic<bool>(true);
 void signalHandler(int signum) { runFlag.store(false); }
+
+template <typename EventTime>
+Generator<AER::Event> synchronize_time(Generator<AER::Event> &generator) {
+  auto start_real = std::chrono::high_resolution_clock::now();
+  auto start_event = EventTime(0);
+  for (AER::Event event : generator) {
+    start_event = EventTime(event.timestamp);
+    break;
+  }
+  for (AER::Event event : generator) {
+    auto now_real = std::chrono::high_resolution_clock::now();
+    auto now_event = EventTime(event.timestamp);
+    auto event_diff = now_real - start_real;
+    auto real_diff = now_event - start_event;
+    auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(real_diff - event_diff);
+    if (diff.count() > 0) {
+      std::this_thread::sleep_for(diff);
+    }
+    co_yield event;
+  }
+  co_return;
+}
 
 // Main
 int main(int argc, char *argv[]) {
@@ -71,13 +95,17 @@ int main(int argc, char *argv[]) {
   // - File
   std::string input_filename = "None";
   bool input_ignore_time = false;
+  std::string input_time_unit = "us";
   auto app_input_file = app_input->add_subcommand("file", "AEDAT4 input file");
   app_input_file
       ->add_option("file", input_filename, "Path to .aedat or .aedat4 file")
       ->required();
-  // app_input_file->add_flag(
-  //     "--ignore-time", input_ignore_time,
-  //     "Playback in real-time (false, default) or ignore timestamps (true).");
+  app_input_file->add_flag(
+      "--ignore-time", input_ignore_time,
+      "Playback in real-time (false, default) or ignore timestamps (true).");
+  app_input_file->add_option(
+      "--time-unit", input_time_unit,
+      "Time unit for timestamps. Defaults to microseconds. Options: ns, us, ms, s");
   // - ZMQ
   std::string input_zmq_socket = "tcp://0.0.0.0:40001";
   auto app_input_zmq =
@@ -149,7 +177,7 @@ int main(int argc, char *argv[]) {
   //
   // Handle input
   //
-  Generator<AER::Event> input_generator;
+  Generator<AER::Event> input_generator, tmp_generator;
   std::unique_ptr<FileBase> file_handle = nullptr;
   if (app_input_inivation->parsed()) {
 #ifdef WITH_CAER
@@ -171,13 +199,31 @@ int main(int argc, char *argv[]) {
 #endif
   } else if (app_input_file->parsed()) {
     file_handle = open_event_file(input_filename);
-    input_generator = file_handle->stream();
+
+    if (!input_ignore_time) {
+      if (input_time_unit == "ns") {
+        tmp_generator = file_handle->stream();
+        input_generator = synchronize_time<std::chrono::nanoseconds>(tmp_generator);
+      } else if (input_time_unit == "us") {
+        tmp_generator = file_handle->stream();
+        input_generator = synchronize_time<std::chrono::microseconds>(tmp_generator);
+      } else if (input_time_unit == "ms") {
+        input_generator = synchronize_time<std::chrono::milliseconds>(tmp_generator);
+      } else if (input_time_unit == "s") {
+        input_generator = synchronize_time<std::chrono::seconds>(tmp_generator);
+      } else {
+        throw std::invalid_argument("Invalid time unit: " + input_time_unit);
+      }
+    } else{
+      input_generator = file_handle->stream();
+    }
   }
 #ifdef WITH_ZMQ
   else if (app_input_zmq->parsed()) {
     input_generator = open_zmq(input_zmq_socket, runFlag);
   }
 #endif
+
 
   //
   // Handle output
@@ -203,7 +249,7 @@ int main(int argc, char *argv[]) {
 #ifdef WITH_SDL
     else if (app_output_viewer->parsed()) {
       view_stream(input_generator, viewer_width, viewer_height,
-                  viewer_frame_duration, viewer_quiet);
+                  viewer_frame_duration, viewer_quiet, runFlag);
     }
 #endif
     else { // Default to STDOUT

@@ -1,3 +1,6 @@
+
+file_identifier "IOHE";
+
 enum CompressionType : int32 {
 	NONE,
 	LZ4,

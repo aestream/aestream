@@ -1,3 +1,4 @@
+#include <atomic>
 #include <iomanip>
 #include <iostream>
 #include <locale>
@@ -21,7 +22,7 @@ struct NumberGrouping : std::numpunct<char> {
 };
 
 int view_stream(Generator<AER::Event> &generator, size_t width, size_t height,
-                size_t frame_duration, bool quiet) {
+                size_t frame_duration, bool quiet, std::atomic<bool> &runFlag) {
   SDL_Event sdl_event;
   SDL_Renderer *renderer;
   SDL_Window *window;
@@ -89,7 +90,7 @@ int view_stream(Generator<AER::Event> &generator, size_t width, size_t height,
       ticks_text = next_ticks;
     }
 
-    if (SDL_PollEvent(&sdl_event) && sdl_event.type == SDL_QUIT)
+    if ((SDL_PollEvent(&sdl_event) && sdl_event.type == SDL_QUIT) || !runFlag.load())
       break;
 
     render_polarity_events(renderer, positive_buffer, negative_buffer);
