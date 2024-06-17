@@ -37,7 +37,6 @@
         };
         aestream = pkgs.stdenv.mkDerivation {
           name = "aestream";
-          version = "0.6.1";
           src = ./.;
           nativeBuildInputs = [
             pkgs.pkg-config
@@ -60,7 +59,6 @@
             "-GNinja"
             "-DCMAKE_SKIP_BUILD_RPATH=ON"
             "-DFLATBUFFERS_SOURCE_DIR=${pkgs.flatbuffers.src}"
-            # "-DCMAKE_PREFIX_PATH=${openeb.src}/sdk/"
           ];
 
           preBuild = ''
@@ -70,7 +68,7 @@
             addAutoPatchelfSearchPath src/output
           '';
           installPhase = ''
-            install -m555 -D -t $out/lib/ src/cpp/*.a src/cpp/file/*.a src/cpp/input/*.a src/cpp/output/*.a
+            install -m555 -D -t $out/lib/ src/cpp/*.a src/cpp/*.so src/cpp/**/*.a
             install -m755 -D src/cpp/aestream $out/bin/aestream
           '';
         };
