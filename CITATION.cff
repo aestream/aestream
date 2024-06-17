@@ -1,0 +1,58 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: AEStream
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Jens Egholm
+    family-names: Pedersen
+    email: jens@jepedersen.dk
+    affiliation: KTH Royal Institute of Technology
+    orcid: 'https://orcid.org/0000-0001-6012-7415'
+  - given-names: Jörg
+    family-names: Conradt
+    email: conr@kth.se
+    affiliation: KTH Royal Institute of Technology
+    orcid: 'https://orcid.org/0000-0001-5998-9640'
+identifiers:
+  - type: doi
+    value: 10.1145/3584954.3584997
+    description: >-
+      NICE '23: Proceedings of the 2023 Annual
+      Neuro-Inspired Computational Elements Conference
+repository-code: 'https://github.com/aestream/aestream'
+url: 'https://aestream.github.io'
+abstract: >-
+  Neuromorphic sensors imitate the sparse and event-based
+  communication seen in biological sensory organs and
+  brains. Today’s sensors can emit many millions of
+  asynchronous events per second, which is challenging to
+  process on conventional computers. To avoid bottleneck
+  effects, there is a need to apply and improve concurrent
+  and parallel processing of events.
+
+
+  We present AEStream: a library to efficiently stream
+  asynchronous events from inputs to outputs on conventional
+  computers. AEStream leverages cooperative multitasking
+  primitives known as coroutines to concurrently process
+  individual events, which dramatically simplifies the
+  integration with event-based peripherals, such as
+  event-based cameras and (neuromorphic) asynchronous
+  hardware. We explore the effects of coroutines in
+  concurrent settings by benchmarking them against
+  conventional threading mechanisms, and find that AEStream
+  provides at least twice the throughput. We then apply
+  AEStream in a real-time edge detection task on a GPU and
+  demonstrate 1.3 times faster processing with 5 times fewer
+  memory operations.
+keywords:
+  - event-based vision
+  - neuromorphic computing
+  - graphical processing unit
+  - coroutines
+license: MIT

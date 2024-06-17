@@ -13,7 +13,7 @@
     <a href="https://discord.gg/7fGN359">
         <img src="https://img.shields.io/discord/723215296399147089"
             alt="chat on Discord"></a>
-    <a href="https://doi.org/10.5281/zenodo.6322829"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6322829.svg" alt="DOI"></a>
+    <a href="https://doi.org/10.1145/3584954.3584997"><img src="https://zenodo.org/badge/DOI/10.1145/3584954.3584997.svg" alt="DOI"></a>
 </p>
 
 AEStream sends event-based data from A to B.
@@ -150,13 +150,22 @@ Thanks to [Philipp Mondorf](https://github.com/PMMon) for interfacing with Metav
 Please cite `aestream` if you use it in your work:
 
 ```bibtex
-@misc{aestream,
-  doi = {10.48550/ARXIV.2212.10719},
-  url = {https://arxiv.org/abs/2212.10719},
-  author = {Pedersen, Jens Egholm and Conradt, Jörg},
-  title = {AEStream: Accelerated event-based processing with coroutines},
-  publisher = {arXiv},
-  year = {2022},
+@inproceedings{10.1145/3584954.3584997,
+    author = {Pedersen, Jens Egholm and Conradt, Jorg},
+    title = {AEStream: Accelerated event-based processing with coroutines},
+    year = {2023},
+    isbn = {9781450399470},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/3584954.3584997},
+    doi = {10.1145/3584954.3584997},
+    booktitle = {Proceedings of the 2023 Annual Neuro-Inspired Computational Elements Conference},
+    pages = {86–91},
+    numpages = {6},
+    keywords = {coroutines, event-based vision, graphical processing unit, neuromorphic computing},
+    location = {San Antonio, TX, USA, },
+    series = {NICE '23}
 }
+
 
 ```
