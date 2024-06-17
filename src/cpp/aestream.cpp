@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
       client.stream(input_generator, include_timestamp);
     } else if (app_output_file->parsed()) {
       std::cout << "Sending events to file " << output_filename << std::endl;
-      if (output_filename.ends_with(".csv")) {
+      if (output_filename.ends_with(".csv") || output_filename.ends_with(".txt")) {
         dvs_to_file_csv(input_generator, output_filename);
       } else if (output_filename.ends_with(".aedat4")) {
         dvs_to_file_aedat(input_generator, output_filename);

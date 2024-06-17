@@ -128,7 +128,7 @@
       rec {
         devShells = flake-utils.lib.flattenTree {
           default = aestream.overrideAttrs (parent: {
-            buildInputs = parent.buildInputs ++ [ pkgs.clang-tools pkgs.gdb pkgs.gtest ];
+            buildInputs = parent.buildInputs ++ [ pkgs.clang-tools ];
           });
           test = aestream-test;
           python = aestream-python;
