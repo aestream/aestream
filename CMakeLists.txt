@@ -13,7 +13,13 @@ option(USE_CUDA "Build CUDA tensor export, if the library is found" ON)
 
 # iNiVation camera support (And other?)
 find_package(libcaer CONFIG QUIET)
-option(USE_CAMERA "Build with camera drivers?" ${libcaer_FOUND})
+find_package(MetavisionSDK COMPONENTS core driver QUIET)
+if (${libcaer_FOUND} OR ${MetavisionSDK_FOUND})
+    set(USE_CAMERA_DEFAULT ON)
+else()
+    set(USE_CAMERA_DEFAULT OFF)
+endif()
+option(USE_CAMERA "Build with camera drivers?" ${USE_CAMERA_DEFAULT})
 
 # Compile flags
 set(default_build_type Release)
