@@ -19,10 +19,10 @@ struct CSV : FileBase {
     while (std::getline(file_stream, line) &&
            (n_events < 0 || sum < n_events)) {
       std::regex_match(line, event_match, csv_regex);
-      uint64_t timestamp = static_cast<uint64_t>(std::stol(event_match[0]));
-      uint16_t x = static_cast<uint16_t>(std::stol(event_match[1]));
-      uint16_t y = static_cast<uint16_t>(std::stol(event_match[2]));
-      co_yield AER::Event{timestamp, x, y, std::stoi(event_match[3]) > 0};
+      uint64_t timestamp = static_cast<uint64_t>(std::stol(event_match[1]));
+      uint16_t x = static_cast<uint16_t>(std::stol(event_match[2]));
+      uint16_t y = static_cast<uint16_t>(std::stol(event_match[3]));
+      co_yield AER::Event{timestamp, x, y, std::stoi(event_match[4]) > 0};
       sum++;
     }
     co_return;
