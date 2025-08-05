@@ -14,6 +14,7 @@
         <img src="https://img.shields.io/discord/723215296399147089"
             alt="chat on Discord"></a>
     <a href="https://doi.org/10.1145/3584954.3584997"><img src="https://zenodo.org/badge/DOI/10.1145/3584954.3584997.svg" alt="DOI"></a>
+    <a href="https://open-neuromorphic.org/neuromorphic-computing/"><img src="https://img.shields.io/badge/Collaboration_Network-Open_Neuromorphic-blue"></a>
 </p>
 
 AEStream sends event-based data from A to B.
